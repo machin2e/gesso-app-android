@@ -14,10 +14,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -29,6 +30,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.ImageBuilder.Circle;
@@ -68,6 +70,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public PlatformRenderSurface(Context context) {
         super(context);
         setFocusable(true);
+
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        setLayoutParams(layoutParams);
 
         palette.canvas = canvas;
         palette.paint = paint;
@@ -384,7 +389,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
-        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Application.getApplication_().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
@@ -739,7 +744,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         palette.paint.setTextSize((float) size);
 
         // Font
-//        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), text.font);
+//        Typeface typeface = Typeface.createFromAsset(Application.getApplication_().getAssets(), text.font);
 //        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 //        paint.setTypeface(boldTypeface);
 

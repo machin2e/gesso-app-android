@@ -292,8 +292,8 @@ public class World {
     public void createExtensionProfile(final Entity extension) {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
-            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Configuration)
-            Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
+            // TODO: Only call openCreateExtensionView if the extensionEntity is a draft (i.e., does not have an associated Configuration)
+            Application.getApplication_().getPlatformUi().openCreateExtensionView(new NativeUi.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
@@ -307,7 +307,7 @@ public class World {
 //                    configureExtensionFromProfile(extension, configuration);
 
                     // Cache the new ExtensionEntity Configuration
-                    Application.getView().getClay().getConfigurations().add(configuration);
+                    Application.getApplication_().getClay().getConfigurations().add(configuration);
 
                     // TODO: Persist the configuration in the user's private store (either local or online)
 
@@ -315,7 +315,7 @@ public class World {
                 }
             });
         } else {
-            Application.getView().getNativeUi().promptAcknowledgment(new NativeUi.OnActionListener() {
+            Application.getApplication_().getPlatformUi().promptAcknowledgment(new NativeUi.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 

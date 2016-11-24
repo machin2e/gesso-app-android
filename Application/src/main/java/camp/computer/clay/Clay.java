@@ -76,7 +76,7 @@ public class Clay {
         // Create Camera
         world.createEntity(Camera.class);
 
-        Application.getView().getPlatformRenderSurface().setWorld(world);
+        Application.getApplication_().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
         int minHostCount = 5;

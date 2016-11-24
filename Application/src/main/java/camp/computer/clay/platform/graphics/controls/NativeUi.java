@@ -3,7 +3,6 @@ package camp.computer.clay.platform.graphics.controls;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,7 +13,6 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -78,7 +76,7 @@ public class NativeUi {
     }
 
     public void promptAcknowledgment(final OnActionListener onActionListener) {
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 new AlertDialog.Builder(context)
@@ -103,38 +101,42 @@ public class NativeUi {
         });
     }
 
-    public void promptInputText(final OnActionListener onActionListener) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Create ExtensionEntity");
+    public void openCreateExtensionView(final OnActionListener onActionListener) {
 
-        // Set up the input
-        final EditText input = new EditText(context);
-
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        // Add input to view
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onActionListener.onComplete(input.getText().toString());
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // TODO: Callback with "Cancel" action
-                dialog.cancel();
-            }
-        });
-
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                Log.v("IASM", "Input Text");
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(Application.getApplication_().getApplication());
+                builder.setTitle("Create ExtensionEntity");
+
+                // Set up the input
+                final EditText input = new EditText(context);
+
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+                // Add input to view
+                builder.setView(input);
+
+//                // Set up the buttons
+//                builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        onActionListener.onComplete(input.getText().toString());
+//                    }
+//                });
+//
+//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // TODO: Callback with "Cancel" action
+//                        dialog.cancel();
+//                    }
+//                });
+
                 builder.show();
             }
         });
@@ -190,7 +192,7 @@ public class NativeUi {
                 });
         */
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -391,42 +393,6 @@ public class NativeUi {
         dialog.show();
     }
 
-    public int dpToPx(float dp) {
-
-        Resources r = context.getResources();
-        int px = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dp,
-                r.getDisplayMetrics()
-        );
-
-        return px;
-    }
-
-    public int mmToPx(float mm) {
-
-        Resources r = context.getResources();
-        int px = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_MM,
-                mm,
-                r.getDisplayMetrics()
-        );
-
-        return px;
-    }
-
-    public int inToPx(float in) {
-
-        Resources r = context.getResources();
-        int px = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_IN,
-                in,
-                r.getDisplayMetrics()
-        );
-
-        return px;
-    }
-
     public void openActionEditor(Entity extension) {
 
         process.clear();
@@ -453,7 +419,7 @@ public class NativeUi {
         }
 
         final String finalPortTypesString = portTypesString;
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -477,7 +443,7 @@ public class NativeUi {
                 // Title: "Actions"
                 TextView textView = new TextView(context);
                 textView.setText("Extension Controller");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(20);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -494,7 +460,7 @@ public class NativeUi {
                 // Default Action Controller based on Port Configuration
                 /*
                 EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
-                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
+                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finadlPortTypesString);
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
                 */
 
@@ -547,14 +513,14 @@ public class NativeUi {
                     // PWM/Pulse: period, duty cycle [analog sliders in bounded range] (alt: sine wave parameters)
                     // ADC/Wave: ADC value [analog slider in ADC range] (alt: amplitude)
 
-                    button6.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                    button6.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                     button6.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i)))));
 
                     LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                     );
-                    params4.setMargins(0, dpToPx(5), 0, 0);
+                    params4.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
                     button6.setLayoutParams(params4);
 
                     portableLayout.addView(button6);
@@ -570,19 +536,19 @@ public class NativeUi {
                 /*
                 EditText searchBox = new EditText(context);
                 searchBox.setHint("Search for Action");
-                searchBox.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                searchBox.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 searchBox.setBackgroundColor(Color.parseColor("#44000000"));
 
                 LinearLayout.LayoutParams params8 = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
-                params8.setMargins(0, dpToPx(5), 0, 0);
+                params8.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
                 searchBox.setLayoutParams(params8);
 
                 Button cancelSearchButton = new Button(context);
                 cancelSearchButton.setText("X");
-                cancelSearchButton.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                cancelSearchButton.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 cancelSearchButton.setBackgroundColor(Color.parseColor("#44000000"));
 
                 searchLayout.addView(searchBox);
@@ -618,14 +584,14 @@ public class NativeUi {
                 // Button: "Add Action"
                 Button button2 = new Button(context);
                 button2.setText("Add Action");
-                button2.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                button2.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 button2.setBackgroundColor(Color.parseColor("#44000000"));
 
                 LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
-                params3.setMargins(0, dpToPx(5), 0, 0);
+                params3.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
                 button2.setLayoutParams(params3);
                 linearLayout.addView(button2);
 
@@ -667,7 +633,7 @@ public class NativeUi {
                 // Button: Test Script
                 Button button3 = new Button(context);
                 button3.setText("Test");
-                button3.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                button3.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 button3.setBackgroundColor(Color.parseColor("#44000000"));
 
                 button3.setOnTouchListener(new View.OnTouchListener() {
@@ -713,12 +679,12 @@ public class NativeUi {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
-                params4.setMargins(0, dpToPx(5), 0, 0);
+                params4.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
                 button3.setLayoutParams(params4);
                 linearLayout.addView(button3);
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -734,7 +700,7 @@ public class NativeUi {
 
     public View createListView(final List listData, final LabelMapper labelMapper, final SelectEventHandler selectEventHandler) {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -761,7 +727,7 @@ public class NativeUi {
                 // Title: "Choose"
                 TextView textView = new TextView(context);
                 textView.setText("Choose");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(20);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -785,7 +751,7 @@ public class NativeUi {
                         selectEventHandler.execute(listData.get(i));
 
                         // <REMOVE_VIEW>
-                        View containerView = Application.getView().findViewById(listViewId);
+                        View containerView = Application.getApplication_().findViewById(listViewId);
                         ((ViewManager) containerView.getParent()).removeView(containerView);
                         // </REMOVE_VIEW>
                     }
@@ -796,7 +762,7 @@ public class NativeUi {
                 linearLayout.addView(ll);
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(containerLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1054,7 +1020,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        digitalLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        digitalLayoutParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         digitalPortLayout.setLayoutParams(digitalLayoutParams);
 
         digitalPortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
@@ -1067,14 +1033,14 @@ public class NativeUi {
         final EditText digitalValue = new EditText(context);
         digitalValue.setTextSize(11.0f);
         digitalValue.setHint("[on|off]");
-        digitalValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        digitalValue.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         digitalValue.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(0, dpToPx(5), 0, 0);
+        params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         digitalValue.setLayoutParams(params);
         digitalPortLayout.addView(digitalValue);
 
@@ -1088,13 +1054,13 @@ public class NativeUi {
         String labelButtonText = "Switch";
 
         // <PARAMETERS>
-        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
-        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
         // ...
-        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -1129,7 +1095,7 @@ public class NativeUi {
         labelButton.setId(labelButtonId);
         labelButton.setText(labelButtonText); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
         labelButton.setTextColor(Color.parseColor("#88ffffff"));
-        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
@@ -1168,8 +1134,8 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("On"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
@@ -1198,8 +1164,8 @@ public class NativeUi {
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
                     // Single-Selector Handler Strategy
-                    View onView = Application.getView().findViewById(taskButton1Id);
-                    View offView = Application.getView().findViewById(taskButton2Id);
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
 
                     // TODO: Update state!
 
@@ -1223,7 +1189,7 @@ public class NativeUi {
         Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
         taskButton2.setText("Off"); // i.e., [Project][Internet][Generator]
-        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton2.setMinWidth(0);
 //        taskButton2.setMaxWidth(10);
@@ -1253,8 +1219,8 @@ public class NativeUi {
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
                     // Single-Selector Handler Strategy
-                    View onView = Application.getView().findViewById(taskButton1Id);
-                    View offView = Application.getView().findViewById(taskButton2Id);
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
 
                     // TODO: Update state!
 
@@ -1276,7 +1242,7 @@ public class NativeUi {
         Button taskButton3 = new Button(context);
         taskButton3.setId(taskButton3Id);
         taskButton3.setText("In"); // i.e., [Project][Internet][Generator]
-        taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton3.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 
         RelativeLayout.LayoutParams taskButton3Params = new RelativeLayout.LayoutParams(
@@ -1325,7 +1291,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        pulseLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        pulseLayoutParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         pulsePortLayout.setLayoutParams(pulseLayoutParams);
 
         pulsePortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.PULSE)));
@@ -1338,14 +1304,14 @@ public class NativeUi {
         final EditText pulseDutyCycleValue = new EditText(context);
         pulseDutyCycleValue.setTextSize(11.0f);
         pulseDutyCycleValue.setHint("on time (duty cycle)");
-        pulseDutyCycleValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        pulseDutyCycleValue.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         pulseDutyCycleValue.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams pulseParams1 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        pulseParams1.setMargins(0, dpToPx(5), 0, 0);
+        pulseParams1.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         pulseDutyCycleValue.setLayoutParams(pulseParams1);
         pulsePortLayout.addView(pulseDutyCycleValue);
 
@@ -1353,14 +1319,14 @@ public class NativeUi {
         final EditText pulsePeriodValue = new EditText(context);
         pulsePeriodValue.setTextSize(11.0f);
         pulsePeriodValue.setHint("interval (period)");
-        pulsePeriodValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        pulsePeriodValue.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         pulsePeriodValue.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams pulseParams2 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        pulseParams2.setMargins(0, dpToPx(5), 0, 0);
+        pulseParams2.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         pulsePeriodValue.setLayoutParams(pulseParams2);
         pulsePortLayout.addView(pulsePeriodValue);
 
@@ -1376,7 +1342,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        waveLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        waveLayoutParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         wavePortLayout.setLayoutParams(waveLayoutParams);
 
         wavePortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.WAVE)));
@@ -1389,14 +1355,14 @@ public class NativeUi {
         final EditText waveValue = new EditText(context);
         waveValue.setTextSize(11.0f);
         waveValue.setHint("amplitude (voltage/ADC)");
-        waveValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        waveValue.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         waveValue.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params2.setMargins(0, dpToPx(5), 0, 0);
+        params2.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         waveValue.setLayoutParams(params2);
         wavePortLayout.addView(waveValue);
 
@@ -1407,8 +1373,8 @@ public class NativeUi {
 
 //        final TextView actionView = new TextView(context);
 //        actionView.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
-//        int horizontalPadding = (int) Application.getView().convertDipToPx(20);
-//        int verticalPadding = (int) Application.getView().convertDipToPx(10);
+//        int horizontalPadding = (int) Application.getApplication_().convertDipToPx(20);
+//        int verticalPadding = (int) Application.getApplication_().convertDipToPx(10);
 //        actionView.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
 //        actionView.setBackgroundColor(Color.parseColor("#44000000"));
 
@@ -1416,14 +1382,14 @@ public class NativeUi {
         final EditText actionView = new EditText(context);
         actionView.setTextSize(11.0f);
         actionView.setHint("TODO: <describe to search scripts>");
-        actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        actionView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         actionView.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(0, dpToPx(5), 0, 0);
+        params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         actionView.setLayoutParams(params);
 
         // final LinearLayout actionList = (LinearLayout) view;
@@ -1501,7 +1467,7 @@ public class NativeUi {
 
     public View createScriptEditorView_v2(final Script script) {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -1533,8 +1499,8 @@ public class NativeUi {
                 Button taskButton1 = new Button(context);
                 //taskButton1.setId(taskButton1Id);
                 taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-                //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+                //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+                taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
                 taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
                 taskButton1.setMinWidth(0);
@@ -1563,10 +1529,10 @@ public class NativeUi {
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
                             // TODO: Save the script revision!
-                            EditText scriptEditorView = (EditText) Application.getView().findViewById(editorViewId);
+                            EditText scriptEditorView = (EditText) Application.getApplication_().findViewById(editorViewId);
                             script.setCode(scriptEditorView.getText().toString());
 
-                            View containerView = Application.getView().findViewById(containerViewId);
+                            View containerView = Application.getApplication_().findViewById(containerViewId);
                             ((ViewManager) containerView.getParent()).removeView(containerView);
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -1581,14 +1547,14 @@ public class NativeUi {
                 // Title: "Actions"
                 TextView textView = new TextView(context);
                 textView.setText("Script Editor");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(20);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(textView);
 
                 // EditText: Script Editor
-                Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), RenderSystem.NOTIFICATION_FONT);
+                Typeface typeface = Typeface.createFromAsset(Application.getApplication_().getAssets(), RenderSystem.NOTIFICATION_FONT);
                 // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 
                 EditText scriptEditorView = new EditText(context);
@@ -1611,7 +1577,7 @@ public class NativeUi {
                     formattedScriptText = script.getCode();
                 }
                 scriptEditorView.setText(Html.fromHtml(formattedScriptText));
-                scriptEditorView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                scriptEditorView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 scriptEditorView.setBackgroundColor(Color.parseColor("#44000000"));
                 scriptEditorView.setGravity(Gravity.TOP | Gravity.LEFT);
 
@@ -1625,7 +1591,7 @@ public class NativeUi {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT
                 );
-                params.setMargins(0, dpToPx(5), 0, 0);
+                params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
                 scriptEditorView.setLayoutParams(params);
 
                 linearLayout.addView(scriptEditorView);
@@ -1672,7 +1638,7 @@ public class NativeUi {
                 */
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(containerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1682,7 +1648,7 @@ public class NativeUi {
 
     public void openSettings() {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -1706,7 +1672,7 @@ public class NativeUi {
                 // Title: "Settings"
                 TextView textView = new TextView(context);
                 textView.setText("Settings");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(20);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1729,7 +1695,7 @@ public class NativeUi {
                 // Title: "Settings"
                 TextView debugSubtitle = new TextView(context);
                 debugSubtitle.setText("Debug Section Subtitle!");
-                debugSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                debugSubtitle.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 debugSubtitle.setTextSize(12);
                 debugSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1741,7 +1707,7 @@ public class NativeUi {
                 linearLayout.addView(createButtonView("debug: sleep time"));
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1749,7 +1715,7 @@ public class NativeUi {
 
     public void openMainMenu() {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -1773,7 +1739,7 @@ public class NativeUi {
                 // Title: "Main Menu"
                 TextView textView = new TextView(context);
                 textView.setText("Main Menu");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(15);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1792,7 +1758,7 @@ public class NativeUi {
                 // Title: "Player"
                 TextView debugSubtitle = new TextView(context);
                 debugSubtitle.setText("Player");
-                debugSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                debugSubtitle.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 debugSubtitle.setTextSize(15);
                 debugSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1807,7 +1773,7 @@ public class NativeUi {
                 // Title: "Store"
                 TextView storeSubtitle = new TextView(context);
                 storeSubtitle.setText("Store");
-                storeSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                storeSubtitle.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 storeSubtitle.setTextSize(15);
                 storeSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 storeSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1819,7 +1785,7 @@ public class NativeUi {
                 linearLayout.addView(createButtonView("Accessories"));
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1828,7 +1794,7 @@ public class NativeUi {
 
     public void generateView(final String title) {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -1852,7 +1818,7 @@ public class NativeUi {
                 // Title: "Main Menu"
                 TextView textView = new TextView(context);
                 textView.setText(title);
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 textView.setTextSize(15);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1872,7 +1838,7 @@ public class NativeUi {
                 // Title: "Player"
                 TextView debugSubtitle = new TextView(context);
                 debugSubtitle.setText("Player");
-                debugSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                debugSubtitle.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 debugSubtitle.setTextSize(15);
                 debugSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1887,7 +1853,7 @@ public class NativeUi {
                 // Title: "Store"
                 TextView storeSubtitle = new TextView(context);
                 storeSubtitle.setText("Store");
-                storeSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                storeSubtitle.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
                 storeSubtitle.setTextSize(15);
                 storeSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 storeSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1900,7 +1866,7 @@ public class NativeUi {
                 */
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1910,7 +1876,7 @@ public class NativeUi {
 
     public void openImageEditor(Entity extension) {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -1935,7 +1901,7 @@ public class NativeUi {
 
                 // Add to main view
                 // TODO: Create in separate fragment!
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1957,7 +1923,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
         );
-        params6.setMargins(0, dpToPx(5), 0, 0);
+        params6.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         imageView.setLayoutParams(params6);
 
         // ViewTreeObserver
@@ -1966,7 +1932,7 @@ public class NativeUi {
             public boolean onPreDraw() {
 
                 // Remove callback to onPreDraw
-                final ImageView imageView = (ImageView) Application.getView().findViewById(imageViewId);
+                final ImageView imageView = (ImageView) Application.getApplication_().findViewById(imageViewId);
                 imageView.getViewTreeObserver().removeOnPreDrawListener(this);
 
                 // Get dimension of ImageView
@@ -1999,7 +1965,7 @@ public class NativeUi {
 
                             // <HACK>
                             if (motionEvent.getX() < 50 && motionEvent.getY() < 50) {
-                                View containerView = Application.getView().findViewById(imageEditorId);
+                                View containerView = Application.getApplication_().findViewById(imageEditorId);
                                 ((ViewManager) containerView.getParent()).removeView(containerView);
                             }
                             // </HACK>
@@ -2042,7 +2008,7 @@ public class NativeUi {
 
                 imageView.invalidate();
 
-                // View view = Application.getView().findViewById(R.id.application_view);
+                // View view = Application.getApplication_().findViewById(R.id.application_view);
                 // view.invalidate();
 
                 return true;
@@ -2082,7 +2048,7 @@ public class NativeUi {
         final TextView textView = new TextView(context);
         textView.setTextSize(10.0f);
         textView.setText(text);
-        textView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         textView.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams params = null;
@@ -2106,7 +2072,7 @@ public class NativeUi {
                     LinearLayout.LayoutParams.MATCH_PARENT
             );
         }
-        params.setMargins(0, dpToPx(5), 0, 0);
+        params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         textView.setLayoutParams(params);
 
         return textView;
@@ -2122,13 +2088,13 @@ public class NativeUi {
             editText.setText(text);
         }
 
-        editText.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        editText.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        layoutParams.setMargins(0, dpToPx(5), 0, 0);
+        layoutParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         editText.setLayoutParams(layoutParams);
 
         return editText;
@@ -2141,12 +2107,12 @@ public class NativeUi {
         int textSize = 10;
         String textColor = "#ffffffff";
         String backgroundColor = "#44000000";
-        int paddingLeft = dpToPx(20);
-        int paddingTop = dpToPx(12);
-        int paddingRight = dpToPx(20);
-        int paddingBottom = dpToPx(12);
+        int paddingLeft = ViewGroupHelper.dpToPx(20);
+        int paddingTop = ViewGroupHelper.dpToPx(12);
+        int paddingRight = ViewGroupHelper.dpToPx(20);
+        int paddingBottom = ViewGroupHelper.dpToPx(12);
         int marginLeft = 0;
-        int marginTop = dpToPx(5);
+        int marginTop = ViewGroupHelper.dpToPx(5);
         int marginRight = 0;
         int marginBottom = 0;
         // </PARAMETERS>
@@ -2203,8 +2169,8 @@ public class NativeUi {
 
     private View createCloseButtonView(String text, final SelectEventHandler selectEventHandler) {
 
-        int TOP_MARGIN = dpToPx(5);
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int TOP_MARGIN = ViewGroupHelper.dpToPx(5);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -2229,7 +2195,7 @@ public class NativeUi {
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
         labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-        labelButton.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor("#44000044"));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 //        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
@@ -2238,7 +2204,7 @@ public class NativeUi {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
-        labelButtonParams.setMargins(0, dpToPx(5), 0, 0);
+        labelButtonParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //        params6.weight = 1;
 //        params6.gravity = Gravity.LEFT;
         labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
@@ -2272,8 +2238,8 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
@@ -2284,7 +2250,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        taskButton1Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton1Params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 //        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
         taskButton1Params.width = TASK_BUTTON_WIDTH;
@@ -2295,7 +2261,7 @@ public class NativeUi {
         Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
         taskButton2.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        taskButton2.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton2.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
 //        taskButton2.setMinWidth(0);
 //        taskButton2.setMaxWidth(10);
@@ -2306,7 +2272,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        taskButton2Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton2Params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         taskButton2Params.width = TASK_BUTTON_WIDTH;
         taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
@@ -2320,13 +2286,13 @@ public class NativeUi {
     private View createDataImportView(String text) {
 
         // <PARAMETERS>
-        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
-        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
         // ...
-        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -2358,7 +2324,7 @@ public class NativeUi {
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
         labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
@@ -2397,8 +2363,8 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
@@ -2429,7 +2395,7 @@ public class NativeUi {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    //View containerView = Application.getApplication_().findViewById(imageEditorId);
                     ((ViewManager) containerView.getParent()).removeView(containerView);
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -2453,13 +2419,13 @@ public class NativeUi {
     private View createNewActionView_v4(String text) {
 
         // <PARAMETERS>
-        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
-        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
         // ...
-        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -2489,7 +2455,7 @@ public class NativeUi {
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
         labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 //        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
@@ -2549,7 +2515,7 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         taskButton1.setMinWidth(0);
         taskButton1.setMinHeight(0);
@@ -2578,7 +2544,7 @@ public class NativeUi {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    //View containerView = Application.getApplication_().findViewById(imageEditorId);
                     ((ViewManager) containerView.getParent()).removeView(containerView);
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -2597,7 +2563,7 @@ public class NativeUi {
 
 
 //        // <MOVE_TO_PLATFORM_LAYER>
-//        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), "MaterialIcons-Regular.ttf");
+//        Typeface typeface = Typeface.createFromAsset(Application.getApplication_().getAssets(), "MaterialIcons-Regular.ttf");
 //        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 ////        paint.setTypeface(boldTypeface);
 //        // </MOVE_TO_PLATFORM_LAYER>
@@ -2609,7 +2575,7 @@ public class NativeUi {
 //        taskButton2.setTypeface(typeface);
         taskButton2.setText("\uD83D\uDD0D"); // i.e., [Project][Internet][Generator]
 
-        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 
         RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
@@ -2680,13 +2646,13 @@ public class NativeUi {
 
     private View createNewActionView_v5(final Action action) {
 
-        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
-        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
         // ...
-        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -2718,7 +2684,7 @@ public class NativeUi {
         labelButton.setId(labelButtonId);
         labelButton.setText(action.getTitle() + " (" + action.getScript().getCode().length() + " lines)"); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
         labelButton.setTextSize(BUTTON_TEXT_SIZE);
-        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 //        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
@@ -2782,8 +2748,8 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
@@ -2814,7 +2780,7 @@ public class NativeUi {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    //View containerView = Application.getApplication_().findViewById(imageEditorId);
                     ((ViewManager) containerView.getParent()).removeView(containerView);
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -2835,7 +2801,7 @@ public class NativeUi {
         final Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
         taskButton2.setText("\uD83D\uDD0D"); // i.e., [Project][Internet][Generator]
-        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
 //        taskButton2.setMinWidth(0);
 //        taskButton2.setMaxWidth(10);
@@ -2917,8 +2883,8 @@ public class NativeUi {
 
     private View TEST_createCloseButtonView(String text) {
 
-        int TOP_MARGIN = dpToPx(5);
-        int BUTTON_PADDING_LEFT = dpToPx(20);
+        int TOP_MARGIN = ViewGroupHelper.dpToPx(5);
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
@@ -2943,7 +2909,7 @@ public class NativeUi {
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
         labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-        labelButton.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor("#44000044"));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 //        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
@@ -2952,7 +2918,7 @@ public class NativeUi {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
-        labelButtonParams.setMargins(0, dpToPx(5), 0, 0);
+        labelButtonParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //        params6.weight = 1;
 //        params6.gravity = Gravity.LEFT;
         labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
@@ -2966,8 +2932,8 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
@@ -2980,7 +2946,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        taskButton1Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton1Params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 //        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
         taskButton1Params.width = TASK_BUTTON_WIDTH;
@@ -2991,7 +2957,7 @@ public class NativeUi {
         Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
         taskButton2.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        taskButton2.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton2.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
 //        taskButton2.setMinWidth(0);
 //        taskButton2.setMaxWidth(10);
@@ -3002,7 +2968,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        taskButton2Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton2Params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         taskButton2Params.width = TASK_BUTTON_WIDTH;
         taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
@@ -3023,14 +2989,14 @@ public class NativeUi {
 //                LinearLayout.LayoutParams.WRAP_CONTENT
 //        );
 //        params7.gravity = Gravity.CENTER;
-//        params7.setMargins(0, dpToPx(5), 0, 0);
+//        params7.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //
 //        containerLayout.setLayoutParams(params7);
 //
 //        // Button: "Import Data Source"
 //        Button button8 = new Button(context);
 //        button8.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-//        button8.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+//        button8.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
 //        button8.setBackgroundColor(Color.parseColor("#44000000"));
 //        button8.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
 //
@@ -3038,7 +3004,7 @@ public class NativeUi {
 //                LinearLayout.LayoutParams.MATCH_PARENT,
 //                LinearLayout.LayoutParams.WRAP_CONTENT
 //        );
-//        params6.setMargins(0, dpToPx(5), 0, 0);
+//        params6.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //        params6.weight = 1;
 //        params6.gravity = Gravity.LEFT;
 //        button8.setLayoutParams(params6);
@@ -3046,8 +3012,8 @@ public class NativeUi {
 //
 //        Button button9 = new Button(context);
 //        button9.setText("\u2716"); // i.e., [Project][Internet][Generator]
-//        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-//        button9.setPadding(0, dpToPx(12), 0, dpToPx(12));
+//        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+//        button9.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
 //        button9.setBackgroundColor(Color.parseColor("#44003300"));
 //        button9.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 //        button9.setMinWidth(0);
@@ -3057,7 +3023,7 @@ public class NativeUi {
 //                LinearLayout.LayoutParams.WRAP_CONTENT,
 //                LinearLayout.LayoutParams.WRAP_CONTENT
 //        );
-//        params9.setMargins(0, dpToPx(5), 0, 0);
+//        params9.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 ////                params6.weight = 0;
 //        params9.weight = 0;
 //        params9.gravity = Gravity.RIGHT;
@@ -3066,7 +3032,7 @@ public class NativeUi {
 //
 //        Button button10 = new Button(context);
 //        button10.setText("\u2716"); // i.e., [Project][Internet][Generator]
-//        button10.setPadding(0, dpToPx(12), 0, dpToPx(12));
+//        button10.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
 //        button10.setBackgroundColor(Color.parseColor("#44330000"));
 ////        button10.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 ////        button10.setWidth(50);
@@ -3079,7 +3045,7 @@ public class NativeUi {
 //                LinearLayout.LayoutParams.WRAP_CONTENT,
 //                LinearLayout.LayoutParams.WRAP_CONTENT
 //        );
-//        params10.setMargins(0, dpToPx(5), 0, 0);
+//        params10.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 ////                params6.weight = 0;
 //        params10.weight = 0;
 //        params10.gravity = Gravity.RIGHT;
@@ -3098,14 +3064,14 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params7.setMargins(0, dpToPx(5), 0, 0);
+        params7.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 
         containerLayout.setLayoutParams(params7);
 
         // Button: "Import Data Source"
         Button button8 = new Button(context);
         button8.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-        button8.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        button8.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         button8.setBackgroundColor(Color.parseColor("#44000000"));
         button8.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
 
@@ -3113,14 +3079,14 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params6.setMargins(0, dpToPx(5), 0, 0);
+        params6.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
         params6.weight = 1;
         button8.setLayoutParams(params6);
         containerLayout.addView(button8);
 
         Button button9 = new Button(context);
         button9.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         button9.setBackgroundColor(Color.parseColor("#44000000"));
         button9.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         button9.setWidth(50);
@@ -3129,7 +3095,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params9.setMargins(0, dpToPx(5), 0, 0);
+        params9.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
 //                params6.weight = 0;
         button9.setLayoutParams(params9);
         containerLayout.addView(button9);
@@ -3148,7 +3114,7 @@ public class NativeUi {
 
         // Spinner: Action Browser
         final Spinner spinner = new Spinner(context);
-        spinner.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        spinner.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         spinner.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -3241,14 +3207,192 @@ public class NativeUi {
 
     public void showView(final View view) {
 
-        Application.getView().runOnUiThread(new Runnable() {
+        Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
                 frameLayout.addView(view, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
     }
     // </BASIC_UI>
 }
+
+//----------------- REBUILD THESE!
+
+//----------------------------------------------------------------------------------------------
+
+//    // References:
+//    // - http://stackoverflow.com/questions/4165414/how-to-hide-soft-keyboard-on-android-after-clicking-outside-edittext
+//    boolean isTitleEditorInitialized = false;
+//
+//    public void openTitleEditor(String title) {
+//        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
+//
+//        // Initialize Text
+//        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+//        titleText.setText(title);
+//
+//        // Configure Text Editor
+//        if (isTitleEditorInitialized == false) {
+//
+//            /*
+//            // Set the font face
+//            Typeface type = Typeface.createFromAsset(getAssets(), "fonts/Dosis-Light.ttf");
+//            titleText.setTypeface(type);
+//            */
+//
+//            // Configure to hide keyboard when a touch occurs anywhere except the text
+//            titleText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                @Override
+//                public void onFocusChange(View v, boolean hasFocus) {
+//                    if (!hasFocus) {
+//                        hideKeyboard(v);
+//                    }
+//                }
+//            });
+//
+//            // Configure touch interaction
+//            titleText.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (v.getId() == titleText.getId()) {
+//
+//                        // Move the cursor to the end of the line
+//                        titleText.setSelection(titleText.getText().length());
+//
+//                        // Show the cursor
+//                        titleText.setCursorVisible(true);
+//                    }
+//                }
+//            });
+//
+//            isTitleEditorInitialized = true;
+//        }
+//
+//        titleText.setCursorVisible(false);
+//
+//        titleEditor.setVisibility(View.VISIBLE);
+//
+//        /*
+//        // Now Set your animation
+//        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
+//        titleText.startAnimation(fadeInAnimation);
+//
+//        // Callback to hide editor
+//        startTitleEditorService();
+//        */
+//    }
+
+//    public void setTitleEditor(String title) {
+//        // Update the Text
+//        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+//        titleText.setText(title);
+//
+//        /*
+//        // Callback to hide editor
+//        startTitleEditorService();
+//        */
+//    }
+
+//    public void closeTitleEditor() {
+//        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
+//
+//        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+//
+//        titleEditor.setVisibility(View.INVISIBLE);
+//
+//        /*
+//        // Now Set your animation
+//        Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
+//
+//        fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+//            @Override
+//            public void onAnimationStart(Animation animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animation animation) {
+//                titleEditor.setImageVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animation animation) {
+//
+//            }
+//        });
+//
+//        titleText.startAnimation(fadeOutAnimation);
+//        */
+//    }
+
+//    private Handler titleEditorServiceHandler = new Handler();
+//    private Runnable titleEditorServiceRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            // Do what you need to do.
+//            // e.g., foobar();
+//            closeTitleEditor();
+//
+////            // Uncomment this for periodic callback
+////            if (enableFullscreenService) {
+////                fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
+////            }
+//        }
+//    };
+//
+//    private void startTitleEditorService() {
+//        titleEditorServiceHandler.postDelayed(titleEditorServiceRunnable, 5000);
+//    }
+//
+//    public void hideKeyboard(View view) {
+//        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//    }
+
+
+/*
+private void addPathExtensionAction() {
+
+    final TextView actionConstruct = new TextView(getContext());
+    actionConstruct.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
+    int horizontalPadding = (int) ViewGroupHelper.dpToPx(20);
+    int verticalPadding = (int) ViewGroupHelper.dpToPx(10);
+    actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+    actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
+
+    final LinearLayout pathPatchActionList = (LinearLayout) findViewById(R.id.path_editor_action_list);
+
+    actionConstruct.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent motionEvent) {
+
+            int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+            if (touchActionType == MotionEvent.ACTION_DOWN) {
+                // TODO:
+            } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                // TODO:
+            } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                // TODO:
+            } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                pathPatchActionList.removeView(actionConstruct);
+
+            } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                // TODO:
+            } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                // TODO:
+            } else {
+                // TODO:
+            }
+
+            return true;
+        }
+    });
+
+    pathPatchActionList.addView(actionConstruct);
+}
+*/

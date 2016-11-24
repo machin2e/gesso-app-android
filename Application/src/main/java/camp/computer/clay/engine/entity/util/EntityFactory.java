@@ -145,7 +145,7 @@ public class EntityFactory {
                 }
 
                 // Show prototype Extension if any are saved and available in the repository
-                if (Application.getView().getClay().getConfigurations().size() > 0) {
+                if (Application.getApplication_().getClay().getConfigurations().size() > 0) {
 
                     Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
@@ -225,7 +225,7 @@ public class EntityFactory {
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
                     // Get cached extension configurations (and retrieve additional from Internet store)
-                    List<Configuration> configurations = Application.getView().getClay().getConfigurations();
+                    List<Configuration> configurations = Application.getApplication_().getClay().getConfigurations();
 
                     if (configurations.size() == 0) {
 
@@ -235,7 +235,7 @@ public class EntityFactory {
 
                         // NativeUi Player to select an ExtensionEntity from the Store
                         // i.e., NativeUi to select extension to use! Then use that profile to create and configure ports for the extension.
-                        Application.getView().getNativeUi().openInteractiveAssembler(configurations, new NativeUi.OnActionListener<Configuration>() {
+                        Application.getApplication_().getPlatformUi().openInteractiveAssembler(configurations, new NativeUi.OnActionListener<Configuration>() {
                             @Override
                             public void onComplete(Configuration configuration) {
 
@@ -425,9 +425,9 @@ public class EntityFactory {
                     // </HACK>
 
                     if (openImageEditor) {
-                        Application.getView().getNativeUi().openImageEditor(extension);
+                        Application.getApplication_().getPlatformUi().openImageEditor(extension);
                     } else {
-                        Application.getView().getNativeUi().openActionEditor(extension);
+                        Application.getApplication_().getPlatformUi().openActionEditor(extension);
                     }
                 }
 
