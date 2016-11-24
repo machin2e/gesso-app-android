@@ -3,8 +3,8 @@ package camp.computer.clay.engine.system;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.Event;
-import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;

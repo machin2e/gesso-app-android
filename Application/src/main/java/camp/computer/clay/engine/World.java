@@ -27,6 +27,7 @@ import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.EventHandler;
 import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.RenderSystem;

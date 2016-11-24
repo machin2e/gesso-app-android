@@ -48,12 +48,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.model.Action;
 import camp.computer.clay.model.Process;
@@ -62,15 +62,14 @@ import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.R;
 import camp.computer.clay.platform.util.ViewGroupHelper;
+import camp.computer.clay.util.Random;
 
 public class NativeUi {
 
-    private Application application = null;
     private Context context = null;
 
-    public NativeUi(Application application) {
-        this.application = application;
-        this.context = application.getApplicationContext();
+    public NativeUi(Context context) {
+        this.context = context;
     }
 
     // TODO: Replace OnActionListener with Action?
@@ -82,7 +81,7 @@ public class NativeUi {
         Application.getView().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new AlertDialog.Builder(application.getView())
+                new AlertDialog.Builder(context)
                         .setTitle("Notice")
                         .setMessage("The extension already has a profile.")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -105,11 +104,11 @@ public class NativeUi {
     }
 
     public void promptInputText(final OnActionListener onActionListener) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(application.getView());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Create ExtensionEntity");
 
         // Set up the input
-        final EditText input = new EditText(application.getView());
+        final EditText input = new EditText(context);
 
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -141,8 +140,8 @@ public class NativeUi {
         });
     }
 
-    // TODO: public <T> void promptSelection(List<T> options, OnActionListener onActionListener) {
-    public <T> void promptSelection(final List<Configuration> options, final OnActionListener onActionListener) {
+    // TODO: public <T> void openInteractiveAssembler(List<T> options, OnActionListener onActionListener) {
+    public void openInteractiveAssembler(final List<Configuration> options, final OnActionListener onActionListener) {
 
         // Items
 //        List<String> options = new ArrayList<>();
@@ -152,13 +151,13 @@ public class NativeUi {
 //        options.add("Ultrasonic Rangefinder");
 //        options.add("Stepper Motor");
 
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("What do you want to connect?");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                application.getView(),
+                context,
                 android.R.layout.select_dialog_item
         );
 
@@ -233,7 +232,7 @@ public class NativeUi {
 
                         dialog.dismiss();
 
-                        promptTasks();
+                        openInteractiveAssemblyTaskOverview();
                     }
                 });
 
@@ -245,9 +244,9 @@ public class NativeUi {
     // Break multi-updateImage tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
     // displayFloatingTaskDialog(<task list>, <task updateImage to display>)
 
-    public void promptTasks() {
+    public void openInteractiveAssemblyTaskOverview() { // was "openInteractiveAssemblyTaskOverview"
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         // builderSingle.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Complete these steps to assemble");
 
@@ -256,7 +255,7 @@ public class NativeUi {
 
         // Create data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                application.getView(),
+                context,
                 android.R.layout.select_dialog_multichoice
         );
 
@@ -267,7 +266,7 @@ public class NativeUi {
         arrayAdapter.add("Task 4");
         arrayAdapter.add("Task 5");
 
-        final Context appContext = application.getView();
+        final Context appContext = context;
 
         /*
         builderSingle.setNegativeButton(
@@ -286,33 +285,7 @@ public class NativeUi {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-//                        String strName = arrayAdapter.getItem(which);
-
-                        // Response
-                        /*
-                        AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                        builderInner.setMessage(strName);
-                        builderInner.setTitle("Connecting patch");
-                        builderInner.setPositiveButton(
-                                "Ok",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(
-                                            DialogInterface dialog,
-                                            int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-
-                        dialog.dismiss();
-                        builderInner.show();
-                        */
-
-//                        promptTasks();
-
-
-                        promptTask();
+                        openInteractiveAssemblyTaskView();
                     }
                 }
         );
@@ -345,19 +318,19 @@ public class NativeUi {
         dialog.show();
     }
 
-    public void promptTask() {
+    public void openInteractiveAssemblyTaskView() {
 
         // Items
         List<String> options = new ArrayList<>();
         options.add("Task 1");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Do this task");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                application.getView(),
+                context,
                 android.R.layout.select_dialog_singlechoice
         );
 
@@ -411,7 +384,7 @@ public class NativeUi {
 
                 dialog.dismiss();
 
-                promptTask();
+                openInteractiveAssemblyTaskView();
             }
         });
 
@@ -510,48 +483,8 @@ public class NativeUi {
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(textView);
 
-                LinearLayout ll = new LinearLayout(context);
-                ll.setOrientation(LinearLayout.HORIZONTAL);
-
-                LinearLayout.LayoutParams params7 = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params7.setMargins(0, dpToPx(5), 0, 0);
-
-                // Button: "Import Data Source"
-                Button button8 = new Button(context);
-                button8.setText("Find Data"); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
-                button8.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                button8.setBackgroundColor(Color.parseColor("#44000000"));
-                button8.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-
-                LinearLayout.LayoutParams params6 = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params6.setMargins(0, dpToPx(5), 0, 0);
-                params6.weight = 1;
-                button8.setLayoutParams(params6);
-                ll.addView(button8);
-
-                Button button9 = new Button(context);
-                button9.setText("\u2716"); // i.e., [Project][Internet][Generator]
-                button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                button9.setBackgroundColor(Color.parseColor("#44000000"));
-                button9.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-                button9.setWidth(50);
-
-                LinearLayout.LayoutParams params9 = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params9.setMargins(0, dpToPx(5), 0, 0);
-//                params6.weight = 0;
-                button9.setLayoutParams(params9);
-                ll.addView(button9);
-
-                linearLayout.addView(ll, params7);
+                View findDataView = createDataImportView("Find Data");
+                linearLayout.addView(findDataView);
 
                 // Layout (Linear Vertical): Action List
                 final LinearLayout linearLayout2 = new LinearLayout(context);
@@ -563,6 +496,41 @@ public class NativeUi {
                 EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
                 defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
+                */
+
+                View setProtocolAdapterView = createDataImportView("Add Protocol Adapter");
+                linearLayout.addView(setProtocolAdapterView);
+
+                /*
+                // TODO: Return View IDs and add listeners after creating view structure.
+                createView(
+                        new TitleView(new SelectEventHandler<>() {
+                            @Override
+                            public void execute(Object selection) {
+                                // TODO:
+                            }
+                        }),
+                        new TaskView(new SelectEventHandler<>() {
+                            @Override
+                            public void execute(Object selection) {
+                                // TODO:
+                            }
+                        }),
+                        new SelectorManager(
+                                new TaskView(new SelectEventHandler<>() {
+                                    @Override
+                                    public void execute(Object selection) {
+                                        // TODO:
+                                    }
+                                }),
+                                new TaskView(new SelectEventHandler<>() {
+                                    @Override
+                                    public void execute(Object selection) {
+                                        // TODO:
+                                    }
+                                })
+                        )
+                );
                 */
 
                 LinearLayout portableLayout = new LinearLayout(context);
@@ -595,9 +563,9 @@ public class NativeUi {
 
 
                 // Button: "Search for Action"
-                LinearLayout searchLayout = new LinearLayout(context);
-                searchLayout.setOrientation(LinearLayout.HORIZONTAL);
-                linearLayout.addView(searchLayout);
+//                LinearLayout searchLayout = new LinearLayout(context);
+//                searchLayout.setOrientation(LinearLayout.HORIZONTAL);
+//                linearLayout.addView(searchLayout);
 
                 /*
                 EditText searchBox = new EditText(context);
@@ -623,6 +591,30 @@ public class NativeUi {
                 searchLayout.addView(browseActionEventView);
                 */
 
+                for (int i = 0; i < ports.size(); i++) {
+
+                    if (Port.getType(ports.get(i)) == Port.Type.SWITCH) {
+                        // <DIGITAL_PORT_CONTROL>
+                        View digitalPortLayout = createSwitchControllerView(ports.get(i));
+                        linearLayout.addView(digitalPortLayout);
+                        // </DIGITAL_PORT_CONTROL>
+                    }
+
+                    if (Port.getType(ports.get(i)) == Port.Type.PULSE) {
+                        // <PWM_PORT_CONTROL>
+                        View pulsePortLayout = createPulseControllerView(ports.get(i));
+                        linearLayout.addView(pulsePortLayout);
+                        // </PWM_PORT_CONTROL>
+                    }
+
+                    if (Port.getType(ports.get(i)) == Port.Type.WAVE) {
+                        // <ADC_PORT_CONTROL>
+                        View wavePortLayout = createWaveControllerView(ports.get(i));
+                        linearLayout.addView(wavePortLayout);
+                        // </ADC_PORT_CONTROL>
+                    }
+                }
+
                 // Button: "Add Action"
                 Button button2 = new Button(context);
                 button2.setText("Add Action");
@@ -635,7 +627,7 @@ public class NativeUi {
                 );
                 params3.setMargins(0, dpToPx(5), 0, 0);
                 button2.setLayoutParams(params3);
-                searchLayout.addView(button2);
+                linearLayout.addView(button2);
 
                 button2.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -671,30 +663,6 @@ public class NativeUi {
                         return true;
                     }
                 });
-
-                for (int i = 0; i < ports.size(); i++) {
-
-                    if (Port.getType(ports.get(i)) == Port.Type.SWITCH) {
-                        // <DIGITAL_PORT_CONTROL>
-                        View digitalPortLayout = createSwitchControllerView(ports.get(i));
-                        linearLayout.addView(digitalPortLayout);
-                        // </DIGITAL_PORT_CONTROL>
-                    }
-
-                    if (Port.getType(ports.get(i)) == Port.Type.PULSE) {
-                        // <PWM_PORT_CONTROL>
-                        View pulsePortLayout = createPulseControllerView(ports.get(i));
-                        linearLayout.addView(pulsePortLayout);
-                        // </PWM_PORT_CONTROL>
-                    }
-
-                    if (Port.getType(ports.get(i)) == Port.Type.WAVE) {
-                        // <ADC_PORT_CONTROL>
-                        View wavePortLayout = createWaveControllerView(ports.get(i));
-                        linearLayout.addView(wavePortLayout);
-                        // </ADC_PORT_CONTROL>
-                    }
-                }
 
                 // Button: Test Script
                 Button button3 = new Button(context);
@@ -992,7 +960,7 @@ public class NativeUi {
     }
 
     private View createSwitchControllerView(Entity port) {
-        return createSwitchControllerView_v1(port);
+        return createSwitchControllerView_v2(port);
     }
 
     private View createPulseControllerView(Entity port) {
@@ -1008,9 +976,10 @@ public class NativeUi {
         // TODO: Add dropdown with available data sources to choose from.
         // TODO: Expose manual controls when selected.
 
-        LinearLayout containerLayout = new LinearLayout(context);
-        containerLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout containerView = new LinearLayout(context);
+        containerView.setOrientation(LinearLayout.VERTICAL);
 
+        /*
         View selectorView = createSelector("Select Data Controller", new RequestDataTask<String>() {
             @Override
             public List<String> execute() {
@@ -1023,8 +992,60 @@ public class NativeUi {
                 return actionTitles;
             }
         });
-        containerLayout.addView(selectorView);
-        containerLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
+        containerView.addView(selectorView);
+        */
+
+        // Choose Controller
+        /*
+        final View chooseControllerButton = createCloseButtonView("Choose Controller Data", new SelectEventHandler<Integer>() {
+            @Override
+            public void execute(Integer selectedViewId) {
+
+                List<Action> actions = process.getActions();
+
+                createListView(
+                        actions,
+                        new LabelMapper<Action>() {
+                            @Override
+                            public String map(Action action) {
+                                return action.getTitle();
+                            }
+                        },
+                        new SelectEventHandler<Action>() {
+                            @Override
+                            public void execute(Action selectedAction) {
+                                Log.v("ListView", "selected: " + selectedAction.getTitle());
+
+                                // <REFACTOR>
+                                List<Action> actions = process.getActions();
+                                for (int i = 0; i < actions.size(); i++) {
+                                    if (actions.get(i) == selectedAction) {
+
+                                    }
+                                }
+                                // </REFACTOR>
+
+                                // TODO: Mark the Port's data source by highlighting/indicating it in the list the color corresponding to the Port.
+
+//                                // Add Action to Process
+//                                process.addAction(selectedAction);
+//
+//                                // Replace with new View
+////                                    View actionView = createActionView_v1(selectedAction);
+////                                    ViewGroupHelper.replaceView(containerView, actionView);
+//
+//                                View actionView = createNewActionView_v5(selectedAction);
+//                                ViewGroupHelper.replaceView(containerView, actionView);
+                            }
+                        }
+                );
+
+            }
+        });
+        containerView.addView(chooseControllerButton);
+        */
+
+        containerView.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
 
         LinearLayout digitalPortLayout = new LinearLayout(context);
         digitalPortLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -1057,9 +1078,242 @@ public class NativeUi {
         digitalValue.setLayoutParams(params);
         digitalPortLayout.addView(digitalValue);
 
-        containerLayout.addView(digitalPortLayout);
+        containerView.addView(digitalPortLayout);
 
-        return containerLayout;
+        return containerView;
+    }
+
+    private View createSwitchControllerView_v2(Entity port) {
+
+        String labelButtonText = "Switch";
+
+        // <PARAMETERS>
+        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        // ...
+        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.SWITCH);
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+        // </PARAMETERS>
+
+        // <CONTAINER_VIEW>
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerLayoutParams);
+        // </CONTAINER_VIEW>
+
+
+        int labelButtonId = generateViewId();
+        final int taskButton1Id = generateViewId();
+        final int taskButton2Id = generateViewId();
+        final int taskButton3Id = generateViewId();
+
+
+        // <LABEL_BUTTON>
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(labelButtonText); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextColor(Color.parseColor("#88ffffff"));
+        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton3Id); // Set to left of left-most "task button view"
+        labelButton.setLayoutParams(labelButtonParams);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(labelButton);
+        // </LABEL_BUTTON>
+
+        // <TASK_BUTTON>
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("On"); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getView().findViewById(taskButton1Id);
+                    View offView = Application.getView().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#44000000"));
+                    offView.setBackgroundColor(Color.parseColor("#00000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton1);
+        // </TASK_BUTTON>
+
+        // <TASK_BUTTON>
+        Button taskButton2 = new Button(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setText("Off"); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        containerView.addView(taskButton2);
+
+        taskButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getView().findViewById(taskButton1Id);
+                    View offView = Application.getView().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#00000000"));
+                    offView.setBackgroundColor(Color.parseColor("#44000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        // </TASK_BUTTON>
+
+        // <TASK_BUTTON>
+        Button taskButton3 = new Button(context);
+        taskButton3.setId(taskButton3Id);
+        taskButton3.setText("In"); // i.e., [Project][Internet][Generator]
+        taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton3.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+
+        RelativeLayout.LayoutParams taskButton3Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton3Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton3Params.width = TASK_BUTTON_WIDTH;
+        taskButton3Params.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+        taskButton3.setLayoutParams(taskButton3Params);
+
+        containerView.addView(taskButton3);
+
+        taskButton3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // TODO:
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        // </TASK_BUTTON>
+
+        return containerView;
     }
 
     private View createPulseControllerView_v1(Entity port) {
@@ -1209,376 +1463,13 @@ public class NativeUi {
         return actionView;
     }
 
-    private View createActionView_v2() {
-
-        // Text: "Data Sources (Imports)"
-        final TextView actionView = new TextView(context);
-        actionView.setTextSize(11.0f);
-        actionView.setText("TODO: <describe to search scripts>");
-        actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        actionView.setBackgroundColor(Color.parseColor("#44000000"));
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, dpToPx(5), 0, 0);
-        actionView.setLayoutParams(params);
-
-        // final LinearLayout actionList = (LinearLayout) view;
-
-        actionView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    createScriptEditorView_v1();
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        // actionList.addView(actionView);
-
-        return actionView;
-    }
-
+    // <REFACTOR>
     private Process process = new Process();
+    // </REFACTOR>
 
     private View createActionView(final Entity extension) {
-        return createActionView_v3(extension);
-    }
-
-    private View createActionView_v3(final Entity extension) {
-
-        final LinearLayout containerLayout = new LinearLayout(context);
-        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        containerLayout.setLayoutParams(layoutParams);
-
-        TextView browseActionEventView, scriptEditorEventView, playPauseEventView, moveUpEventView, moveDownEventView, removeEventView;
-
-        browseActionEventView = (TextView) createTextView("\uD83D\uDD0D", 1);
-        browseActionEventView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    final List<Action> actions = World.getWorld().repository.getActions();
-
-                    createListView(
-                            actions,
-                            new LabelMapper<Action>() {
-                                @Override
-                                public String map(Action action) {
-                                    return action.getTitle();
-                                }
-                            },
-                            new SelectEventHandler<Action>() {
-                                @Override
-                                public void execute(Action selectedAction) {
-                                    //Toast.makeText(getBaseContext(), ""+arg2,     Toast.LENGTH_SHORT).show();
-                                    Log.v("ListView", "selected: " + selectedAction.getTitle());
-
-                                    // Add Action to Process
-                                    process.addAction(selectedAction);
-
-                                    // Replace with new View
-                                    View actionView = createActionView_v1(selectedAction);
-                                    ViewGroupHelper.replaceView(containerLayout, actionView);
-                                }
-                            }
-                    );
-
-
-//                    final Spinner selectorView = (Spinner) createSelector("Select Action", new RequestDataTask<String>() {
-//                        @Override
-//                        public List<String> execute() {
-//                            final List<Action> actions = World.getWorld().repository.getActions();
-//
-//                            final List<String> repositoryActionTitles = new ArrayList<>();
-//                            for (int i = 0; i < actions.size(); i++) {
-//                                repositoryActionTitles.add(actions.get(i).getTitle());
-//                            }
-//                            return repositoryActionTitles;
-//                        }
-//                    });
-//                    selectorView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                        @Override
-//                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                            if (i > 0) {
-//                                //String selectedText = spinnerArray.get(i);
-//                                String selectedText = (String) selectorView.getAdapter().getItem(i);
-//
-//                                /*
-//                                if (selectedText.equals("new script")) {
-//
-//                                }
-//                                */
-//
-//                                final List<Action> actions = World.getWorld().repository.getActions();
-//                                Action action = actions.get(i - 1);
-//                                process.addAction(action);
-//
-//                                // Replace with new View
-//                                View actionView = createActionView_v1(action);
-//
-//                                ViewGroupHelper.replaceView(selectorView, actionView);
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//                        }
-//                    });
-//
-////                    showView(selectorView);
-//
-//                    // Replace with new View
-////                    View newActionView = createNewActionView_v3(extension);
-//
-//                    ViewGroupHelper.replaceView(containerLayout, selectorView);
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-        containerLayout.addView(browseActionEventView);
-
-        scriptEditorEventView = (TextView) createTextView("NEW/EDIT", 1);
-        ((LinearLayout.LayoutParams) scriptEditorEventView.getLayoutParams()).weight = 1.0f;
-        containerLayout.addView(scriptEditorEventView);
-
-        /*
-        playPauseEventView = (TextView) createTextView("\u25ba", 1); // Play/Pause
-        containerLayout.addView(playPauseEventView);
-
-        moveUpEventView = (TextView) createTextView("\u25b2", 1); // Move Up
-        containerLayout.addView(moveUpEventView);
-
-        moveDownEventView = (TextView) createTextView("\u25bc", 1); // Move Down
-        containerLayout.addView(moveDownEventView);
-        */
-
-        removeEventView = (TextView) createTextView("\u2716", 1); // Remove
-        containerLayout.addView(removeEventView);
-
-        // final LinearLayout actionList = (LinearLayout) view;
-
-        scriptEditorEventView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    // Remove current View
-                    //View containerView = Application.getView().findViewById(imageEditorId);
-//                    View containerView = containerLayout;
-//                    ((ViewManager) containerView.getParent()).removeView(containerView);
-
-                    Script newScript = new Script();
-                    newScript.setCode("// TODO: write script!");
-                    World.getWorld().repository.addScript(newScript); // Add to repository
-
-                    Action newAction = new Action();
-                    newAction.setTitle("new action");
-                    newAction.setScript(newScript); // Add to repository
-                    World.getWorld().repository.addAction(newAction); // Add to repository
-
-                    process.addAction(newAction);
-
-                    // Replace with new View
-                    View newActionView = createNewActionView_v3(newAction);
-
-                    ViewGroupHelper.replaceView(containerLayout, newActionView);
-
-                    openScriptEditor(newAction.getScript());
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        removeEventView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    //View containerView = Application.getView().findViewById(imageEditorId);
-                    View containerView = containerLayout;
-                    ((ViewManager) containerView.getParent()).removeView(containerView);
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        // actionList.addView(actionView);
-
-        return containerLayout;
-    }
-
-    // TODO: Combine with createActionView(...)
-    private View createNewActionView_v3(final Action action) {
-
-        final LinearLayout containerLayout = new LinearLayout(context);
-        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        containerLayout.setLayoutParams(layoutParams);
-
-        View view;
-
-        view = createTextView("Action Title [Edit/Branch] [Remove]", 0);
-        containerLayout.addView(view);
-
-        // final LinearLayout actionList = (LinearLayout) view;
-
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    openScriptEditor(action.getScript());
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        // actionList.addView(actionView);
-
-        return containerLayout;
-    }
-
-    private View createActionView_v1(final Action action) {
-
-        final LinearLayout containerLayout = new LinearLayout(context);
-        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        containerLayout.setLayoutParams(layoutParams);
-
-        View view;
-
-        view = createTextView(action.getTitle(), 0);
-        containerLayout.addView(view);
-
-        // final LinearLayout actionList = (LinearLayout) view;
-
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    openScriptEditor(action.getScript());
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        // actionList.addView(actionView);
-
-        return containerLayout;
+        // return createActionView_v3(extension);
+        return createNewActionView_v4("New/Edit");
     }
 
     /*
@@ -1608,108 +1499,84 @@ public class NativeUi {
         createScriptEditorView_v2(script);
     }
 
-    public View createScriptEditorView_v1() {
-
-        Application.getView().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                final RelativeLayout relativeLayout = new RelativeLayout(context);
-                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
-                // TODO: set layout_margin=20dp
-
-                // Background Event Handler
-                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        relativeLayout.setVisibility(View.GONE);
-                        return true;
-                    }
-                });
-
-                LinearLayout linearLayout = new LinearLayout(context);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-                // Title: "Actions"
-                TextView textView = new TextView(context);
-                textView.setText("Script Editor");
-                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
-                textView.setTextSize(20);
-                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                linearLayout.addView(textView);
-
-                // EditText: Script Editor
-                Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), RenderSystem.NOTIFICATION_FONT);
-                // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
-
-                final EditText scriptEditorView = new EditText(context);
-                scriptEditorView.setTypeface(typeface);
-                scriptEditorView.setTextSize(SCRIPT_EDITOR_TEXT_SIZE);
-                scriptEditorView.setLineSpacing(SCRIPT_EDITOR_LINE_SPACING, SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER);
-                // scriptEditorView.setHint("");
-                String formattedScriptText = "" +
-                        "<font color=\"#47a842\">var</font> action = <font color=\"#47a842\">function</font>(<font color=\"#3498db\">data</font>) {<br />" +
-                        "\u0009<font color=\"#47a842\">print</font>(\"Hello World!\");<br />" +
-                        "\u0009// <strong>TODO:</strong> Use Clay API to code action's script.</font><br />" +
-                        "}<br /><br />" +
-                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Refer to examples/tutorial below to get started.</font><br />" +
-                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Cast to larger screen and attach keyboard.</font><br />" +
-                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Open script and action editors on two screens.</font>";
-                scriptEditorView.setText(Html.fromHtml(formattedScriptText));
-                scriptEditorView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                scriptEditorView.setBackgroundColor(Color.parseColor("#44000000"));
-                scriptEditorView.setGravity(Gravity.TOP | Gravity.LEFT);
-
-                // scriptEditorView.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
-                scriptEditorView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-                scriptEditorView.setVerticalScrollBarEnabled(true);
-                scriptEditorView.setMovementMethod(ScrollingMovementMethod.getInstance());
-                scriptEditorView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                );
-                params.setMargins(0, dpToPx(5), 0, 0);
-                scriptEditorView.setLayoutParams(params);
-
-                linearLayout.addView(scriptEditorView);
-
-                // TODO: Add keyboard handler to EditText so a Bluetooth or USB keyboard can be used to write code (say, in combination with casting to a monitor or tablet).
-
-                // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
-                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-            }
-        });
-
-        return null;
-    }
-
     public View createScriptEditorView_v2(final Script script) {
 
         Application.getView().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                final RelativeLayout relativeLayout = new RelativeLayout(context);
-                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // <PARAMETERS>
+                int TASK_BUTTON_WIDTH = 150;
+                // </PARAMETERS>
+
+                final int containerViewId = generateViewId();
+                final int editorViewId = generateViewId();
+
+                final FrameLayout containerView = new FrameLayout(context);
+                containerView.setId(containerViewId);
+                containerView.setBackgroundColor(Color.parseColor("#bb000000"));
                 // TODO: set layout_margin=20dp
 
                 // Background Event Handler
-                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                containerView.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        relativeLayout.setVisibility(View.GONE);
+                        containerView.setVisibility(View.GONE);
                         return true;
                     }
                 });
 
                 LinearLayout linearLayout = new LinearLayout(context);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
-                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                containerView.addView(linearLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                Button taskButton1 = new Button(context);
+                //taskButton1.setId(taskButton1Id);
+                taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+                //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+                taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                taskButton1.setMinWidth(0);
+                taskButton1.setMinHeight(0);
+                taskButton1.setIncludeFontPadding(false);
+
+                FrameLayout.LayoutParams taskButton1Params = new FrameLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                taskButton1Params.setMargins(0, 0, 0, 0);
+                taskButton1Params.width = TASK_BUTTON_WIDTH;
+                taskButton1Params.gravity = Gravity.TOP | Gravity.RIGHT; // Button Outer Gravity
+                taskButton1.setLayoutParams(taskButton1Params);
+                containerView.addView(taskButton1);
+
+                taskButton1.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                        if (touchActionType == MotionEvent.ACTION_DOWN) {
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                        } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                            // TODO: Save the script revision!
+                            EditText scriptEditorView = (EditText) Application.getView().findViewById(editorViewId);
+                            script.setCode(scriptEditorView.getText().toString());
+
+                            View containerView = Application.getView().findViewById(containerViewId);
+                            ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                        } else {
+                        }
+
+                        return true;
+                    }
+                });
 
                 // Title: "Actions"
                 TextView textView = new TextView(context);
@@ -1725,6 +1592,7 @@ public class NativeUi {
                 // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 
                 EditText scriptEditorView = new EditText(context);
+                scriptEditorView.setId(editorViewId);
                 scriptEditorView.setTypeface(typeface);
                 scriptEditorView.setTextSize(SCRIPT_EDITOR_TEXT_SIZE);
                 scriptEditorView.setLineSpacing(SCRIPT_EDITOR_LINE_SPACING, SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER);
@@ -1805,7 +1673,7 @@ public class NativeUi {
 
                 // Add to main Application View
                 FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
-                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                frameLayout.addView(containerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
 
@@ -2331,6 +2199,942 @@ public class NativeUi {
         });
 
         return button;
+    }
+
+    private View createCloseButtonView(String text, final SelectEventHandler selectEventHandler) {
+
+        int TOP_MARGIN = dpToPx(5);
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        RelativeLayout containerLayout = new RelativeLayout(context);
+        containerLayout.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, TOP_MARGIN, 0, 0);
+
+        containerLayout.setLayoutParams(containerLayoutParams);
+
+
+        final int labelButtonId = generateViewId();
+        int taskButton1Id = generateViewId();
+        int taskButton2Id = generateViewId();
+
+
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor("#44000044"));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, dpToPx(5), 0, 0);
+//        params6.weight = 1;
+//        params6.gravity = Gravity.LEFT;
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+//        params6.addRule(RelativeLayout.LEFT_OF, R.id.id_to_be_left_of);
+//        params6.addRule(RelativeLayout.RIGHT_OF, button8.getId());
+        labelButton.setLayoutParams(labelButtonParams);
+        containerLayout.addView(labelButton);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                    selectEventHandler.execute(labelButtonId);
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+        containerLayout.addView(taskButton1);
+
+
+        Button taskButton2 = new Button(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, dpToPx(5), 0, 0);
+//        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        containerLayout.addView(taskButton2);
+
+        return containerLayout;
+    }
+
+    private View createDataImportView(String text) {
+
+        // <PARAMETERS>
+        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        // ...
+        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        String CONTAINER_BACKGROUND_COLOR = "#44000000";
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+        // </PARAMETERS>
+
+        // <CONTAINER_VIEW>
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerLayoutParams);
+        // </CONTAINER_VIEW>
+
+
+        int labelButtonId = generateViewId();
+        int taskButton1Id = generateViewId();
+
+
+        // <LABEL_BUTTON>
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton1Id); // Set to left of left-most "task button view"
+        labelButton.setLayoutParams(labelButtonParams);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(labelButton);
+        // </LABEL_BUTTON>
+
+        // <TASK_BUTTON>
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton1);
+        // </TASK_BUTTON>
+
+        return containerView;
+    }
+
+    private View createNewActionView_v4(String text) {
+
+        // <PARAMETERS>
+        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        // ...
+        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        String CONTAINER_BACKGROUND_COLOR = "#44000000";
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+        // </PARAMETERS>
+
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerLayoutParams);
+
+
+        int labelButtonId = generateViewId();
+        int taskButton1Id = generateViewId();
+        int taskButton2Id = generateViewId();
+
+
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+        labelButton.setLayoutParams(labelButtonParams);
+        containerView.addView(labelButton);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Remove current View
+
+                    Script newScript = new Script();
+                    newScript.setCode("// TODO: write script!");
+                    World.getWorld().repository.addScript(newScript); // Add to repository
+
+                    Action newAction = new Action();
+                    newAction.setTitle("new action");
+                    newAction.setScript(newScript); // Add to repository
+                    World.getWorld().repository.addAction(newAction); // Add to repository
+
+                    process.addAction(newAction);
+
+                    // Replace with new View
+//                    View newActionView = createNewActionView_v3(newAction);
+                    View newActionView = createNewActionView_v5(newAction);
+
+                    ViewGroupHelper.replaceView(containerView, newActionView);
+
+                    openScriptEditor(newAction.getScript());
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton1);
+
+
+//        // <MOVE_TO_PLATFORM_LAYER>
+//        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), "MaterialIcons-Regular.ttf");
+//        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+////        paint.setTypeface(boldTypeface);
+//        // </MOVE_TO_PLATFORM_LAYER>
+
+
+        Button taskButton2 = new Button(context);
+        taskButton2.setId(taskButton2Id);
+
+//        taskButton2.setTypeface(typeface);
+        taskButton2.setText("\uD83D\uDD0D"); // i.e., [Project][Internet][Generator]
+
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        taskButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    final List<Action> actions = World.getWorld().repository.getActions();
+
+                    createListView(
+                            actions,
+                            new LabelMapper<Action>() {
+                                @Override
+                                public String map(Action action) {
+                                    return action.getTitle();
+                                }
+                            },
+                            new SelectEventHandler<Action>() {
+                                @Override
+                                public void execute(Action selectedAction) {
+                                    //Toast.makeText(getBaseContext(), ""+arg2,     Toast.LENGTH_SHORT).show();
+                                    Log.v("ListView", "selected: " + selectedAction.getTitle());
+
+                                    // Add Action to Process
+                                    process.addAction(selectedAction);
+
+                                    // Replace with new View
+//                                    View actionView = createActionView_v1(selectedAction);
+//                                    ViewGroupHelper.replaceView(containerView, actionView);
+
+                                    View actionView = createNewActionView_v5(selectedAction);
+
+                                    ViewGroupHelper.replaceView(containerView, actionView);
+
+//                                    openScriptEditor(selectedAction.getScript());
+                                }
+                            }
+                    );
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton2);
+
+        return containerView;
+    }
+
+    private View createNewActionView_v5(final Action action) {
+
+        int CONTAINER_TOP_MARGIN = dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int BUTTON_INNER_PADDING_TOP = dpToPx(12);
+        // ...
+        int BUTTON_OUTER_PADDING_TOP = 0; // was dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        String CONTAINER_BACKGROUND_COLOR = "#44000000";
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+
+        int BUTTON_TEXT_SIZE = 12;
+
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerLayoutParams);
+
+
+        int labelButtonId = generateViewId();
+        int taskButton1Id = generateViewId();
+        int taskButton2Id = generateViewId();
+
+
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(action.getTitle() + " (" + action.getScript().getCode().length() + " lines)"); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextSize(BUTTON_TEXT_SIZE);
+        labelButton.setPadding(dpToPx(20), BUTTON_INNER_PADDING_TOP, dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        params6.weight = 1;
+//        params6.gravity = Gravity.LEFT;
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton1Id); // Set to left of left-most "task button view"
+//        params6.addRule(RelativeLayout.LEFT_OF, R.id.id_to_be_left_of);
+//        params6.addRule(RelativeLayout.RIGHT_OF, button8.getId());
+        labelButton.setLayoutParams(labelButtonParams);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Remove current View
+
+//                    Script newScript = new Script();
+//                    newScript.setCode("// TODO: write script!");
+//                    World.getWorld().repository.addScript(newScript); // Add to repository
+//
+//                    Action newAction = new Action();
+//                    newAction.setTitle("new action");
+//                    newAction.setScript(newScript); // Add to repository
+//                    World.getWorld().repository.addAction(newAction); // Add to repository
+
+//                    process.addAction(newAction);
+
+//                    // Replace with new View
+//                    View newActionView = createNewActionView_v3(newAction);
+//
+//                    ViewGroupHelper.replaceView(containerView, newActionView);
+
+                    openScriptEditor(action.getScript());
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(labelButton);
+
+
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton1);
+
+
+        final Button taskButton2 = new Button(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setText("\uD83D\uDD0D"); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, dpToPx(12));
+        taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        taskButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    final List<Action> actions = World.getWorld().repository.getActions();
+
+                    // TODO: Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i))))
+
+                    taskButton2.setBackgroundColor(
+                            Color.argb(
+                                    255,
+                                    Random.generateRandomInteger(0, 255),
+                                    Random.generateRandomInteger(0, 255),
+                                    Random.generateRandomInteger(0, 255)
+                            )
+                    );
+
+//                    createListView(
+//                            actions,
+//                            new LabelMapper<Action>() {
+//                                @Override
+//                                public String map(Action action) {
+//                                    return action.getTitle();
+//                                }
+//                            },
+//                            new SelectEventHandler<Action>() {
+//                                @Override
+//                                public void execute(Action selectedAction) {
+//                                    //Toast.makeText(getBaseContext(), ""+arg2,     Toast.LENGTH_SHORT).show();
+//                                    Log.v("ListView", "selected: " + selectedAction.getTitle());
+//
+//                                    taskButton2.setBackgroundColor(Color.RED);
+//
+////                                    // Add Action to Process
+////                                    process.addAction(selectedAction);
+////
+////                                    // Replace with new View
+////                                    View actionView = createActionView_v1(selectedAction);
+////                                    ViewGroupHelper.replaceView(containerView, actionView);
+//                                }
+//                            }
+//                    );
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+                return true;
+            }
+        });
+
+        containerView.addView(taskButton2);
+
+        return containerView;
+    }
+
+    private View TEST_createCloseButtonView(String text) {
+
+        int TOP_MARGIN = dpToPx(5);
+        int BUTTON_PADDING_LEFT = dpToPx(20);
+        // ...
+        int TASK_BUTTON_WIDTH = 150;
+
+        RelativeLayout containerLayout = new RelativeLayout(context);
+        containerLayout.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams containerLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerLayoutParams.setMargins(0, TOP_MARGIN, 0, 0);
+
+        containerLayout.setLayoutParams(containerLayoutParams);
+
+
+        int labelButtonId = generateViewId();
+        int taskButton1Id = generateViewId();
+        int taskButton2Id = generateViewId();
+
+
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor("#44000044"));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(0, dpToPx(5), 0, 0);
+//        params6.weight = 1;
+//        params6.gravity = Gravity.LEFT;
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+//        params6.addRule(RelativeLayout.LEFT_OF, R.id.id_to_be_left_of);
+//        params6.addRule(RelativeLayout.RIGHT_OF, button8.getId());
+        labelButton.setLayoutParams(labelButtonParams);
+        containerLayout.addView(labelButton);
+
+
+        Button taskButton1 = new Button(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        taskButton1.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton1.setBackgroundColor(Color.parseColor("#44003300"));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        taskButton1.setMinWidth(0);
+        taskButton1.setMinHeight(0);
+        taskButton1.setMaxWidth(10);
+        taskButton1.setWidth(10);
+        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, dpToPx(5), 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1.setLayoutParams(taskButton1Params);
+        containerLayout.addView(taskButton1);
+
+
+        Button taskButton2 = new Button(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(0, dpToPx(12), 0, dpToPx(12));
+        taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, dpToPx(5), 0, 0);
+//        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        containerLayout.addView(taskButton2);
+
+        return containerLayout;
+    }
+
+//    private View createCloseButtonView(String text) {
+//
+//        LinearLayout containerLayout = new LinearLayout(context);
+//        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
+//
+//        LinearLayout.LayoutParams params7 = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        );
+//        params7.gravity = Gravity.CENTER;
+//        params7.setMargins(0, dpToPx(5), 0, 0);
+//
+//        containerLayout.setLayoutParams(params7);
+//
+//        // Button: "Import Data Source"
+//        Button button8 = new Button(context);
+//        button8.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+//        button8.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+//        button8.setBackgroundColor(Color.parseColor("#44000000"));
+//        button8.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+//
+//        LinearLayout.LayoutParams params6 = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        );
+//        params6.setMargins(0, dpToPx(5), 0, 0);
+//        params6.weight = 1;
+//        params6.gravity = Gravity.LEFT;
+//        button8.setLayoutParams(params6);
+//        containerLayout.addView(button8);
+//
+//        Button button9 = new Button(context);
+//        button9.setText("\u2716"); // i.e., [Project][Internet][Generator]
+//        //button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+//        button9.setPadding(0, dpToPx(12), 0, dpToPx(12));
+//        button9.setBackgroundColor(Color.parseColor("#44003300"));
+//        button9.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+//        button9.setMinWidth(0);
+//        button9.setMinHeight(0);
+//
+//        LinearLayout.LayoutParams params9 = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.WRAP_CONTENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        );
+//        params9.setMargins(0, dpToPx(5), 0, 0);
+////                params6.weight = 0;
+//        params9.weight = 0;
+//        params9.gravity = Gravity.RIGHT;
+//        button9.setLayoutParams(params9);
+//        containerLayout.addView(button9);
+//
+//        Button button10 = new Button(context);
+//        button10.setText("\u2716"); // i.e., [Project][Internet][Generator]
+//        button10.setPadding(0, dpToPx(12), 0, dpToPx(12));
+//        button10.setBackgroundColor(Color.parseColor("#44330000"));
+////        button10.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+////        button10.setWidth(50);
+//        button10.setMinWidth(0);
+//        button10.setMaxWidth(10);
+//        button10.setMinHeight(0);
+//        button10.setIncludeFontPadding(false);
+//
+//        LinearLayout.LayoutParams params10 = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.WRAP_CONTENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        );
+//        params10.setMargins(0, dpToPx(5), 0, 0);
+////                params6.weight = 0;
+//        params10.weight = 0;
+//        params10.gravity = Gravity.RIGHT;
+////        button10.setLayoutParams(params10);
+//        containerLayout.addView(button10);
+//
+//        return containerLayout;
+//    }
+
+    private View createActionButtonView(String text) {
+
+        LinearLayout containerLayout = new LinearLayout(context);
+        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams params7 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params7.setMargins(0, dpToPx(5), 0, 0);
+
+        containerLayout.setLayoutParams(params7);
+
+        // Button: "Import Data Source"
+        Button button8 = new Button(context);
+        button8.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        button8.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        button8.setBackgroundColor(Color.parseColor("#44000000"));
+        button8.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+
+        LinearLayout.LayoutParams params6 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params6.setMargins(0, dpToPx(5), 0, 0);
+        params6.weight = 1;
+        button8.setLayoutParams(params6);
+        containerLayout.addView(button8);
+
+        Button button9 = new Button(context);
+        button9.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        button9.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        button9.setBackgroundColor(Color.parseColor("#44000000"));
+        button9.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        button9.setWidth(50);
+
+        LinearLayout.LayoutParams params9 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params9.setMargins(0, dpToPx(5), 0, 0);
+//                params6.weight = 0;
+        button9.setLayoutParams(params9);
+        containerLayout.addView(button9);
+
+        return containerLayout;
     }
 
     public interface RequestDataTask<T> {

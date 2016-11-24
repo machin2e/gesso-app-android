@@ -1,4 +1,4 @@
-package camp.computer.clay.engine;
+package camp.computer.clay.engine.manager;
 
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
@@ -16,6 +16,12 @@ public class Event {
     }
 
     public enum Commands {
+
+        // Host
+
+        // Extension
+
+        // Portable
 
         // Path
         PATH_CREATE,

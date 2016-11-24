@@ -1,6 +1,6 @@
 package camp.computer.clay.model;
 
-import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.manager.Groupable;
 
 public class Action extends Groupable {
 

@@ -2,7 +2,7 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
-import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.manager.Groupable;
 
 public class Script extends Groupable {
 

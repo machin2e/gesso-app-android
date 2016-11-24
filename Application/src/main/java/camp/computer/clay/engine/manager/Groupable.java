@@ -1,4 +1,4 @@
-package camp.computer.clay.engine;
+package camp.computer.clay.engine.manager;
 
 public abstract class Groupable {
 

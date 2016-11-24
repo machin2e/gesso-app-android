@@ -17,7 +17,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
-import camp.computer.clay.engine.Event;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -406,10 +406,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         if (!isSingletonPath) {
 
-            Entity targetPort = Path.getTarget(path);
+//            Entity targetPort = Path.getTarget(path);
 
             Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
-            extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(Geometry.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
+//            extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(Geometry.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
 
             Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
             Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
@@ -505,8 +505,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-            sourcePortShape.setColor(pathColor);
-
             sourcePortShape.setColor(pathColor);
 
             // Color

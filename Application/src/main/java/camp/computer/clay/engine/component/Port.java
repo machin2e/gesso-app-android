@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 

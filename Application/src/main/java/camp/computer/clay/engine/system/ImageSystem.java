@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.system;
 
-import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;

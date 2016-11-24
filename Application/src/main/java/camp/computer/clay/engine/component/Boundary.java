@@ -3,7 +3,7 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.util.Geometry;

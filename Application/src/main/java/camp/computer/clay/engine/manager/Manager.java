@@ -2,7 +2,6 @@ package camp.computer.clay.engine.manager;
 
 import java.util.HashMap;
 
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 
 public class Manager {

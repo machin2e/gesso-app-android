@@ -37,11 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
@@ -140,7 +140,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // Display Interface
         Application.applicationView = this;
 
-        nativeUi = new NativeUi(this);
+        nativeUi = new NativeUi(getApplicationContext());
 
 //        for (int i = 0; i < 100; i++) {
 //            String outgoingMessage = "announce device " + UUID.randomUUID();
