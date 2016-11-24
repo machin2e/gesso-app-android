@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -46,6 +47,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
      * during debugging.
      */
     private static final boolean ENABLE_FULLSCREEN = true;
+
+    public static boolean ENABLE_HARDWARE_ACCELERATION = true;
     // </SETTINGS>
 
     public PlatformRenderSurface platformRenderSurface;
@@ -82,12 +85,17 @@ public class Application extends FragmentActivity implements PlatformInterface {
         }
     }
 
+    public static int applicationViewId;
+
     /**
      * Called when the activity is getFirstEvent created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Store reference to the application.
+        Application.application = this;
 
         // "Return the context of the single, global Application object of the current process.
         // This generally should only be used if you need a Context whose lifecycle is separate
@@ -98,95 +106,74 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // Set up Platform Helpers
         ViewGroupHelper.setContext(getApplicationContext());
 
-        // Lock screen orientation
+        // Generate Application View ID
+        applicationViewId = NativeUi.generateViewId();
+
+        // Create Application Layout View
+        FrameLayout applicationView = new FrameLayout(getApplicationContext());
+        applicationView.setId(applicationViewId);
+        setContentView(applicationView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // Lock screen orientation to vertical orientation.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (ENABLE_FULLSCREEN) {
+            startFullscreenService();
+        }
+
+        // Prevent on-screen keyboard from pushing up content. Instead it will overlay content.
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // Sensor Interface
         if (ENABLE_MOTION_INPUT) {
             orientationInput = new OrientationInput(getApplicationContext());
         }
 
-        if (ENABLE_FULLSCREEN) {
-            startFullscreenService();
+        // Check availability of speech synthesis engine on Android host device.
+        if (ENABLE_SPEECH_OUTPUT) {
+            SpeechOutput.checkAvailability(this);
         }
 
-        // Display Interface
-        Application.application = this;
+        if (ENABLE_TONE_OUTPUT) {
+            toneOutput = new ToneOutput();
+        }
+
+        // <HARDWARE_ACCELERATION>
+        if (ENABLE_HARDWARE_ACCELERATION) {
+            View view = findViewById(applicationViewId);
+            boolean isHardwareAccelerated = view.isHardwareAccelerated();
+            Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
+        }
+        // </HARDWARE_ACCELERATION>
 
         platformUi = new NativeUi(getApplicationContext());
 
-//        for (int i = 0; i < 100; i++) {
-//            String outgoingMessage = "announce device " + UUID.randomUUID();
-//            CRC16 CRC16 = new CRC16();
-//            int seed = 0;
-//            byte[] outgoingMessageBytes = outgoingMessage.getBytes();
-//            int check = CRC16.calculate(outgoingMessageBytes, seed);
-//            String outmsg =
-//                    "\f" +
-//                            String.valueOf(outgoingMessage.length()) + "\t" +
-//                            String.valueOf(check) + "\t" +
-//                            "text" + "\t" +
-//                            outgoingMessage;
-//            Log.v("CRC_Demo", "" + outmsg);
-//        }
-
-        setContentView(R.layout.activity_main);
+        /*
+        for (int i = 0; i < 100; i++) {
+            String outgoingMessage = "announce device " + UUID.randomUUID();
+            CRC16 CRC16 = new CRC16();
+            int seed = 0;
+            byte[] outgoingMessageBytes = outgoingMessage.getBytes();
+            int check = CRC16.calculate(outgoingMessageBytes, seed);
+            String outmsg =
+                    "\f" +
+                            String.valueOf(outgoingMessage.length()) + "\t" +
+                            String.valueOf(check) + "\t" +
+                            "text" + "\t" +
+                            outgoingMessage;
+            Log.v("CRC_Demo", "" + outmsg);
+        }
+        */
 
         // Create Platform Rendering Surface and add it to the application view.
         platformRenderSurface = new PlatformRenderSurface(getContext());
-        FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+        FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(applicationViewId);
         frameLayout.addView(platformRenderSurface, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         platformRenderSurface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
-
-        /*
-        // PathEntity Editor
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
-        pathEditor.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                pathEditor.setVisibility(View.GONE);
-                return true;
-            }
-        });
-
-        final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
-        pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                int pointerId = motionEvent.getPointerId(pointerIndex);
-                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-                int pointCount = motionEvent.getPointerCount();
-
-                // Update the state of the touched object based on the current pointerCoordinates interaction state.
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    addPathExtensionAction();
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-        */
 
         // Clay
         clay = new Clay();
@@ -206,40 +193,30 @@ public class Application extends FragmentActivity implements PlatformInterface {
             clay.addResource(this.networkResource);
         }
 
-        // Prevent on-screen keyboard from pushing up content
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-
         // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
         messagingThreadHandler.post(messagingThread);
 
-        // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_OUTPUT) {
-            SpeechOutput.checkAvailability(this);
-        }
-
-        if (ENABLE_TONE_OUTPUT) {
-            toneOutput = new ToneOutput();
-        }
-
         // <REDIS>
-//        new JedisConnectToDatabaseTask().execute("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com:14268");
+        /*
+        new JedisConnectToDatabaseTask().execute("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com:14268");
 
-//        while (this.jedis == null) {
-//            // Waiting for connection...
-//        }
+        while (this.jedis == null) {
+            // Waiting for connection...
+        }
 
-//        new Thread(
-//                new RedisSubThread(this.jedis)
-//        ).start();
+        new Thread(
+                new RedisSubThread(this.jedis)
+        ).start();
+        */
         // </REDIS>
 
 
         // <REDIS>
-//        RedisDBThread redisDB = new RedisDBThread();
-//        redisDB.start();
+        /*
+        RedisDBThread redisDB = new RedisDBThread();
+        redisDB.start();
+        */
         // </REDIS>
-
-//        openFile("Host.json");
 
         // <JAVASCRIPT_ENGINE>
         // Reference: https://github.com/ericwlange/AndroidJSCore
@@ -263,13 +240,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         JSValue fact_a = context.property("fact_a");
         Log.v("AndroidJSCore", df.format(fact_a.toNumber())); // 3628800.0
         // </JAVASCRIPT_ENGINE>
-
-
-        // <CHECK_HARDWARE_ACCELERATION>
-        View view = findViewById(R.id.application_view);
-        boolean isHardwareAccelerated = view.isHardwareAccelerated();
-        Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
-        // </CHECK_HARDWARE_ACCELERATION>
 
         // <SHOW_MAIN_MENU>
         platformUi.openMainMenu();

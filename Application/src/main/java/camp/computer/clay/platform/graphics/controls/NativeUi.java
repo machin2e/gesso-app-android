@@ -58,7 +58,6 @@ import camp.computer.clay.model.Process;
 import camp.computer.clay.model.Script;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.R;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 import camp.computer.clay.util.Random;
 
@@ -684,7 +683,7 @@ public class NativeUi {
                 linearLayout.addView(button3);
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -762,7 +761,7 @@ public class NativeUi {
                 linearLayout.addView(ll);
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(containerLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1638,7 +1637,7 @@ public class NativeUi {
                 */
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(containerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1707,7 +1706,7 @@ public class NativeUi {
                 linearLayout.addView(createButtonView("debug: sleep time"));
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1785,7 +1784,7 @@ public class NativeUi {
                 linearLayout.addView(createButtonView("Accessories"));
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1866,7 +1865,7 @@ public class NativeUi {
                 */
 
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -1901,7 +1900,7 @@ public class NativeUi {
 
                 // Add to main view
                 // TODO: Create in separate fragment!
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -2008,7 +2007,7 @@ public class NativeUi {
 
                 imageView.invalidate();
 
-                // View view = Application.getApplication_().findViewById(R.id.application_view);
+                // View view = Application.getApplication_().findViewById(Application.applicationViewId);
                 // view.invalidate();
 
                 return true;
@@ -3211,7 +3210,7 @@ public class NativeUi {
             @Override
             public void run() {
                 // Add to main Application View
-                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(R.id.application_view);
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
                 frameLayout.addView(view, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
@@ -3395,4 +3394,50 @@ private void addPathExtensionAction() {
 
     pathPatchActionList.addView(actionConstruct);
 }
+*/
+
+/*
+// PathEntity Editor
+final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
+pathEditor.setOnTouchListener(new View.OnTouchListener() {
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        pathEditor.setVisibility(View.GONE);
+        return true;
+    }
+});
+
+final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
+pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
+    @Override
+    public boolean onTouch(View v, MotionEvent motionEvent) {
+
+        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+        int pointerId = motionEvent.getPointerId(pointerIndex);
+        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
+        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+        int pointCount = motionEvent.getPointerCount();
+
+        // Update the state of the touched object based on the current pointerCoordinates interaction state.
+        if (touchActionType == MotionEvent.ACTION_DOWN) {
+            // TODO:
+        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+            // TODO:
+        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+            // TODO:
+        } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+            addPathExtensionAction();
+
+        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+            // TODO:
+        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+            // TODO:
+        } else {
+            // TODO:
+        }
+
+        return true;
+    }
+});
 */
