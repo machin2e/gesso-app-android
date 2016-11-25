@@ -1,23 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue">#33b5e5</color>
-    <color name="darkblue">#0099cc</color>
-    <color name="red">#ff4444</color>
-    <color name="grayStart">#adadad</color>
-    <color name="grayEnd">#ffffff</color>
     <color name="black">#000000</color>
-    <color name="bg_handle_pressed">#a0a0a0</color>
-
-    <color name="app_primary">#1976D2</color>
-    <color name="app_primary_dark">#1565C0</color>
-    <color name="grey">#DDDDDD</color>
-    <color name="light_grey">#EEEEEE</color>
-    <color name="white_transparent">#99FFFFFF</color>
-
-    <color name="app_primary_pressed">#770099FF</color>
-    <color name="app_ripple">#998877FF</color>
-
-    <color name="timeline_segment_color">#1976D2</color>
-
-    <color name="map_highlight_color">#1976D2</color>
 </resources>

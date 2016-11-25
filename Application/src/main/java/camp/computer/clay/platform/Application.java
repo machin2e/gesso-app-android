@@ -94,6 +94,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // <PLATFORM>
+
         // Store reference to the application.
         Application.application = this;
 
@@ -146,6 +148,9 @@ public class Application extends FragmentActivity implements PlatformInterface {
         }
         // </HARDWARE_ACCELERATION>
 
+        // </PLATFORM>
+
+        // <PLATFORM_ADAPTER>
         platformUi = new NativeUi(getApplicationContext());
 
         /*
@@ -175,26 +180,34 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
 
-        // Clay
-        clay = new Clay();
-
-        clay.addPlatform(this); // Add the view provided by the host device.
-
         // UDP Datagram Server
         if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
-            clay.addHost(this.UDPHost);
             UDPHost.startServer();
         }
 
         // Internet Network Interface
         if (networkResource == null) {
             networkResource = new Internet();
-            clay.addResource(this.networkResource);
         }
 
         // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
         messagingThreadHandler.post(messagingThread);
+        // </PLATFORM_ADAPTER>
+
+        // <ENGINE>
+        // Clay
+        clay = new Clay();
+        clay.addPlatform(this); // Add the view provided by the host device.
+
+        if (UDPHost == null) {
+            clay.addHost(this.UDPHost);
+        }
+
+        if (networkResource == null) {
+            clay.addResource(this.networkResource);
+        }
+        // </ENGINE>
 
         // <REDIS>
         /*
@@ -255,15 +268,15 @@ public class Application extends FragmentActivity implements PlatformInterface {
     protected void onPause() {
         super.onPause();
 
-        // <VISUALIZATION>
+        // Rendering Surface
         platformRenderSurface.onPause();
-        // </VISUALIZATION>
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        // UDP Client/Server
         if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
         }
@@ -271,16 +284,15 @@ public class Application extends FragmentActivity implements PlatformInterface {
             UDPHost.startServer();
         }
 
-        // <VISUALIZATION>
+        // Rendering Surface
         platformRenderSurface.onResume();
-        // </VISUALIZATION>
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        // Stop speech generator
+        // Speech Synthesis Engine. Stop.
         if (speechOutput != null) {
             speechOutput.destroy();
         }
@@ -293,9 +305,10 @@ public class Application extends FragmentActivity implements PlatformInterface {
      * @param event
      * @return
      */
-    // TODO: Queue key events in inputSystem
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        // TODO: Queue key events in inputSystem
 
         switch (keyCode) {
             case KeyEvent.KEYCODE_S: {
