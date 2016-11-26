@@ -38,7 +38,7 @@ import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
@@ -89,6 +89,8 @@ public class World {
 
     // <SETTINGS>
     public static boolean ENABLE_DRAW_OVERLAY = true;
+
+    public static final String ASSET_SERVER_URI = "http://192.168.1.2:8001";
     // </SETTINGS>
 
     // <TEMPORARY>
@@ -293,7 +295,7 @@ public class World {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call openCreateExtensionView if the extensionEntity is a draft (i.e., does not have an associated Configuration)
-            Application.getApplication_().getPlatformUi().openCreateExtensionView(new NativeUi.OnActionListener<String>() {
+            Application.getApplication_().getPlatformUi().openCreateExtensionView(new PlatformUi.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
@@ -315,7 +317,7 @@ public class World {
                 }
             });
         } else {
-            Application.getApplication_().getPlatformUi().promptAcknowledgment(new NativeUi.OnActionListener() {
+            Application.getApplication_().getPlatformUi().promptAcknowledgment(new PlatformUi.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 

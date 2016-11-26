@@ -12,7 +12,7 @@ import java.util.UUID;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
+import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.ImageSystem;
@@ -34,17 +34,17 @@ import camp.computer.clay.util.Random;
 
 public class Clay {
 
+    private Cache cache = null;
+
     private Messenger messenger = null;
 
     private Internet internet = null;
 
-    private Cache cache = null;
-
     // Group of discovered touchscreen PhoneHosts
-    private List<PlatformInterface> platforms = new ArrayList<>();
+    private PlatformInterface platform;
 
     // Group of discovered PhoneHosts
-    private List<PhoneHost> phoneHosts = new ArrayList<>();
+    private List<PhoneHost> phoneHosts = new ArrayList<>(); // TODO: Convert to Entity
 
     private List<Configuration> configurations = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class Clay {
         this.internet = new Internet(this); // Start the networking systems
 
         // Create World
-        this.world = new World();
+        world = new World();
         world.addSystem(new InputSystem(world));
         world.addSystem(new ImageSystem(world));
         world.addSystem(new StyleSystem(world));
@@ -89,14 +89,16 @@ public class Clay {
 
         // <HACK>
         // TODO: Place in a LayoutSystem
-        this.world.getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
+        world.getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
         // </HACK>
     }
 
+    // TODO: Convert to Event Handler
     public void addHost(MessengerInterface messageManager) {
         this.messenger.addHost(messageManager);
     }
 
+    // TODO: Convert to Event Handler
     public void addResource(InternetInterface networkResource) {
         this.internet.addHost(networkResource);
     }
@@ -107,7 +109,7 @@ public class Clay {
      * @param view The view to make available to Clay.
      */
     public void addPlatform(PlatformInterface view) {
-        this.platforms.add(view);
+        this.platform = (view);
     }
 
     /**
@@ -116,8 +118,8 @@ public class Clay {
      * @param i The index of the view to return.
      * @return The view at the specified index.
      */
-    public PlatformInterface getPlatform(int i) {
-        return this.platforms.get(i);
+    public PlatformInterface getPlatform() {
+        return platform;
     }
 
     public Cache getCache() {
@@ -157,7 +159,7 @@ public class Clay {
     /**
      * Adds the specified unit to Clay's operating model.
      */
-    public PhoneHost addDevice(final UUID deviceUuid, final String internetAddress) {
+    public PhoneHost addDevice(final UUID deviceUuid, String internetAddress) {
 
         // Search for the phoneHost in the store
         if (hasDeviceByUuid(deviceUuid)) {
@@ -169,6 +171,7 @@ public class Clay {
         return null;
     }
 
+    // <TODO: MOVE_TO_MANAGER>
     public boolean hasDeviceByUuid(UUID uuid) {
         for (PhoneHost phoneHost : getPhoneHosts()) {
             if (phoneHost.getUuid().compareTo(uuid) == 0) {
@@ -188,8 +191,10 @@ public class Clay {
     }
 
     public boolean hasDeviceByAddress(String address) {
+        // TODO:
         return false;
     }
+    // </TODO: MOVE_TO_MANAGER>
 
     private boolean hasCache() {
         return this.cache != null;

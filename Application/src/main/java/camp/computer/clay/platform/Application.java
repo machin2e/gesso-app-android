@@ -14,73 +14,78 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import org.liquidplayer.webkit.javascriptcore.JSContext;
-import org.liquidplayer.webkit.javascriptcore.JSValue;
-
-import java.text.DecimalFormat;
-
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
+import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
-import camp.computer.clay.platform.sound.SpeechOutput;
-import camp.computer.clay.platform.sound.ToneOutput;
+import camp.computer.clay.platform.graphics.controls.PlatformUi;
+import camp.computer.clay.platform.scripting.JavaScriptEngine;
+import camp.computer.clay.platform.sound.SpeechSynthesisEngine;
 import camp.computer.clay.platform.spatial.OrientationInput;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 
 public class Application extends FragmentActivity implements PlatformInterface {
 
     // <SETTINGS>
-    private static final boolean ENABLE_TONE_OUTPUT = false;
-    private static final boolean ENABLE_SPEECH_OUTPUT = false;
-    private static final boolean ENABLE_MOTION_INPUT = true;
+    public static class Settings {
+        public static final boolean ENABLE_SPEECH_OUTPUT = false;
+        public static final boolean ENABLE_MOTION_INPUT = true;
 
-    private static final long MESSAGE_SEND_FREQUENCY = 5000; // 500;
+        public static final long MESSAGE_SEND_FREQUENCY = 5000; // 500;
 
-    /**
-     * Hides the operating system's status and navigation bars. Setting this to false is helpful
-     * during debugging.
-     */
-    private static final boolean ENABLE_FULLSCREEN = true;
+        /**
+         * Hides the operating system's status and navigation bars. Setting this to false is helpful
+         * during debugging.
+         */
+        public static final boolean ENABLE_FULLSCREEN = true;
+        public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
 
-    public static boolean ENABLE_HARDWARE_ACCELERATION = true;
+        public static boolean ENABLE_HARDWARE_ACCELERATION = true;
+
+        public static boolean ENABLE_JAVASCRIPT_ENGINE = true;
+
+        // Platform Adapter
+        public static boolean ENABLE_MESSAGING_SERVICE = true;
+    }
     // </SETTINGS>
-
-    public PlatformRenderSurface platformRenderSurface;
-
-    private SpeechOutput speechOutput;
-
-    private ToneOutput toneOutput;
-
-    private OrientationInput orientationInput;
 
     private static Context context;
 
     private static Application application;
 
-    private Clay clay;
+    private PlatformUi platformUi;
+
+    public PlatformRenderSurface platformRenderSurface;
+
+    private SpeechSynthesisEngine speechSynthesisEngine;
+
+    private OrientationInput orientationInput;
 
     private UDPHost UDPHost;
 
     private Internet networkResource;
 
-    NativeUi platformUi;
+    private JavaScriptEngine javaScriptEngine;
+
+    private Clay clay;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SpeechOutput.CHECK_CODE) {
-            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                speechOutput = new SpeechOutput(this);
-            } else {
-                Intent install = new Intent();
-                install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(install);
+
+        if (Settings.ENABLE_SPEECH_OUTPUT) {
+            if (requestCode == SpeechSynthesisEngine.CHECK_CODE) {
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    speechSynthesisEngine = new SpeechSynthesisEngine(this);
+                } else {
+                    Intent install = new Intent();
+                    install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(install);
+                }
             }
         }
     }
@@ -109,7 +114,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         ViewGroupHelper.setContext(getApplicationContext());
 
         // Generate Application View ID
-        applicationViewId = NativeUi.generateViewId();
+        applicationViewId = PlatformUi.generateViewId();
 
         // Create Application Layout View
         FrameLayout applicationView = new FrameLayout(getApplicationContext());
@@ -119,7 +124,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // Lock screen orientation to vertical orientation.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        if (ENABLE_FULLSCREEN) {
+        if (Settings.ENABLE_FULLSCREEN) {
             startFullscreenService();
         }
 
@@ -127,21 +132,17 @@ public class Application extends FragmentActivity implements PlatformInterface {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // Sensor Interface
-        if (ENABLE_MOTION_INPUT) {
+        if (Settings.ENABLE_MOTION_INPUT) {
             orientationInput = new OrientationInput(getApplicationContext());
         }
 
         // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_OUTPUT) {
-            SpeechOutput.checkAvailability(this);
-        }
-
-        if (ENABLE_TONE_OUTPUT) {
-            toneOutput = new ToneOutput();
+        if (Settings.ENABLE_SPEECH_OUTPUT) {
+            SpeechSynthesisEngine.checkAvailability(this);
         }
 
         // <HARDWARE_ACCELERATION>
-        if (ENABLE_HARDWARE_ACCELERATION) {
+        if (Settings.ENABLE_HARDWARE_ACCELERATION) {
             View view = findViewById(applicationViewId);
             boolean isHardwareAccelerated = view.isHardwareAccelerated();
             Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
@@ -151,7 +152,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // </PLATFORM>
 
         // <PLATFORM_ADAPTER>
-        platformUi = new NativeUi(getApplicationContext());
+        platformUi = new PlatformUi(getApplicationContext());
 
         /*
         for (int i = 0; i < 100; i++) {
@@ -183,7 +184,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // UDP Datagram Server
         if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
-            UDPHost.startServer();
+            UDPHost.startServer(); // TODO: Move into BootstrapComponent
         }
 
         // Internet Network Interface
@@ -191,8 +192,11 @@ public class Application extends FragmentActivity implements PlatformInterface {
             networkResource = new Internet();
         }
 
-        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
-        messagingThreadHandler.post(messagingThread);
+        // Start Messaging Thread
+        if (Settings.ENABLE_MESSAGING_SERVICE) {
+            startMessagingService();
+            // TODO: Move MessengingService.startService() into BootstrapComponent
+        }
         // </PLATFORM_ADAPTER>
 
         // <ENGINE>
@@ -232,31 +236,16 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // </REDIS>
 
         // <JAVASCRIPT_ENGINE>
-        // Reference: https://github.com/ericwlange/AndroidJSCore
-        JSContext context = new JSContext();
-
-        // Test 1
-        context.property("a", 5);
-        JSValue aValue = context.property("a");
-        double a = aValue.toNumber();
-        DecimalFormat df = new DecimalFormat(".#");
-        Log.v("AndroidJSCore", (df.format(a))); // 5.0
-
-        // Test 2
-        context.evaluateScript("a = 10");
-        JSValue newAValue = context.property("a");
-        Log.v("AndroidJSCore", df.format(newAValue.toNumber())); // 10.0
-        String script =
-                "function factorial(x) { var f = 1; for(; x > 1; x--) f *= x; return f; }\n" +
-                        "var fact_a = factorial(a);\n";
-        context.evaluateScript(script);
-        JSValue fact_a = context.property("fact_a");
-        Log.v("AndroidJSCore", df.format(fact_a.toNumber())); // 3628800.0
+        if (Settings.ENABLE_JAVASCRIPT_ENGINE) {
+            javaScriptEngine = new JavaScriptEngine();
+        }
         // </JAVASCRIPT_ENGINE>
 
+        /*
         // <SHOW_MAIN_MENU>
         platformUi.openMainMenu();
         // </SHOW_MAIN_MENU>
+        */
     }
 
     @Override
@@ -293,8 +282,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
         super.onDestroy();
 
         // Speech Synthesis Engine. Stop.
-        if (speechOutput != null) {
-            speechOutput.destroy();
+        if (speechSynthesisEngine != null) {
+            speechSynthesisEngine.destroy();
         }
     }
 
@@ -318,7 +307,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
+                World.getWorld().getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
                 return true;
             }
 
@@ -367,16 +356,13 @@ public class Application extends FragmentActivity implements PlatformInterface {
         return Application.application;
     }
 
-    public NativeUi getPlatformUi() {
+    public PlatformUi getPlatformUi() {
         return this.platformUi;
     }
 
     //----------------------------------------------------------------------------------------------
 
-
     // <FULLSCREEN_SERVICE>
-    public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
-
     private boolean enableFullscreenService = false;
 
     private void startFullscreenService() {
@@ -391,7 +377,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
                 // Uncomment this for periodic callback
                 if (enableFullscreenService) {
-                    fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
+                    fullscreenServiceHandler.postDelayed(this, Settings.FULLSCREEN_SERVICE_PERIOD);
                 }
             }
         }, Event.MINIMUM_HOLD_DURATION);
@@ -414,21 +400,54 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     // <MESSAGING_THREAD>
     // Create the Handler object. This will be run on the main thread by default.
-    private Handler messagingThreadHandler = new Handler();
+    public void startMessagingService() {
+        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
+        final Handler messagingThreadHandler = new Handler();
+        messagingThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // Action the outgoing messages
+                clay.update();
 
-    // Define the code block to be executed
-    private Runnable messagingThread = new Runnable() {
-        @Override
-        public void run() {
-            // Action the outgoing messages
-            clay.update();
-
-            // Repeat this the same runnable code block again another 2 seconds
-            messagingThreadHandler.postDelayed(messagingThread, MESSAGE_SEND_FREQUENCY);
-        }
-    };
+                // Repeat this the same runnable code block again another 2 seconds
+                messagingThreadHandler.postDelayed(this, Settings.MESSAGE_SEND_FREQUENCY);
+            }
+        });
+    }
     // </MESSAGING_THREAD>
 
+    // <PLATFORM_THREAD_ADAPTER>
+    /*
+    public abstract class PlatformThread {
+        long delay = 1000L;
+
+        public abstract void execute();
+    }
+
+    private List<PlatformThread> platformThreads = new ArrayList<>(); // TODO: Add to manager.
+
+    public void addPlatformThread(final PlatformThread platformThread) {
+        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                // Execute thread code
+                platformThread.execute();
+
+                // Repeat this the same runnable code block again another 2 seconds
+                handler.postDelayed(this, platformThread.delay);
+            }
+        });
+    }
+    */
+    // </PLATFORM_THREAD_ADAPTER>
+
+    public PlatformRenderSurface getPlatformRenderSurface() {
+        return this.platformRenderSurface;
+    }
+
+    // <TODO: DELETE>
     @Override
     public void setClay(Clay clay) {
         this.clay = clay;
@@ -438,28 +457,5 @@ public class Application extends FragmentActivity implements PlatformInterface {
     public Clay getClay() {
         return this.clay;
     }
-
-    public PlatformRenderSurface getPlatformRenderSurface() {
-        return this.platformRenderSurface;
-    }
-
-    // <DELETE>
-    /*
-    public double getFramesPerSecond() {
-        return getPlatformRenderSurface().getPlatformRenderer().getFramesPerSecond();
-    }
-
-    public SpeechOutput getSpeechOutput() {
-        return this.speechOutput;
-    }
-
-    public ToneOutput getToneOutput() {
-        return this.toneOutput;
-    }
-
-    public OrientationInput getOrientationInput() {
-        return this.orientationInput;
-    }
-    */
-    // </DELETE>
+    // </TODO: DELETE>
 }

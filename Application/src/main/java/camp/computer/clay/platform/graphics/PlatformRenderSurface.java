@@ -763,6 +763,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     // TODO: Refactor with transforms
     public void drawPolygon(List<Transform> vertices, Palette palette) {
 
+        // <HACK>
+        if (vertices == null) {
+            return;
+        }
+        // </HACK>
+
         // Draw vertex Points in Shape
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);

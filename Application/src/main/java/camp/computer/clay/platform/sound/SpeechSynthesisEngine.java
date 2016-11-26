@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
-public class SpeechOutput implements TextToSpeech.OnInitListener {
+public class SpeechSynthesisEngine implements TextToSpeech.OnInitListener {
 
     // <SETTINGS>
     public static final int CHECK_CODE = 0x1;
@@ -29,7 +29,7 @@ public class SpeechOutput implements TextToSpeech.OnInitListener {
     private boolean isAllowed = false;
     // </STATE>
 
-    public SpeechOutput(Context context) {
+    public SpeechSynthesisEngine(Context context) {
         tts = new TextToSpeech(context, this);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {

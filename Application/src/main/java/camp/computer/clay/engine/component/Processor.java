@@ -14,6 +14,10 @@ public class Processor extends Component {
 
     // <CONSTRUCTOR>
     public Processor() {
+        // <REFACTOR>
+        // TODO: Should a process be created by default? How to tell if a process should be stored in the database?
+        process = new Process();
+        // </REFACTOR>
     }
     // </CONSTRUCTOR>
 

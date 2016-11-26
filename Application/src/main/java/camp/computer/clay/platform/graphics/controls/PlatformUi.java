@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -49,6 +50,7 @@ import javax.net.ssl.HttpsURLConnection;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Processor;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
@@ -61,11 +63,11 @@ import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 import camp.computer.clay.util.Random;
 
-public class NativeUi {
+public class PlatformUi {
 
     private Context context = null;
 
-    public NativeUi(Context context) {
+    public PlatformUi(Context context) {
         this.context = context;
     }
 
@@ -102,6 +104,7 @@ public class NativeUi {
 
     public void openCreateExtensionView(final OnActionListener onActionListener) {
 
+        /*
         Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -139,9 +142,74 @@ public class NativeUi {
                 builder.show();
             }
         });
+        */
+
+        Application.getApplication_().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final int containerViewId = generateViewId();
+
+                final RelativeLayout containerView = new RelativeLayout(context);
+                containerView.setId(containerViewId);
+                containerView.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                containerView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        containerView.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                containerView.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Title: "Save Extension"
+                TextView textView = new TextView(context);
+                textView.setText("Save Extension");
+                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
+                textView.setTextSize(15);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // Layout (Linear Vertical): Action List
+                final LinearLayout linearLayout2 = new LinearLayout(context);
+                linearLayout2.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                final EditText extensionTitleView = (EditText) createEditText(null, "Type name here");
+                linearLayout.addView(extensionTitleView);
+
+                linearLayout.addView(createButtonView("Save", new SelectEventHandler<String>() {
+                    @Override
+                    public void execute(String selection) {
+                        Log.v("createButtonView", "got callback! " + selection);
+                        String extensionTitle = extensionTitleView.getText().toString();
+                        Log.v("createButtonView", "extension title: " + extensionTitle);
+                        onActionListener.onComplete(extensionTitle);
+
+                        // <REMOVE_VIEW>
+                        View containerView = Application.getApplication_().findViewById(containerViewId);
+                        ((ViewManager) containerView.getParent()).removeView(containerView);
+                        // </REMOVE_VIEW>
+                    }
+                }));
+                // in callback: onActionListener.onComplete(input.getText().toString());
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
+                frameLayout.addView(containerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
     }
 
     // TODO: public <T> void openInteractiveAssembler(List<T> options, OnActionListener onActionListener) {
+
     public void openInteractiveAssembler(final List<Configuration> options, final OnActionListener onActionListener) {
 
         // Items
@@ -152,94 +220,116 @@ public class NativeUi {
 //        options.add("Ultrasonic Rangefinder");
 //        options.add("Stepper Motor");
 
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        // dialogBuilder.setIcon(R.drawable.ic_launcher);
-        dialogBuilder.setTitle("What do you want to connect?");
-
-        // Add data adapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                context,
-                android.R.layout.select_dialog_item
-        );
-
-//        // Add data to adapter. These are the options.
+//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+//        // dialogBuilder.setIcon(R.drawable.ic_launcher);
+//        dialogBuilder.setTitle("What do you want to connect?");
+//
+//        // Add data adapter
+//        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+//                context,
+//                android.R.layout.select_dialog_item
+//        );
+//
+////        // Add data to adapter. These are the options.
+////        for (int i = 0; i < options.size(); i++) {
+////            arrayAdapter.add(options.get(i));
+////        }
+//
+//        // Add Profiles from Repository
 //        for (int i = 0; i < options.size(); i++) {
-//            arrayAdapter.add(options.get(i));
+////            Configuration extensionProfile = getClay().getConfigurations().get(i);
+////            options.add(extensionProfile.getLabel());
+//            arrayAdapter.add(options.get(i).getLabel());
 //        }
+//
+//        // Profiles from Inventory
+//        arrayAdapter.add("Add from Inventory");
+//
+//        // Apply the adapter to the dialog
+//        dialogBuilder.setAdapter(arrayAdapter, null);
+//
+//        /*
+//        builderSingle.setNegativeButton(
+//                "Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//        */
+//
+//        Application.getApplication_().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                final AlertDialog dialog = dialogBuilder.create();
+//
+//                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                        String selectionLabel = arrayAdapter.getItem(position);
+//                        Configuration selection = options.get(position);
+//
+//                        // Configure based on Configuration
+//                        // Add Ports based on Configuration
+//                        onActionListener.onComplete(selection);
+////                while (selection.getPortCount() < position + 1) {
+////                    selection.addPort(new PortEntity());
+////                }
+//
+//                        // Response
+//                /*
+//                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
+//                builderInner.setMessage(selectionLabel);
+//                builderInner.setTitle("Connecting patch");
+//                builderInner.setPositiveButton(
+//                        "Ok",
+//                        new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(
+//                                    DialogInterface dialog,
+//                                    int which) {
+//                                dialog.dismiss();
+//                            }
+//                        });
+//
+//                dialog.dismiss();
+//                builderInner.show();
+//                */
+//
+//                        dialog.dismiss();
+//
+//                        openInteractiveAssemblyTaskOverview();
+//                    }
+//                });
+//
+//                dialog.show();
+//            }
+//        });
 
-        // Add Profiles from Repository
-        for (int i = 0; i < options.size(); i++) {
-//            Configuration extensionProfile = getClay().getConfigurations().get(i);
-//            options.add(extensionProfile.getLabel());
-            arrayAdapter.add(options.get(i).getLabel());
-        }
+//        final List<Action> actions = World.getWorld().repository.getActions();
 
-        // Profiles from Inventory
-        arrayAdapter.add("Add from Inventory");
-
-        // Apply the adapter to the dialog
-        dialogBuilder.setAdapter(arrayAdapter, null);
-
-        /*
-        builderSingle.setNegativeButton(
-                "Cancel",
-                new DialogInterface.OnClickListener() {
+        createListView(
+                options,
+                new LabelMapper<Configuration>() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                    public String map(Configuration configuration) {
+                        return configuration.getLabel();
                     }
-                });
-        */
-
-        Application.getApplication_().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                final AlertDialog dialog = dialogBuilder.create();
-
-                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                },
+                new SelectEventHandler<Configuration>() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void execute(Configuration selectedConfiguration) {
+                        //Toast.makeText(getBaseContext(), ""+arg2,     Toast.LENGTH_SHORT).show();
+                        Log.v("ListView", "selected Configuration: " + selectedConfiguration.getLabel());
 
-                        String selectionLabel = arrayAdapter.getItem(position);
-                        Configuration selection = options.get(position);
-
-                        // Configure based on Configuration
-                        // Add Ports based on Configuration
-                        onActionListener.onComplete(selection);
-//                while (selection.getPortCount() < position + 1) {
-//                    selection.addPort(new PortEntity());
-//                }
-
-                        // Response
-                /*
-                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                builderInner.setMessage(selectionLabel);
-                builderInner.setTitle("Connecting patch");
-                builderInner.setPositiveButton(
-                        "Ok",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialog,
-                                    int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                dialog.dismiss();
-                builderInner.show();
-                */
-
-                        dialog.dismiss();
-
-                        openInteractiveAssemblyTaskOverview();
+                        // Add Action to Process
+                        onActionListener.onComplete(selectedConfiguration);
                     }
-                });
-
-                dialog.show();
-            }
-        });
+                }
+        );
     }
 
     // Break multi-updateImage tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
@@ -393,68 +483,86 @@ public class NativeUi {
     }
 
     public void openActionEditor(Entity extension) {
-
-        process.clear();
-
         createActionEditor_v3(extension);
     }
+
+    boolean reqeustedActions = false;
 
     public void createActionEditor_v3(final Entity extension) {
 
         // TODO: Hack into the JS engine in V8 to execute this pure JS. Fuck it.
 
+        final String BUTTON_TEXT_COLOR = "#ffffffff";
+
         // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
 
+        // <REFACTOR>
+        // TODO: Relocate so these are stored in Cache.
         // Cache Action and Script in Repository. Retrieve Actions and Scripts from Remote Server.
-        new HttpGetRequestTask().execute("http://stackoverflow.com");
+        if (!reqeustedActions) {
+            HttpRequestTask httpRequestTask = new HttpRequestTask();
+            httpRequestTask.uri = World.ASSET_SERVER_URI + "/repository/actions";
+            new HttpGetRequestTask().execute(httpRequestTask); // TODO: Add GET request to queue in Application startup... in an Engine System
+            reqeustedActions = true;
+        }
+        // </REFACTOR>
 
         // Get list of Ports connected to Extension
-        String portTypesString = "";
+        // String portTypesString = "";
         final Group<Entity> ports = Portable.getPorts(extension);
+        /*
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             Log.v("PortType", "port type: " + Port.getType(port));
             portTypesString += Port.getType(port) + " ";
         }
+        */
 
-        final String finalPortTypesString = portTypesString;
         Application.getApplication_().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                final RelativeLayout relativeLayout = new RelativeLayout(context);
-                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                final FrameLayout containerView = new FrameLayout(context);
+                containerView.setBackgroundColor(Color.parseColor("#bb000000"));
                 // TODO: set layout_margin=20dp
 
                 // Background Event Handler
-                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                containerView.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        relativeLayout.setVisibility(View.GONE);
+                        containerView.setVisibility(View.GONE);
                         return true;
                     }
                 });
 
+                FrameLayout.LayoutParams containerViewLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                containerView.setLayoutParams(containerViewLayoutParams);
+
                 LinearLayout linearLayout = new LinearLayout(context);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
-                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                containerView.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
                 // Title: "Actions"
-                TextView textView = new TextView(context);
-                textView.setText("Extension Controller");
-                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
-                textView.setTextSize(20);
-                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                linearLayout.addView(textView);
+//                TextView textView = new TextView(context);
+//                textView.setText("Extension Controller");
+//                textView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(20));
+//                textView.setTextSize(20);
+//                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+//                linearLayout.addView(textView);
+
+                View titleView = createDataImportView("Extension Controller");
+                linearLayout.addView(titleView);
 
                 View findDataView = createDataImportView("Find Data");
                 linearLayout.addView(findDataView);
 
                 // Layout (Linear Vertical): Action List
-                final LinearLayout linearLayout2 = new LinearLayout(context);
-                linearLayout2.setOrientation(LinearLayout.VERTICAL);
-                linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                final LinearLayout actionListLayout = new LinearLayout(context);
+                actionListLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(actionListLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // TODO: Populate Action List from Extension
 
                 // Default Action Controller based on Port Configuration
                 /*
@@ -463,8 +571,10 @@ public class NativeUi {
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
                 */
 
+                /*
                 View setProtocolAdapterView = createDataImportView("Add Protocol Adapter");
                 linearLayout.addView(setProtocolAdapterView);
+                */
 
                 /*
                 // TODO: Return View IDs and add listeners after creating view structure.
@@ -583,6 +693,7 @@ public class NativeUi {
                 // Button: "Add Action"
                 Button button2 = new Button(context);
                 button2.setText("Add Action");
+                button2.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
                 button2.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 button2.setBackgroundColor(Color.parseColor("#44000000"));
 
@@ -606,23 +717,52 @@ public class NativeUi {
 
                         // Update the state of the touched object based on the current pointerCoordinates interaction state.
                         if (touchActionType == MotionEvent.ACTION_DOWN) {
-                            // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                            // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                            // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
+                            final List<Action> actions = World.getWorld().repository.getActions();
+
+                            createListView(
+                                    actions,
+                                    new LabelMapper<Action>() {
+                                        @Override
+                                        public String map(Action action) {
+                                            return action.getTitle();
+                                        }
+                                    },
+                                    new SelectEventHandler<Action>() {
+                                        @Override
+                                        public void execute(Action selectedAction) {
+                                            //Toast.makeText(getBaseContext(), ""+arg2,     Toast.LENGTH_SHORT).show();
+                                            Log.v("ListView", "selected: " + selectedAction.getTitle());
+
+                                            // Add Action to Process
+                                            extension.getComponent(Processor.class).process.addAction(selectedAction);
+
+                                            // Replace with new View
+//                                    View actionView = createActionView_v1(selectedAction);
+//                                    ViewGroupHelper.replaceView(containerView, actionView);
+
+                                            View actionView = createNewActionView_v5(selectedAction);
+
+//                                            ViewGroupHelper.replaceView(containerView, actionView);
+                                            actionListLayout.addView(actionView);
+
+//                                    openScriptEditor(selectedAction.getScript());
+                                        }
+                                    }
+                            );
+
+                            /*
                             View actionEditorView = createActionView(extension);
 //                            linearLayout2.addView(actionEditorView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                            linearLayout2.addView(actionEditorView);
+                            actionListLayout.addView(actionEditorView);
+                            */
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                            // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                            // TODO:
                         } else {
-                            // TODO:
                         }
 
                         return true;
@@ -632,6 +772,7 @@ public class NativeUi {
                 // Button: Test Script
                 Button button3 = new Button(context);
                 button3.setText("Test");
+                button3.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
                 button3.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 button3.setBackgroundColor(Color.parseColor("#44000000"));
 
@@ -654,13 +795,15 @@ public class NativeUi {
                             // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            List<Action> actions = process.getActions();
+                            List<Action> actions = extension.getComponent(Processor.class).process.getActions();
                             for (int i = 0; i < actions.size(); i++) {
                                 Log.v("ActionProcess", "" + i + ": " + actions.get(i).getTitle());
                             }
 
                             // Send complete scripts to Hosts
-                            new HttpPostRequestTask().execute("http://stackoverflow.com");
+                            HttpRequestTask httpRequestTask = new HttpRequestTask();
+                            httpRequestTask.entity = extension;
+                            new HttpPostRequestTask().execute(httpRequestTask); // TODO: Replace with queueHttpTask(httpTask)
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                             // TODO:
@@ -684,17 +827,27 @@ public class NativeUi {
 
                 // Add to main Application View
                 FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
-                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                frameLayout.addView(containerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+
+                // <POPULATE_DATA>
+                List<Action> actions = extension.getComponent(Processor.class).process.getActions();
+                for (int i = 0; i < actions.size(); i++) {
+                    Log.v("ActionProcess", "" + i + ": " + actions.get(i).getTitle());
+                    View actionView = createNewActionView_v5(actions.get(i));
+                    actionListLayout.addView(actionView);
+                }
+                // </POPULATE_DATA>
             }
         });
     }
 
-    public interface SelectEventHandler<T> {
-        void execute(T selection);
-    }
-
     public interface LabelMapper<T> {
         String map(T element);
+    }
+
+    public interface SelectEventHandler<T> {
+        void execute(T selection);
     }
 
     public View createListView(final List listData, final LabelMapper labelMapper, final SelectEventHandler selectEventHandler) {
@@ -769,17 +922,19 @@ public class NativeUi {
         return null;
     }
 
-    class HttpGetRequestTask extends AsyncTask<String, String, String> {
+    class HttpGetRequestTask extends AsyncTask<HttpRequestTask, String, String> {
 
-        String serverUri = "http://192.168.1.2:8001/repository/actions";
+        //        String serverUri = "http://192.168.1.2:8001/repository/actions";
         String response = "";
 
         @Override
-        protected String doInBackground(String... uri) {
+        protected String doInBackground(HttpRequestTask... httpRequestTasks) {
+            HttpRequestTask httpRequestTask = httpRequestTasks[0];
+
             Log.v("HTTPResponse", "HttpGetRequestTask");
             String responseString = null;
             try {
-                URL url = new URL(serverUri);
+                URL url = new URL(httpRequestTask.uri);
                 HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
                 if (httpConnection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
                     // Do normal input or output stream reading
@@ -810,6 +965,7 @@ public class NativeUi {
                     Log.v("HTTPResponse", "HTTP GET response: " + jsonString);
 
 
+                    // <RESPONSE_HANDLER>
                     // Create JSON object from file contents
                     JSONObject jsonObject = null;
                     try {
@@ -842,6 +998,7 @@ public class NativeUi {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    // </RESPONSE_HANDLER>
 
                 } else {
                     response = "FAILED"; // See documentation for more info on response handling
@@ -860,17 +1017,25 @@ public class NativeUi {
         }
     }
 
-    // TODO: 11/21/2016 Add HttpPostRequestTask to global TCP/UDP communications queue to server.
-    class HttpPostRequestTask extends AsyncTask<String, String, String> {
+    public static String DEFAULT_HTTP_POST_PROCESS_URI = "http://192.168.1.2:8001/jsonPost";
 
-        String serverUri = "http://192.168.1.2:8001/jsonPost";
+    class HttpRequestTask {
+        public String uri = DEFAULT_HTTP_POST_PROCESS_URI;
+        public Entity entity = null;
+    }
+
+    // TODO: 11/21/2016 Add HttpPostRequestTask to global TCP/UDP communications queue to server.
+    class HttpPostRequestTask extends AsyncTask<HttpRequestTask, String, String> {
+
+        //        String serverUri = "http://192.168.1.2:8001/jsonPost";
         String response = "";
 
         @Override
-        protected String doInBackground(String... uri) {
+        protected String doInBackground(HttpRequestTask... httpRequestTasks) {
+            HttpRequestTask httpRequestTask = httpRequestTasks[0];
             String responseString = null;
             try {
-                URL url = new URL(serverUri);
+                URL url = new URL(httpRequestTask.uri);
                 HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
                 httpConnection.setRequestMethod("POST");// type of request
                 httpConnection.setRequestProperty("Content-Type", "application/json");//some header you want to add
@@ -882,6 +1047,9 @@ public class NativeUi {
                 DataOutputStream dataOutputStream = new DataOutputStream(httpConnection.getOutputStream());
                 //content is the object you want to send, use instead of NameValuesPair
 //                mapper.writeValue(dataOutputStream, content);
+
+                // <REFACTOR>
+                Process process = httpRequestTask.entity.getComponent(Processor.class).process;
 
                 String processActionScripts = "{ \"type\": \"process\", \"actions\": [";
                 List<Action> actions = process.getActions();
@@ -897,6 +1065,7 @@ public class NativeUi {
                     }
                 }
                 processActionScripts += "] }";
+                // </REFACTOR>
 
                 //httpConnection.getOutputStream().write("{ \"type\": \"Action\", \"script_uuid\": \"08edbf0a-b020-11e6-80f5-76304dec7eb7\" }".getBytes());
                 Log.v("HttpPostRequestTask", "HTTP POST: " + processActionScripts);
@@ -929,123 +1098,11 @@ public class NativeUi {
     }
 
     private View createPulseControllerView(Entity port) {
-        return createPulseControllerView_v1(port);
+        return createPulseControllerView_v2(port);
     }
 
     private View createWaveControllerView(Entity port) {
-        return createWaveControllerView_v1(port);
-    }
-
-    private View createSwitchControllerView_v1(Entity port) {
-
-        // TODO: Add dropdown with available data sources to choose from.
-        // TODO: Expose manual controls when selected.
-
-        LinearLayout containerView = new LinearLayout(context);
-        containerView.setOrientation(LinearLayout.VERTICAL);
-
-        /*
-        View selectorView = createSelector("Select Data Controller", new RequestDataTask<String>() {
-            @Override
-            public List<String> execute() {
-                List<Action> actions = process.getActions();
-
-                final List<String> actionTitles = new ArrayList<>();
-                for (int i = 0; i < actions.size(); i++) {
-                    actionTitles.add(actions.get(i).getTitle());
-                }
-                return actionTitles;
-            }
-        });
-        containerView.addView(selectorView);
-        */
-
-        // Choose Controller
-        /*
-        final View chooseControllerButton = createCloseButtonView("Choose Controller Data", new SelectEventHandler<Integer>() {
-            @Override
-            public void execute(Integer selectedViewId) {
-
-                List<Action> actions = process.getActions();
-
-                createListView(
-                        actions,
-                        new LabelMapper<Action>() {
-                            @Override
-                            public String map(Action action) {
-                                return action.getTitle();
-                            }
-                        },
-                        new SelectEventHandler<Action>() {
-                            @Override
-                            public void execute(Action selectedAction) {
-                                Log.v("ListView", "selected: " + selectedAction.getTitle());
-
-                                // <REFACTOR>
-                                List<Action> actions = process.getActions();
-                                for (int i = 0; i < actions.size(); i++) {
-                                    if (actions.get(i) == selectedAction) {
-
-                                    }
-                                }
-                                // </REFACTOR>
-
-                                // TODO: Mark the Port's data source by highlighting/indicating it in the list the color corresponding to the Port.
-
-//                                // Add Action to Process
-//                                process.addAction(selectedAction);
-//
-//                                // Replace with new View
-////                                    View actionView = createActionView_v1(selectedAction);
-////                                    ViewGroupHelper.replaceView(containerView, actionView);
-//
-//                                View actionView = createNewActionView_v5(selectedAction);
-//                                ViewGroupHelper.replaceView(containerView, actionView);
-                            }
-                        }
-                );
-
-            }
-        });
-        containerView.addView(chooseControllerButton);
-        */
-
-        containerView.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
-
-        LinearLayout digitalPortLayout = new LinearLayout(context);
-        digitalPortLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        LinearLayout.LayoutParams digitalLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        digitalLayoutParams.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
-        digitalPortLayout.setLayoutParams(digitalLayoutParams);
-
-        digitalPortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
-
-        // Digital Label
-        View digitalText = createTextView("Switch", 2);
-        digitalPortLayout.addView(digitalText);
-
-        // Text: "Data Sources (Imports)"
-        final EditText digitalValue = new EditText(context);
-        digitalValue.setTextSize(11.0f);
-        digitalValue.setHint("[on|off]");
-        digitalValue.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
-        digitalValue.setBackgroundColor(Color.parseColor("#44000000"));
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, ViewGroupHelper.dpToPx(5), 0, 0);
-        digitalValue.setLayoutParams(params);
-        digitalPortLayout.addView(digitalValue);
-
-        containerView.addView(digitalPortLayout);
-
-        return containerView;
+        return createWaveControllerView_v2(port);
     }
 
     private View createSwitchControllerView_v2(Entity port) {
@@ -1063,9 +1120,13 @@ public class NativeUi {
         // ...
         int TASK_BUTTON_WIDTH = 150;
 
+        int BUTTON_TEXT_SIZE = 12;
+
         String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.SWITCH);
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
+
+        String BUTTON_TEXT_COLOR = "#ffffffff";
         // </PARAMETERS>
 
         // <CONTAINER_VIEW>
@@ -1133,7 +1194,9 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("On"); // i.e., [Project][Internet][Generator]
+        taskButton1.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setTextSize(BUTTON_TEXT_SIZE);
         taskButton1.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
@@ -1187,7 +1250,9 @@ public class NativeUi {
         // <TASK_BUTTON>
         Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
+        taskButton2.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         taskButton2.setText("Off"); // i.e., [Project][Internet][Generator]
+        taskButton2.setTextSize(BUTTON_TEXT_SIZE);
         taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton2.setMinWidth(0);
@@ -1240,7 +1305,9 @@ public class NativeUi {
         // <TASK_BUTTON>
         Button taskButton3 = new Button(context);
         taskButton3.setId(taskButton3Id);
+        taskButton3.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         taskButton3.setText("In"); // i.e., [Project][Internet][Generator]
+        taskButton3.setTextSize(BUTTON_TEXT_SIZE);
         taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton3.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 
@@ -1277,6 +1344,573 @@ public class NativeUi {
             }
         });
         // </TASK_BUTTON>
+
+        return containerView;
+    }
+
+    // <TODO>
+    public enum ViewType {
+        BUTTON,
+        TEXT // i.e., for labels, read-only text, editable text
+    }
+
+    public class Parameters {
+
+    }
+
+    public class EntryView {
+        ViewType type;
+        Parameters parameters;
+    }
+
+    private View createEntryView(String label) {
+        return null;
+    }
+    // </TODO>
+
+    private View createPulseControllerView_v2(Entity port) {
+
+        String labelButtonText = "Pulse";
+
+        // <PARAMETERS>
+        abstract class LabelParameters {
+
+        }
+
+        abstract class TaskParameters {
+
+        }
+
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_TOP = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_RIGHT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_BOTTOM = ViewGroupHelper.dpToPx(20);
+        // ...
+
+        int BUTTON_TEXT_SIZE = 12;
+
+        int BUTTON_INNER_PADDING_LEFT = ViewGroupHelper.dpToPx(5);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
+        int BUTTON_INNER_PADDING_RIGHT = ViewGroupHelper.dpToPx(5);
+        int BUTTON_INNER_PADDING_BOTTOM = ViewGroupHelper.dpToPx(12);
+
+        int BUTTON_OUTER_PADDING_LEFT = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_RIGHT = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_BOTTOM = 0; // was ViewGroupHelper.dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 400;
+
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.PULSE);
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+
+        int TEXT_INNER_PADDING_LEFT = ViewGroupHelper.dpToPx(5);
+        int TEXT_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
+        int TEXT_INNER_PADDING_RIGHT = ViewGroupHelper.dpToPx(5);
+        int TEXT_INNER_PADDING_BOTTOM = ViewGroupHelper.dpToPx(12);
+        // </PARAMETERS>
+
+        // <CONTAINER_VIEW>
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerViewLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerViewLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerViewLayoutParams);
+        // </CONTAINER_VIEW>
+
+
+        int labelButtonId = generateViewId();
+        final int taskButton1Id = generateViewId();
+        final int taskButton2Id = generateViewId();
+//        final int taskButton3Id = generateViewId();
+
+
+        // <LABEL_BUTTON>
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(labelButtonText); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextColor(Color.parseColor("#88ffffff"));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(BUTTON_OUTER_PADDING_LEFT, BUTTON_OUTER_PADDING_TOP, BUTTON_OUTER_PADDING_RIGHT, BUTTON_OUTER_PADDING_BOTTOM);
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton2Id); // Set to left of left-most "task button view"
+        labelButton.setLayoutParams(labelButtonParams);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(labelButton);
+        // </LABEL_BUTTON>
+
+        // <TASK_BUTTON>
+        EditText taskButton1 = new EditText(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton1.setTypeface(null, Typeface.BOLD);
+        // taskButton1.setAllCaps(true); // NOTE: Doesn't work for EditText
+        taskButton1.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+        // TODO: Set BOLD
+        taskButton1.setHint("On Time (DS)".toUpperCase()); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+//        taskButton1.setMinWidth(0);
+//        taskButton1.setMinHeight(0);
+//        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+//        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1Params.addRule(RelativeLayout.CENTER_VERTICAL); // for EditText, for vertical centering
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        /*
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#44000000"));
+                    offView.setBackgroundColor(Color.parseColor("#00000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        */
+
+        containerView.addView(taskButton1);
+        // </TASK_BUTTON>
+
+        // <TASK_BUTTON>
+        EditText taskButton2 = new EditText(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton2.setTypeface(null, Typeface.BOLD);
+        // taskButton2.setAllCaps(true); // NOTE: Doesn't work for EditText
+        taskButton2.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+        taskButton2.setHint("Interval (Period)".toUpperCase()); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
+        taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2Params.addRule(RelativeLayout.CENTER_VERTICAL); // for EditText, for vertical centering
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        containerView.addView(taskButton2);
+
+        /*
+        taskButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#00000000"));
+                    offView.setBackgroundColor(Color.parseColor("#44000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        */
+        // </TASK_BUTTON>
+
+        /*
+        // <TASK_BUTTON>
+        Button taskButton3 = new Button(context);
+        taskButton3.setId(taskButton3Id);
+        taskButton3.setText("In"); // i.e., [Project][Internet][Generator]
+        taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
+        taskButton3.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+
+        RelativeLayout.LayoutParams taskButton3Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton3Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton3Params.width = TASK_BUTTON_WIDTH;
+        taskButton3Params.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+        taskButton3.setLayoutParams(taskButton3Params);
+
+        containerView.addView(taskButton3);
+
+        taskButton3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // TODO:
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        // </TASK_BUTTON>
+        */
+
+        return containerView;
+    }
+
+    private View createWaveControllerView_v2(Entity port) {
+
+        String labelButtonText = "Wave";
+
+        // <PARAMETERS>
+        abstract class LabelParameters {
+
+        }
+
+        abstract class TaskParameters {
+
+        }
+
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
+        // ...
+        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_TOP = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_RIGHT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_PADDING_BOTTOM = ViewGroupHelper.dpToPx(20);
+        // ...
+
+        int BUTTON_TEXT_SIZE = 12;
+
+        int BUTTON_INNER_PADDING_LEFT = ViewGroupHelper.dpToPx(5);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
+        int BUTTON_INNER_PADDING_RIGHT = ViewGroupHelper.dpToPx(5);
+        int BUTTON_INNER_PADDING_BOTTOM = ViewGroupHelper.dpToPx(12);
+
+        int BUTTON_OUTER_PADDING_LEFT = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_RIGHT = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_BOTTOM = 0; // was ViewGroupHelper.dpToPx(5)
+        // ...
+        int TASK_BUTTON_WIDTH = 400;
+
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.WAVE);
+
+        String BUTTON_BACKGROUND_COLOR = "#00000000";
+
+        int TEXT_INNER_PADDING_LEFT = ViewGroupHelper.dpToPx(5);
+        int TEXT_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
+        int TEXT_INNER_PADDING_RIGHT = ViewGroupHelper.dpToPx(5);
+        int TEXT_INNER_PADDING_BOTTOM = ViewGroupHelper.dpToPx(12);
+        // </PARAMETERS>
+
+        // <CONTAINER_VIEW>
+        final RelativeLayout containerView = new RelativeLayout(context);
+        containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
+
+        LinearLayout.LayoutParams containerViewLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        containerViewLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+
+        containerView.setLayoutParams(containerViewLayoutParams);
+        // </CONTAINER_VIEW>
+
+
+        int labelButtonId = generateViewId();
+        final int taskButton1Id = generateViewId();
+//        final int taskButton2Id = generateViewId();
+//        final int taskButton3Id = generateViewId();
+
+
+        // <LABEL_BUTTON>
+        // Button: "Import Data Source"
+        Button labelButton = new Button(context);
+        labelButton.setId(labelButtonId);
+        labelButton.setText(labelButtonText); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextColor(Color.parseColor("#88ffffff"));
+        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+        labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+        RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        labelButtonParams.setMargins(BUTTON_OUTER_PADDING_LEFT, BUTTON_OUTER_PADDING_TOP, BUTTON_OUTER_PADDING_RIGHT, BUTTON_OUTER_PADDING_BOTTOM);
+        labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton1Id); // Set to left of left-most "task button view"
+        labelButton.setLayoutParams(labelButtonParams);
+
+        labelButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+
+        containerView.addView(labelButton);
+        // </LABEL_BUTTON>
+
+        // <TASK_BUTTON>
+        EditText taskButton1 = new EditText(context);
+        taskButton1.setId(taskButton1Id);
+        taskButton1.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton1.setTypeface(null, Typeface.BOLD);
+        // taskButton1.setAllCaps(true); // NOTE: Doesn't work for EditText
+        taskButton1.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+        // TODO: Set BOLD
+        taskButton1.setHint("Amplitude (Voltage/ADC)".toUpperCase()); // i.e., [Project][Internet][Generator]
+        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
+        taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+//        taskButton1.setMinWidth(0);
+//        taskButton1.setMinHeight(0);
+//        taskButton1.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton1Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+        taskButton1Params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//        taskButton1Params.addRule(RelativeLayout.RIGHT_OF, labelButtonId);
+//        taskButton1Params.width = TASK_BUTTON_WIDTH;
+        taskButton1Params.addRule(RelativeLayout.CENTER_VERTICAL); // for EditText, for vertical centering
+        taskButton1.setLayoutParams(taskButton1Params);
+
+        /*
+        taskButton1.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#44000000"));
+                    offView.setBackgroundColor(Color.parseColor("#00000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        */
+
+        containerView.addView(taskButton1);
+        // </TASK_BUTTON>
+
+        /*
+        // <TASK_BUTTON>
+        EditText taskButton2 = new EditText(context);
+        taskButton2.setId(taskButton2Id);
+        taskButton2.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton2.setHint("Interval (Period)"); // i.e., [Project][Internet][Generator]
+        taskButton2.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
+        taskButton2.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+//        taskButton2.setMinWidth(0);
+//        taskButton2.setMaxWidth(10);
+//        taskButton2.setMinHeight(0);
+//        taskButton2.setIncludeFontPadding(false);
+
+        RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton2Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton2Params.width = TASK_BUTTON_WIDTH;
+        taskButton2Params.addRule(RelativeLayout.LEFT_OF, taskButton1Id);
+        taskButton2Params.addRule(RelativeLayout.CENTER_VERTICAL); // for EditText, for vertical centering
+        taskButton2.setLayoutParams(taskButton2Params);
+
+        containerView.addView(taskButton2);
+
+        taskButton2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Single-Selector Handler Strategy
+                    View onView = Application.getApplication_().findViewById(taskButton1Id);
+                    View offView = Application.getApplication_().findViewById(taskButton2Id);
+
+                    // TODO: Update state!
+
+                    // Update style to reflect state
+                    onView.setBackgroundColor(Color.parseColor("#00000000"));
+                    offView.setBackgroundColor(Color.parseColor("#44000000"));
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        // </TASK_BUTTON>
+        */
+
+        /*
+        // <TASK_BUTTON>
+        Button taskButton3 = new Button(context);
+        taskButton3.setId(taskButton3Id);
+        taskButton3.setText("In"); // i.e., [Project][Internet][Generator]
+        taskButton3.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
+        taskButton3.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
+
+        RelativeLayout.LayoutParams taskButton3Params = new RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        taskButton3Params.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
+//        taskButton3Params.width = TASK_BUTTON_WIDTH;
+        taskButton3Params.addRule(RelativeLayout.LEFT_OF, taskButton2Id);
+        taskButton3.setLayoutParams(taskButton3Params);
+
+        containerView.addView(taskButton3);
+
+        taskButton3.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // TODO:
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                } else {
+                }
+
+                return true;
+            }
+        });
+        // </TASK_BUTTON>
+        */
 
         return containerView;
     }
@@ -1429,12 +2063,12 @@ public class NativeUi {
     }
 
     // <REFACTOR>
-    private Process process = new Process();
+//    private Process process = new Process();
     // </REFACTOR>
 
     private View createActionView(final Entity extension) {
         // return createActionView_v3(extension);
-        return createNewActionView_v4("New/Edit");
+        return createNewActionView_v4(extension);
     }
 
     /*
@@ -1562,6 +2196,7 @@ public class NativeUi {
                 scriptEditorView.setTextSize(SCRIPT_EDITOR_TEXT_SIZE);
                 scriptEditorView.setLineSpacing(SCRIPT_EDITOR_LINE_SPACING, SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER);
                 // scriptEditorView.setHint("");
+
                 String formattedScriptText = "";
                 if (script == null) {
                     formattedScriptText = "" +
@@ -1573,8 +2208,44 @@ public class NativeUi {
                             "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Cast to larger screen and attach keyboard.</font><br />" +
                             "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Open script and action editors on two screens.</font>";
                 } else {
+
                     formattedScriptText = script.getCode();
+                    // formattedScriptText = formattedScriptText.replace("\n", "<br />");
+                    // formattedScriptText = formattedScriptText.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
                 }
+
+                /*
+                // <SYNTAX_HIGHLIGHTER>
+                Formatter htmlFormatter = null;
+                try {
+                    htmlFormatter = Formatter.getByName("html");
+                } catch (ResolutionException x) {
+                    Log.v("Jygments", "cannot get HTML formatter");
+                }
+
+                //String contents = "var action = function(data) { clay.getPorts(); return data; }"; // submittedFile.getContents();
+                String contents = script.getCode();
+                String formattedText = null;
+                try {
+                    Lexer lexer = Lexer.getByName("javascript");
+                    CharArrayWriter w = new CharArrayWriter();
+                    htmlFormatter.format(lexer.getTokens(contents), w);
+                    formattedText = w.toString();
+
+                } catch (ResolutionException x) {
+                    Log.v("Pygments", "cannot syntax highlight: " + x);
+                    formattedText = contents;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.v("Jygments", "formatted text: " + formattedText);
+
+//                textPane.setText(formattedText);
+//                textPane.setCaretPosition(0);
+                formattedScriptText = formattedText;
+                // </SYNTAX_HIGHLIGHTER>
+                */
+
                 scriptEditorView.setText(Html.fromHtml(formattedScriptText));
                 scriptEditorView.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
                 scriptEditorView.setBackgroundColor(Color.parseColor("#44000000"));
@@ -1682,14 +2353,14 @@ public class NativeUi {
                 linearLayout2.setOrientation(LinearLayout.VERTICAL);
                 linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                linearLayout.addView(createButtonView("portable separation distance"));
-                linearLayout.addView(createButtonView("extension separation MIN"));
-                linearLayout.addView(createButtonView("extension separation MAX"));
+                linearLayout.addView(createButtonView("portable separation distance", null));
+                linearLayout.addView(createButtonView("extension separation MIN", null));
+                linearLayout.addView(createButtonView("extension separation MAX", null));
 
-                linearLayout.addView(createButtonView("add/remove Host"));
-                linearLayout.addView(createButtonView("enable/disable notifications"));
-                linearLayout.addView(createButtonView("enable/disable vibration"));
-                linearLayout.addView(createButtonView("enable/disable network"));
+                linearLayout.addView(createButtonView("add/remove Host", null));
+                linearLayout.addView(createButtonView("enable/disable notifications", null));
+                linearLayout.addView(createButtonView("enable/disable vibration", null));
+                linearLayout.addView(createButtonView("enable/disable network", null));
 
                 // Title: "Settings"
                 TextView debugSubtitle = new TextView(context);
@@ -1700,10 +2371,10 @@ public class NativeUi {
                 debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(debugSubtitle);
 
-                linearLayout.addView(createButtonView("debug: show monitor"));
-                linearLayout.addView(createButtonView("debug: show boundaries"));
-                linearLayout.addView(createButtonView("debug: target fps"));
-                linearLayout.addView(createButtonView("debug: sleep time"));
+                linearLayout.addView(createButtonView("debug: show monitor", null));
+                linearLayout.addView(createButtonView("debug: show boundaries", null));
+                linearLayout.addView(createButtonView("debug: target fps", null));
+                linearLayout.addView(createButtonView("debug: sleep time", null));
 
                 // Add to main Application View
                 FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
@@ -1749,10 +2420,10 @@ public class NativeUi {
                 linearLayout2.setOrientation(LinearLayout.VERTICAL);
                 linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                linearLayout.addView(createButtonView("browse projects"));
-                linearLayout.addView(createButtonView("start from extensions"));
-                linearLayout.addView(createButtonView("free build"));
-                linearLayout.addView(createButtonView("challenge mode"));
+                linearLayout.addView(createButtonView("browse projects", null));
+                linearLayout.addView(createButtonView("start from extensions", null));
+                linearLayout.addView(createButtonView("free build", null));
+                linearLayout.addView(createButtonView("challenge mode", null));
 
                 // Title: "Player"
                 TextView debugSubtitle = new TextView(context);
@@ -1763,11 +2434,11 @@ public class NativeUi {
                 debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(debugSubtitle);
 
-                linearLayout.addView(createButtonView("Projects"));
-                linearLayout.addView(createButtonView("Inventory"));
-                linearLayout.addView(createButtonView("Ideas"));
-                linearLayout.addView(createButtonView("Friends"));
-                linearLayout.addView(createButtonView("Achievements"));
+                linearLayout.addView(createButtonView("Projects", null));
+                linearLayout.addView(createButtonView("Inventory", null));
+                linearLayout.addView(createButtonView("Ideas", null));
+                linearLayout.addView(createButtonView("Friends", null));
+                linearLayout.addView(createButtonView("Achievements", null));
 
                 // Title: "Store"
                 TextView storeSubtitle = new TextView(context);
@@ -1778,10 +2449,10 @@ public class NativeUi {
                 storeSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(storeSubtitle);
 
-                linearLayout.addView(createButtonView("Clay"));
-                linearLayout.addView(createButtonView("Kits"));
-                linearLayout.addView(createButtonView("Components"));
-                linearLayout.addView(createButtonView("Accessories"));
+                linearLayout.addView(createButtonView("Clay", null));
+                linearLayout.addView(createButtonView("Kits", null));
+                linearLayout.addView(createButtonView("Components", null));
+                linearLayout.addView(createButtonView("Accessories", null));
 
                 // Add to main Application View
                 FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(Application.applicationViewId);
@@ -2100,7 +2771,7 @@ public class NativeUi {
     }
 
     // TODO: Create content, style, layout parameters so they can be passed to a general function.
-    private View createButtonView(String text) {
+    private View createButtonView(final String text, final SelectEventHandler selectEventHandler) {
 
         // <PARAMETERS>
         int textSize = 10;
@@ -2144,19 +2815,19 @@ public class NativeUi {
 
                 // Update the state of the touched object based on the current pointerCoordinates interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
+                    Log.v("createButtonView", "Pressed Button");
+                    if (selectEventHandler != null) {
+                        Log.v("createButtonView", "invoking callback");
+                        selectEventHandler.execute(text);
+                    }
+
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
                 } else {
-                    // TODO:
                 }
 
                 return true;
@@ -2285,7 +2956,10 @@ public class NativeUi {
     private View createDataImportView(String text) {
 
         // <PARAMETERS>
-        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
+        int CONTAINER_LEFT_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_RIGHT_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_BOTTOM_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
         int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
         // ...
@@ -2298,6 +2972,8 @@ public class NativeUi {
         String CONTAINER_BACKGROUND_COLOR = "#44000000";
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
+
+        String BUTTON_TEXT_COLOR = "#ffffffff";
         // </PARAMETERS>
 
         // <CONTAINER_VIEW>
@@ -2308,7 +2984,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+        containerLayoutParams.setMargins(CONTAINER_LEFT_MARGIN, CONTAINER_TOP_MARGIN, CONTAINER_RIGHT_MARGIN, CONTAINER_BOTTOM_MARGIN);
 
         containerView.setLayoutParams(containerLayoutParams);
         // </CONTAINER_VIEW>
@@ -2323,6 +2999,7 @@ public class NativeUi {
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
         labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
@@ -2362,6 +3039,7 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
+        taskButton1.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
@@ -2415,9 +3093,11 @@ public class NativeUi {
         return containerView;
     }
 
-    private View createNewActionView_v4(String text) {
+    private View createNewActionView_v4(final Entity extension) {
 
         // <PARAMETERS>
+        String LABEL_TEXT = "New/Edit";
+
         int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
         // ...
         int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
@@ -2453,7 +3133,7 @@ public class NativeUi {
         // Button: "Import Data Source"
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
-        labelButton.setText(text); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setText(LABEL_TEXT); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
         labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
@@ -2491,7 +3171,8 @@ public class NativeUi {
                     newAction.setScript(newScript); // Add to repository
                     World.getWorld().repository.addAction(newAction); // Add to repository
 
-                    process.addAction(newAction);
+                    // Add Action for Extension's Process
+                    extension.getComponent(Processor.class).process.addAction(newAction);
 
                     // Replace with new View
 //                    View newActionView = createNewActionView_v3(newAction);
@@ -2615,7 +3296,7 @@ public class NativeUi {
                                     Log.v("ListView", "selected: " + selectedAction.getTitle());
 
                                     // Add Action to Process
-                                    process.addAction(selectedAction);
+                                    extension.getComponent(Processor.class).process.addAction(selectedAction);
 
                                     // Replace with new View
 //                                    View actionView = createActionView_v1(selectedAction);
@@ -2645,21 +3326,29 @@ public class NativeUi {
 
     private View createNewActionView_v5(final Action action) {
 
-        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(5);
-        // ...
-        int BUTTON_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
-        // ...
-        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12);
-        // ...
+        int CONTAINER_LEFT_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_TOP_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_RIGHT_MARGIN = ViewGroupHelper.dpToPx(0);
+        int CONTAINER_BOTTOM_MARGIN = ViewGroupHelper.dpToPx(0);
+
+        int BUTTON_INNER_PADDING_LEFT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_INNER_PADDING_TOP = ViewGroupHelper.dpToPx(12); // ViewGroupHelper.dpToPx(12)
+        int BUTTON_INNER_PADDING_RIGHT = ViewGroupHelper.dpToPx(20);
+        int BUTTON_INNER_PADDING_BOTTOM = ViewGroupHelper.dpToPx(12); // ViewGroupHelper.dpToPx(12)
+
+        int BUTTON_OUTER_PADDING_LEFT = 0; // was ViewGroupHelper.dpToPx(5)
         int BUTTON_OUTER_PADDING_TOP = 0; // was ViewGroupHelper.dpToPx(5)
-        // ...
+        int BUTTON_OUTER_PADDING_RIGHT = 0; // was ViewGroupHelper.dpToPx(5)
+        int BUTTON_OUTER_PADDING_BOTTOM = 0; // was ViewGroupHelper.dpToPx(5)
+
         int TASK_BUTTON_WIDTH = 150;
 
-        String CONTAINER_BACKGROUND_COLOR = "#44000000";
+        String CONTAINER_BACKGROUND_COLOR = "#88000000";
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
 
-        int BUTTON_TEXT_SIZE = 12;
+        int BUTTON_TEXT_SIZE = 10;
+        String BUTTON_TEXT_COLOR = "#ffffffff";
 
         final RelativeLayout containerView = new RelativeLayout(context);
         containerView.setBackgroundColor(Color.parseColor(CONTAINER_BACKGROUND_COLOR));
@@ -2668,7 +3357,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        containerLayoutParams.setMargins(0, CONTAINER_TOP_MARGIN, 0, 0);
+        containerLayoutParams.setMargins(CONTAINER_LEFT_MARGIN, CONTAINER_TOP_MARGIN, CONTAINER_RIGHT_MARGIN, CONTAINER_BOTTOM_MARGIN);
 
         containerView.setLayoutParams(containerLayoutParams);
 
@@ -2681,24 +3370,25 @@ public class NativeUi {
         // Button: "Import Data Source"
         Button labelButton = new Button(context);
         labelButton.setId(labelButtonId);
-        labelButton.setText(action.getTitle() + " (" + action.getScript().getCode().length() + " lines)"); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setText(action.getTitle() + "\n (" + action.getScript().getCode().length() + " lines)"); // i.e., Formerly "Add Data Source". i.e., [Project][Internet][Generator].
+        labelButton.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
         labelButton.setTextSize(BUTTON_TEXT_SIZE);
-        labelButton.setPadding(ViewGroupHelper.dpToPx(20), BUTTON_INNER_PADDING_TOP, ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        labelButton.setIncludeFontPadding(false);
+        labelButton.setAllCaps(false);
+        labelButton.setTypeface(null, Typeface.NORMAL);
+        labelButton.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
         labelButton.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
         labelButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 //        labelButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL); // Aligns button text to the left side of the button
+        labelButton.setMinHeight(0);
 
         RelativeLayout.LayoutParams labelButtonParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
-        labelButtonParams.setMargins(0, BUTTON_OUTER_PADDING_TOP, 0, 0);
-//        params6.weight = 1;
-//        params6.gravity = Gravity.LEFT;
+        labelButtonParams.setMargins(BUTTON_OUTER_PADDING_LEFT, BUTTON_OUTER_PADDING_TOP, BUTTON_OUTER_PADDING_RIGHT, BUTTON_OUTER_PADDING_BOTTOM);
         labelButtonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         labelButtonParams.addRule(RelativeLayout.LEFT_OF, taskButton1Id); // Set to left of left-most "task button view"
-//        params6.addRule(RelativeLayout.LEFT_OF, R.id.id_to_be_left_of);
-//        params6.addRule(RelativeLayout.RIGHT_OF, button8.getId());
         labelButton.setLayoutParams(labelButtonParams);
 
         labelButton.setOnTouchListener(new View.OnTouchListener() {
@@ -2712,24 +3402,7 @@ public class NativeUi {
                 } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    // Remove current View
-
-//                    Script newScript = new Script();
-//                    newScript.setCode("// TODO: write script!");
-//                    World.getWorld().repository.addScript(newScript); // Add to repository
-//
-//                    Action newAction = new Action();
-//                    newAction.setTitle("new action");
-//                    newAction.setScript(newScript); // Add to repository
-//                    World.getWorld().repository.addAction(newAction); // Add to repository
-
-//                    process.addAction(newAction);
-
-//                    // Replace with new View
-//                    View newActionView = createNewActionView_v3(newAction);
-//
-//                    ViewGroupHelper.replaceView(containerView, newActionView);
-
+                    // Open Script Editor
                     openScriptEditor(action.getScript());
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -2747,13 +3420,17 @@ public class NativeUi {
         Button taskButton1 = new Button(context);
         taskButton1.setId(taskButton1Id);
         taskButton1.setText("\u2716"); // i.e., [Project][Internet][Generator]
-        //button9.setPadding(ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12), ViewGroupHelper.dpToPx(20), ViewGroupHelper.dpToPx(12));
+        taskButton1.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
+        taskButton1.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton1.setIncludeFontPadding(false);
+        taskButton1.setAllCaps(false);
+        taskButton1.setTypeface(null, Typeface.NORMAL);
+        //taskButton1.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
         taskButton1.setPadding(0, ViewGroupHelper.dpToPx(12), 0, ViewGroupHelper.dpToPx(12));
         taskButton1.setBackgroundColor(Color.parseColor(BUTTON_BACKGROUND_COLOR));
 //        taskButton1.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         taskButton1.setMinWidth(0);
         taskButton1.setMinHeight(0);
-        taskButton1.setIncludeFontPadding(false);
 
         RelativeLayout.LayoutParams taskButton1Params = new RelativeLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -2800,11 +3477,17 @@ public class NativeUi {
         final Button taskButton2 = new Button(context);
         taskButton2.setId(taskButton2Id);
         taskButton2.setText("\uD83D\uDD0D"); // i.e., [Project][Internet][Generator]
+        taskButton2.setTextColor(Color.parseColor(BUTTON_TEXT_COLOR));
+        taskButton2.setTextSize(BUTTON_TEXT_SIZE);
+        taskButton2.setIncludeFontPadding(false);
+        taskButton2.setAllCaps(false);
+        taskButton2.setTypeface(null, Typeface.NORMAL);
+        //taskButton1.setPadding(BUTTON_INNER_PADDING_LEFT, BUTTON_INNER_PADDING_TOP, BUTTON_INNER_PADDING_RIGHT, BUTTON_INNER_PADDING_BOTTOM);
         taskButton2.setPadding(0, BUTTON_INNER_PADDING_TOP, 0, ViewGroupHelper.dpToPx(12));
         taskButton2.setBackgroundColor(Color.parseColor("#44330000"));
 //        taskButton2.setMinWidth(0);
 //        taskButton2.setMaxWidth(10);
-//        taskButton2.setMinHeight(0);
+        taskButton2.setMinHeight(0);
 //        taskButton2.setIncludeFontPadding(false);
 
         RelativeLayout.LayoutParams taskButton2Params = new RelativeLayout.LayoutParams(

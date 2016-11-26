@@ -24,7 +24,7 @@ public class Clock { // extends Thread {
         // - android.os.SystemClock.elapsedRealtime();
     }
 
-//    private long timeFrequency = 0L; // What is this? The count frequency of the "high performance counter"
+//    private long timeFrequency = 0L; // What is this? The count delay of the "high performance counter"
     private long frameTime = 0L; // Timestamp at which the current frame was started (last call to reset())
     private double previousFrameDuration = 0.0D;
 //    private long frameDuration = 0L; // deltaLastFrame

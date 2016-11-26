@@ -4,8 +4,6 @@ import android.util.Log;
 
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Event;
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -20,6 +18,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Processor;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Style;
@@ -28,7 +27,9 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.EventHandler;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
@@ -41,7 +42,7 @@ import camp.computer.clay.lib.ImageBuilder.Text;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.Random;
 
@@ -233,9 +234,9 @@ public class EntityFactory {
 
                     } else if (configurations.size() > 0) {
 
-                        // NativeUi Player to select an ExtensionEntity from the Store
-                        // i.e., NativeUi to select extension to use! Then use that profile to create and configure ports for the extension.
-                        Application.getApplication_().getPlatformUi().openInteractiveAssembler(configurations, new NativeUi.OnActionListener<Configuration>() {
+                        // PlatformUi Player to select an ExtensionEntity from the Store
+                        // i.e., PlatformUi to select extension to use! Then use that profile to create and configure ports for the extension.
+                        Application.getApplication_().getPlatformUi().openInteractiveAssembler(configurations, new PlatformUi.OnActionListener<Configuration>() {
                             @Override
                             public void onComplete(Configuration configuration) {
 
@@ -278,6 +279,16 @@ public class EntityFactory {
         // Add Components
         extension.addComponent(new Extension()); // Unique to Extension
         extension.addComponent(new Portable());
+        extension.addComponent(new Transform());
+        extension.addComponent(new Physics());
+        extension.addComponent(new Image());
+        extension.addComponent(new Style());
+        extension.addComponent(new Boundary());
+        extension.addComponent(new Visibility());
+
+        // <REFACTOR>
+        extension.addComponent(new Processor());
+        // </REFACTOR>
 
         // <PORTABLE_COMPONENT>
         // Create Ports and add them to the Extension
@@ -296,14 +307,6 @@ public class EntityFactory {
             port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
         }
 //        Portable.getPort(extension, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 20.0 * 6.0);
-
-        // Add Components
-        extension.addComponent(new Transform());
-        extension.addComponent(new Physics());
-        extension.addComponent(new Image());
-        extension.addComponent(new Style());
-        extension.addComponent(new Boundary());
-        extension.addComponent(new Visibility());
 
 //        // <LOAD_GEOMETRY_FROM_FILE>
 //        ImageBuilder imageBuilder = new ImageBuilder();
