@@ -173,7 +173,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
         // Create Platform Rendering Surface and add it to the application view.
         platformRenderSurface = new PlatformRenderSurface(getContext());
-        FrameLayout frameLayout = (FrameLayout) Application.getApplication_().findViewById(applicationViewId);
+        FrameLayout frameLayout = (FrameLayout) Application.getInstance().findViewById(applicationViewId);
         frameLayout.addView(platformRenderSurface, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         platformRenderSurface.onResume();
@@ -352,7 +352,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     // TODO: Rename to something else and make a getPlatform() function specific to the
     // TODO: (cont'd) display interface.
-    public static Application getApplication_() {
+    public static Application getInstance() {
         return Application.application;
     }
 

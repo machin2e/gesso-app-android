@@ -39,7 +39,7 @@ public class RenderSystem extends System {
         // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to draw.
 
         // <HACK>
-        PlatformRenderSurface platformRenderSurface = Application.getApplication_().platformRenderSurface;
+        PlatformRenderSurface platformRenderSurface = Application.getInstance().platformRenderSurface;
         Palette palette = platformRenderSurface.palette;
         Canvas canvas = platformRenderSurface.canvas;
         // </HACK>
@@ -101,7 +101,7 @@ public class RenderSystem extends System {
             Entity entity = entities.get(j);
 
             // <HACK>
-            PlatformRenderSurface platformRenderSurface = Application.getApplication_().platformRenderSurface;
+            PlatformRenderSurface platformRenderSurface = Application.getInstance().platformRenderSurface;
             // </HACK>
 
             // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM>
@@ -185,7 +185,7 @@ public class RenderSystem extends System {
     public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
     public static float OVERLAY_FONT_SIZE = 25;
     public static String OVERLAY_FONT_COLOR = "#ffff0000";
-    private static Typeface typeface = Typeface.createFromAsset(Application.getApplication_().getAssets(), OVERLAY_FONT);
+    private static Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), OVERLAY_FONT);
     private static Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 
     double minFps = Double.MAX_VALUE;

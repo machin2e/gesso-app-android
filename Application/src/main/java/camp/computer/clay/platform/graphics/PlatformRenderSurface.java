@@ -389,7 +389,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
-        Application.getApplication_().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Application.getInstance().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
@@ -744,7 +744,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         palette.paint.setTextSize((float) size);
 
         // Font
-//        Typeface typeface = Typeface.createFromAsset(Application.getApplication_().getAssets(), text.font);
+//        Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
 //        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 //        paint.setTypeface(boldTypeface);
 
