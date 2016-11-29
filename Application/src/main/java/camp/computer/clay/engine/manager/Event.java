@@ -7,6 +7,9 @@ import camp.computer.clay.util.time.Clock;
 
 public class Event {
 
+    // TODO: Calculate velocity of current event relative to previous.
+    // TODO: Calculate acceleration of current event relative to previous.
+
     public enum Type {
         NONE,
         SELECT,
@@ -75,6 +78,8 @@ public class Event {
     private boolean[] isDragging = new boolean[Event.MAXIMUM_POINT_COUNT];
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
 
+    public Transform[] surfaceCoordinates = new Transform[MAXIMUM_POINT_COUNT];
+
     public Transform[] pointerCoordinates = new Transform[MAXIMUM_POINT_COUNT];
 
     // TODO: Delete this!
@@ -98,6 +103,7 @@ public class Event {
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
+            surfaceCoordinates[i] = new Transform(0, 0);
             pointerCoordinates[i] = new Transform(0, 0);
             isPointing[i] = false;
 
@@ -117,6 +123,10 @@ public class Event {
 
     public Transform getPosition() {
         return this.pointerCoordinates[0];
+    }
+
+    public Transform getSurfacePosition() {
+        return this.surfaceCoordinates[0];
     }
 
     public long getTimestamp() {

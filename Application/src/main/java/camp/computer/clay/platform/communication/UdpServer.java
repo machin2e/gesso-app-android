@@ -2,28 +2,24 @@ package camp.computer.clay.platform.communication;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.util.CRC16;
 import camp.computer.clay.platform.Message;
 import camp.computer.clay.platform.Messenger;
+import camp.computer.clay.platform.util.CRC16;
 
-public class UDPHost extends Thread implements MessengerInterface {
+public class UdpServer extends Thread implements MessengerInterface {
 
     private static final int MAX_UDP_DATAGRAM_LEN = 1500;
 
     public static final String BROADCAST_ADDRESS = "255.255.255.255";
 
     public static final int DISCOVERY_BROADCAST_PORT = 4445;
-    public static final int BROADCAST_PORT = 4446;
-    public static final int MESSAGE_PORT = BROADCAST_PORT; // or 4446
 
     // UDP server
     private WifiManager.MulticastLock multicastLock = null;
@@ -34,7 +30,7 @@ public class UDPHost extends Thread implements MessengerInterface {
 
     private String type;
 
-    public UDPHost(String type) {
+    public UdpServer(String type) {
         this.type = type;
     }
 
@@ -195,56 +191,7 @@ public class UDPHost extends Thread implements MessengerInterface {
 
     // formerly "sendAsync"
     private void sendAsync(Message message) {
-        UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
+        UdpDatagramTasks.UdpDatagramTask udpDatagramTask = new UdpDatagramTasks.UdpDatagramTask();
         udpDatagramTask.execute(message);
-    }
-
-    private class UdpDatagramTask extends AsyncTask<Message, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Message... params) {
-            // Send the message as a UDP datagram to the specified address.
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            // Get the message to send.
-            Message message = params[0];
-
-            // Send the datagram.
-            // formerly "sendDatagram(...)"
-            //sendDatagram (UDPHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
-            sendDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
-//            Log.v("UDP", "from: " + message.getSourceAddress());
-//            Log.v("UDP", "to: " + message.getTargetAddress());
-//            Log.v("UDP", "port: " + MESSAGE_PORT);
-//            Log.v("UDP", "message: " + message.getContent());
-//            Log.v("UDP", "---");
-
-            // This only happens if there was an error getting or parsing the forecast.
-            return null;
-        }
-
-        private void sendDatagram(String ipAddress, int port, String message) {
-
-            try {
-
-//                Log.v ("UDP", "ipAddress: " + ipAddress);
-//                Log.v ("UDP", "port: " + port);
-//                Log.v ("UDP", "message: " + message);
-//                Log.v ("UDP", "---");
-
-                message += "\n";
-
-                // Send UDP packet to the specified address.
-                DatagramSocket socket = new DatagramSocket(port);
-                DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);
-                socket.send(packet);
-                socket.close();
-            } catch (IOException e) {
-                Log.e("Clay", "Error ", e);
-            }
-        }
     }
 }

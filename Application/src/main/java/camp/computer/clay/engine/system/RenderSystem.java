@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.util.Log;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
@@ -23,6 +24,7 @@ import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 
 public class RenderSystem extends System {
 
@@ -33,20 +35,44 @@ public class RenderSystem extends System {
     // TODO: Move into platform layer (PlatformRenderSurface)?
     Entity camera = null;
 
+    float f = 0;
+    float incr = 0.9f;
+
     @Override
     public void update() {
+
+    }
+
+    public void update2(Canvas canvas) {
 
         // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to draw.
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getInstance().platformRenderSurface;
-        Palette palette = platformRenderSurface.palette;
-        Canvas canvas = platformRenderSurface.canvas;
+        // platformRenderSurface.setDrawingCacheEnabled(true);
+//        Palette palette = platformRenderSurface.palette;
+//        Canvas canvas = platformRenderSurface.canvas;
         // </HACK>
 
-        platformRenderSurface.canvas = canvas;
+        Palette palette = new Palette();
+        palette.canvas = canvas;
+        palette.paint = platformRenderSurface.paint;
+
+//        platformRenderSurface.canvas = canvas;
         Bitmap canvasBitmap = platformRenderSurface.canvasBitmap;
         Matrix identityMatrix = platformRenderSurface.identityMatrix;
+
+        if (camera == null) {
+            camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        }
+
+        double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt; // 1.0;
+        f += incr * dt;
+        if (f < -500.0f || f > 500.0f) {
+            incr *= -1;
+        }
+
+//        palette.canvas.save();
 
         // Adjust the Camera
         palette.canvas.save();
@@ -55,32 +81,40 @@ public class RenderSystem extends System {
             camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
         }
         Transform cameraPosition = camera.getComponent(Transform.class);
+        double scale = world.getSystem(CameraSystem.class).getScale(camera);
         palette.canvas.translate(
-                (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
+                (float) platformRenderSurface.originPosition.x + f, // (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
                 (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
         );
+        Log.v("xpos", "camera.x: " + ((float) platformRenderSurface.originPosition.x + f));
 
-        double scale = world.getSystem(CameraSystem.class).getScale(camera);
+//        event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + cameraTransform.x)) / cameraScale;
+//        event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + cameraTransform.y)) / cameraScale;
+
+//        double scale = world.getSystem(CameraSystem.class).getScale(camera);
         palette.canvas.scale(
                 (float) scale,
                 (float) scale
         );
 
-
         palette.canvas.drawColor(Color.WHITE); // Draw the background
 
         // TODO: renderSystem.update();
 
-        drawEntities(palette);
+//        drawEntities(palette);
 
         palette.canvas.restore();
 
-        if (World.ENABLE_DRAW_OVERLAY) {
-            drawOverlay(platformRenderSurface);
-        }
+//        if (World.ENABLE_DRAW_OVERLAY) {
+//            drawOverlay(platformRenderSurface);
+//        }
+//
+//        drawDebugOverlay(platformRenderSurface);
 
         // Paint the bitmap to the "primary" canvas.
         palette.canvas.drawBitmap(canvasBitmap, identityMatrix, null);
+
+//        palette.canvas.restore();
 
         /*
         // Alternative to the above
@@ -91,7 +125,8 @@ public class RenderSystem extends System {
         */
     }
 
-    public void drawEntities(Palette palette) {
+    //public void drawEntities(Palette palette) {
+    public void drawEntities(Canvas canvas, Paint paint, Palette palette) {
 
         // TODO: This call is expensive. Make it way faster. Cache? Sublist?
         Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
@@ -126,13 +161,13 @@ public class RenderSystem extends System {
             if (entity.hasComponent(Path.class)) {
 
                 // TODO: Make the rendering state automatic... enable or disable geometry sets in the image?
-
+//
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    platformRenderSurface.drawEditablePath(entity, palette);
+                    platformRenderSurface.drawEditablePath(entity, canvas, paint, palette);
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
-                        platformRenderSurface.drawOverviewPath(entity, palette);
+                        platformRenderSurface.drawOverviewPath(entity, canvas, paint, palette);
                     }
                 }
 
@@ -143,12 +178,12 @@ public class RenderSystem extends System {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    palette.canvas.save();
+                    canvas.save();
                     Group<Entity> shapes = Image.getShapes(entity);
                     for (int i = 0; i < shapes.size(); i++) {
-                        platformRenderSurface.drawShape(shapes.get(i), palette);
+                        platformRenderSurface.drawShape(shapes.get(i), canvas, paint);
                     }
-                    palette.canvas.restore();
+                    canvas.restore();
                 }
 //                }
 
@@ -191,10 +226,10 @@ public class RenderSystem extends System {
     double minFps = Double.MAX_VALUE;
     double maxFps = Double.MIN_VALUE;
 
-    public void drawOverlay(PlatformRenderSurface platformRenderSurface) {
+    public void drawOverlay(Canvas canvas, Paint paint, PlatformRenderSurface platformRenderSurface) {
 
-        Canvas canvas = platformRenderSurface.canvas;
-        Paint paint = platformRenderSurface.paint;
+//        Canvas canvas = platformRenderSurface.canvas;
+//        Paint paint = platformRenderSurface.paint;
         // World world = platformRenderSurface.getWorld(););
 
         // Font
@@ -383,5 +418,43 @@ public class RenderSystem extends System {
 //        canvas.drawText(shapeBoundaryCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
 //        canvas.restore();
 //        // </BOUNDARY_COUNT>
+    }
+
+    public void drawDebugOverlay(Canvas canvas, Paint paint, PlatformRenderSurface platformRenderSurface) {
+
+//        Canvas canvas = platformRenderSurface.canvas;
+//        Paint paint = platformRenderSurface.paint;
+        // World world = platformRenderSurface.getWorld(););
+
+        // Font
+        paint.setTypeface(boldTypeface);
+
+        // <DISPLAY_SURFACE_AXES>
+        canvas.save();
+        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
+        paint.setStrokeWidth(1.0f);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(OVERLAY_FONT_SIZE);
+
+        // Horizontal Axis
+        canvas.drawLine(
+                0,
+                DeviceDimensionsHelper.getDisplayHeight(Application.getContext()) / 2.0f,
+                DeviceDimensionsHelper.getDisplayWidth(Application.getContext()),
+                DeviceDimensionsHelper.getDisplayHeight(Application.getContext()) / 2.0f,
+                paint
+        );
+
+        // Vertical Axis
+        canvas.drawLine(
+                DeviceDimensionsHelper.getDisplayWidth(Application.getContext()) / 2.0f,
+                0,
+                DeviceDimensionsHelper.getDisplayWidth(Application.getContext()) / 2.0f,
+                DeviceDimensionsHelper.getDisplayHeight(Application.getContext()),
+                paint
+        );
+
+        canvas.restore();
+        // </DISPLAY_SURFACE_AXES>
     }
 }

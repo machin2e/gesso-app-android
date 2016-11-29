@@ -37,9 +37,10 @@ public class TCPClientHost {
 
     /**
      * Callback to call when a message is received from the remote device.
+     *
      * @param onMessageReceived Callback
      */
-    public void setOnMessageReceived (OnMessageReceived onMessageReceived) {
+    public void setOnMessageReceived(OnMessageReceived onMessageReceived) {
         mMessageListener = onMessageReceived;
     }
 
@@ -48,14 +49,14 @@ public class TCPClientHost {
      *
      * @param message text entered by client
      */
-    public boolean expose(String message) {
-        Log.v ("TCP_Client", "\tSending: " + message);
+    public boolean sendMessage(String message) {
+        Log.v("TCP_Client", "\tSending: " + message);
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
             return true;
         } else {
-            Log.v ("TCP_Client", "\tERROR Sending: " + message);
+            Log.v("TCP_Client", "\tERROR Sending: " + message);
             return false;
         }
     }
@@ -63,7 +64,7 @@ public class TCPClientHost {
     /**
      * Close the connection and release the members
      */
-    public void stop () {
+    public void stop() {
         Log.i("TCP_Client", "stop");
 
         // send mesage that we are closing the connection
@@ -92,7 +93,7 @@ public class TCPClientHost {
 
 //            Log.e("TCP_Client", "C: Connecting...");
 
-            Log.v ("TCP_Client_Connect", "Connecting to " + this.remoteAddress.toString());
+            Log.v("TCP_Client_Connect", "Connecting to " + this.remoteAddress.toString());
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(remoteAddress, remotePort);
@@ -117,7 +118,7 @@ public class TCPClientHost {
 
                         if (String.valueOf(firstCharacter).equals("\n")) { // TODO: Update "\n" to look for regex
                             // call the method messageReceived from MyActivity class
-                            String messageCopy = new String (mServerMessage);
+                            String messageCopy = new String(mServerMessage);
                             mMessageListener.messageReceived(messageCopy);
                             mServerMessage = ""; // Reset the string
                         }
@@ -151,7 +152,7 @@ public class TCPClientHost {
                     }
                     */
 
-                    Log.v ("TCP_Client", "running");
+                    Log.v("TCP_Client", "running");
 
                 }
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
@@ -183,7 +184,7 @@ public class TCPClientHost {
 
     }
 
-    public boolean isRunning () {
+    public boolean isRunning() {
         return mRun;
     }
 

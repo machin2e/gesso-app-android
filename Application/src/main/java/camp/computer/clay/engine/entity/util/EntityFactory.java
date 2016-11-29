@@ -1087,7 +1087,15 @@ public class EntityFactory {
 
                 //            if (action.isDragging()) {
                 // TODO: Make sure there's no inconsistency "information access sequence" between this EventHandlerSystem, InputSystem, and PlatformRenderSurface.onTouch. Should only access info from previously dispatched? event
-                world.getSystem(CameraSystem.class).setOffset(camera, event.xOffset, event.yOffset);
+                //world.getSystem(CameraSystem.class).setOffset(camera, event.xOffset, event.yOffset);
+                camera.getComponent(Physics.class).targetTransform.set(
+//                        camera.getComponent(Transform.class).x - event.xOffset,
+//                        camera.getComponent(Transform.class).y - event.yOffset
+//                        camera.getComponent(Transform.class).x + event.xOffset,
+//                        camera.getComponent(Transform.class).y + event.yOffset
+                        camera.getComponent(Physics.class).targetTransform.x + event.xOffset,
+                        camera.getComponent(Physics.class).targetTransform.y + event.yOffset
+                );
                 Log.v("CameraEvent", "offset.x: " + event.getOffset().y + ", y: " + event.getOffset().y);
 //            }
             }

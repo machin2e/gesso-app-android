@@ -23,6 +23,19 @@ import camp.computer.clay.model.Process;
 
 public class HttpRequestTasks {
 
+    public static final int DEFAULT_ASSET_SERVER_PORT = 8001;
+
+    public static final String DEFAULT_ASSET_SERVER_BASE_URI = "http://192.168.1.2:" + String.valueOf(DEFAULT_ASSET_SERVER_PORT);
+
+    public static final String DEFAULT_HTTP_GET_ACTIONS_URI = DEFAULT_ASSET_SERVER_BASE_URI + "/assets/actions";
+
+    public static final String DEFAULT_HTTP_POST_PROCESS_URI = DEFAULT_ASSET_SERVER_BASE_URI + "/assets/process";
+
+    public static class HttpRequestTask {
+        public String uri = DEFAULT_HTTP_POST_PROCESS_URI;
+        public Entity entity = null;
+    }
+
     public static class HttpGetRequestTask extends AsyncTask<HttpRequestTask, String, String> {
 
         //        String serverUri = "http://192.168.1.2:8001/repository/actions";
@@ -116,13 +129,6 @@ public class HttpRequestTasks {
             super.onPostExecute(result);
             //Do anything with response..
         }
-    }
-
-    public static String DEFAULT_HTTP_POST_PROCESS_URI = "http://192.168.1.2:8001/jsonPost";
-
-    public static class HttpRequestTask {
-        public String uri = DEFAULT_HTTP_POST_PROCESS_URI;
-        public Entity entity = null;
     }
 
     // TODO: 11/21/2016 Add HttpPostRequestTask to global TCP/UDP communications queue to server.

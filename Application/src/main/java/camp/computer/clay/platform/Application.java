@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import camp.computer.clay.Clay;
@@ -20,12 +19,13 @@ import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
-import camp.computer.clay.platform.communication.UDPHost;
+import camp.computer.clay.platform.communication.UdpServer;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.platform.scripting.JavaScriptEngine;
 import camp.computer.clay.platform.sound.SpeechSynthesisEngine;
 import camp.computer.clay.platform.spatial.OrientationInput;
+import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 
 public class Application extends FragmentActivity implements PlatformInterface {
@@ -44,7 +44,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         public static final boolean ENABLE_FULLSCREEN = true;
         public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
 
-        public static boolean ENABLE_HARDWARE_ACCELERATION = true;
+        public static boolean ENABLE_HARDWARE_ACCELERATION = false;
 
         public static boolean ENABLE_JAVASCRIPT_ENGINE = true;
 
@@ -65,7 +65,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     private OrientationInput orientationInput;
 
-    private UDPHost UDPHost;
+    private UdpServer UdpServer;
 
     private Internet networkResource;
 
@@ -110,6 +110,10 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // current component." (Android Documentation)
         Application.context = getApplicationContext();
 
+        if (Settings.ENABLE_FULLSCREEN) {
+            startFullscreenService();
+        }
+
         // Set up Platform Helpers
         ViewGroupHelper.setContext(getApplicationContext());
 
@@ -124,12 +128,12 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // Lock screen orientation to vertical orientation.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        if (Settings.ENABLE_FULLSCREEN) {
-            startFullscreenService();
-        }
+//        if (Settings.ENABLE_FULLSCREEN) {
+//            startFullscreenService();
+//        }
 
         // Prevent on-screen keyboard from pushing up content. Instead it will overlay content.
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // Sensor Interface
         if (Settings.ENABLE_MOTION_INPUT) {
@@ -174,7 +178,15 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // Create Platform Rendering Surface and add it to the application view.
         platformRenderSurface = new PlatformRenderSurface(getContext());
         FrameLayout frameLayout = (FrameLayout) Application.getInstance().findViewById(applicationViewId);
-        frameLayout.addView(platformRenderSurface, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        frameLayout.setPadding(0, 0, 0, 0);
+        FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
+                DeviceDimensionsHelper.getDisplayWidth(context),
+                DeviceDimensionsHelper.getDisplayHeight(context)
+//                FrameLayout.LayoutParams.MATCH_PARENT,
+//                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        frameLayoutParams.setMargins(0, 0, 0, 0);
+        frameLayout.addView(platformRenderSurface, frameLayoutParams);
 
         platformRenderSurface.onResume();
 
@@ -182,9 +194,9 @@ public class Application extends FragmentActivity implements PlatformInterface {
         //setContentView(visualizationSurface);
 
         // UDP Datagram Server
-        if (UDPHost == null) {
-            UDPHost = new UDPHost("udp");
-            UDPHost.startServer(); // TODO: Move into BootstrapComponent
+        if (UdpServer == null) {
+            UdpServer = new UdpServer("udp");
+            UdpServer.startServer(); // TODO: Move into BootstrapComponent
         }
 
         // Internet Network Interface
@@ -204,8 +216,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
         clay = new Clay();
         clay.addPlatform(this); // Add the view provided by the host device.
 
-        if (UDPHost == null) {
-            clay.addHost(this.UDPHost);
+        if (UdpServer == null) {
+            clay.addHost(this.UdpServer);
         }
 
         if (networkResource == null) {
@@ -266,11 +278,11 @@ public class Application extends FragmentActivity implements PlatformInterface {
         super.onResume();
 
         // UDP Client/Server
-        if (UDPHost == null) {
-            UDPHost = new UDPHost("udp");
+        if (UdpServer == null) {
+            UdpServer = new UdpServer("udp");
         }
-        if (!UDPHost.isActive()) {
-            UDPHost.startServer();
+        if (!UdpServer.isActive()) {
+            UdpServer.startServer();
         }
 
         // Rendering Surface
@@ -393,7 +405,18 @@ public class Application extends FragmentActivity implements PlatformInterface {
      */
     private void hidePlatformUi() {
         View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        //decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_IMMERSIVE);
+//        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
     }
     // </FULLSCREEN_SERVICE>
 

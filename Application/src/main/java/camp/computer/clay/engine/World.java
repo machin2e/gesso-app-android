@@ -1,5 +1,6 @@
 package camp.computer.clay.engine;
 
+import android.graphics.Canvas;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -89,8 +90,6 @@ public class World {
 
     // <SETTINGS>
     public static boolean ENABLE_DRAW_OVERLAY = true;
-
-    public static final String ASSET_SERVER_URI = "http://192.168.1.2:8001";
     // </SETTINGS>
 
     // <TEMPORARY>
@@ -155,7 +154,7 @@ public class World {
         long updateStartTime = Clock.getCurrentTime();
         for (int i = 0; i < systems.size(); i++) {
             // <HACK>
-            if (systems.get(i).getClass() == RenderSystem.class) {
+            if (systems.get(i).getClass() == RenderSystem.class /*|| systems.get(i).getClass() == CameraSystem.class*/) {
                 continue;
             }
             // </HACK>
@@ -164,9 +163,10 @@ public class World {
         updateTime = Clock.getCurrentTime() - updateStartTime;
     }
 
-    public void draw() {
+    public void draw(Canvas canvas) {
         long renderStartTime = Clock.getCurrentTime();
-        getSystem(RenderSystem.class).update();
+//        getSystem(CameraSystem.class).update();
+        getSystem(RenderSystem.class).update2(canvas);
         renderTime = Clock.getCurrentTime() - renderStartTime;
     }
 

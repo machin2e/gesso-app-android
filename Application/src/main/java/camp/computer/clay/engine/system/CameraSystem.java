@@ -2,7 +2,6 @@ package camp.computer.clay.engine.system;
 
 import android.util.Log;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -14,8 +13,10 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.Geometry;
 
 public class CameraSystem extends System {
@@ -39,13 +40,36 @@ public class CameraSystem extends System {
         Transform transformComponent = camera.getComponent(Transform.class);
         Physics physicsComponent = camera.getComponent(Physics.class);
 
-        transformComponent.scale = physicsComponent.targetTransform.scale;
+//        // Position
+//        camera.getComponent(Transform.class).set(
+//                physicsComponent.targetTransform.x * transformComponent.scale,
+//                physicsComponent.targetTransform.y * transformComponent.scale
+//        );
 
-        // Position
-        camera.getComponent(Transform.class).set(
-                physicsComponent.targetTransform.x * transformComponent.scale,
-                physicsComponent.targetTransform.y * transformComponent.scale
-        );
+//        transformComponent.scale = physicsComponent.targetTransform.scale;
+
+//        transformComponent.set(
+//                camera.getComponent(Physics.class).targetTransform.x * transformComponent.scale,
+//                camera.getComponent(Physics.class).targetTransform.y * transformComponent.scale
+//        );
+
+        double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt; // 1.0;
+
+        double scaleVelocity = 0.0030;
+//        Log.v("dt", "dt: " + dt);
+        transformComponent.scale += (physicsComponent.targetTransform.scale - transformComponent.scale) * scaleVelocity * dt;
+
+        double panVelocity = 0.0030;
+        Transform source = camera.getComponent(Transform.class);
+        Transform target = camera.getComponent(Physics.class).targetTransform;
+        // This works...
+        camera.getComponent(Transform.class).x += (target.x * transformComponent.scale - source.x) * panVelocity * dt;
+        camera.getComponent(Transform.class).y += (target.y * transformComponent.scale - source.y) * panVelocity * dt;
+//        camera.getComponent(Transform.class).x += (target.x - source.x * transformComponent.scale) * panVelocity * dt;
+//        camera.getComponent(Transform.class).y += (target.y - source.y * transformComponent.scale) * panVelocity * dt;
+        // ..but not this... why?
+//        camera.getComponent(Transform.class).x += (target.x - source.x) * panVelocity * dt;
+//        camera.getComponent(Transform.class).y += (target.y - source.y) * panVelocity * dt;
 
     }
 
@@ -70,6 +94,20 @@ public class CameraSystem extends System {
 
     private void setPosition(Entity camera, Transform position, double duration) {
         Log.v("CameraSystem", "setPosition");
+
+        // <HACK>
+        /*
+        // TODO: This sets position in a way that accounts for the offset resulting from the status bar height...
+        int navBarHeight = 0;
+        Resources resources = Application.getInstance().getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            navBarHeight = resources.getDimensionPixelSize(resourceId);
+        }
+        camera.getComponent(Physics.class).targetTransform.set(-position.x, -position.y + (navBarHeight / 2.0));
+        */
+        // <HACK>
+
         camera.getComponent(Physics.class).targetTransform.set(-position.x, -position.y);
 //        camera.getComponent(Transform.class).set(-position.x, -position.y);
     }
@@ -102,7 +140,6 @@ public class CameraSystem extends System {
          */
 
         camera.getComponent(Physics.class).targetTransform.scale = scale;
-        camera.getComponent(Transform.class).scale = scale;
     }
 
     public double getScale(Entity camera) {
@@ -255,8 +292,10 @@ public class CameraSystem extends System {
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
-            adjustScale(camera, boundingBox);
+            setScale(camera, 1.0, 0);
             setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+            adjustScale(camera, boundingBox);
+            //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
 
         }
     }
