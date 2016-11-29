@@ -3,14 +3,12 @@ package camp.computer.clay.platform.graphics;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.time.Clock;
 
 /**
@@ -49,10 +47,7 @@ public class PlatformRenderClock extends Thread {
     }
 
     private double frameTime;
-    public static volatile double dt = Clock.getCurrentTime();
-
-    static volatile float f = 0;
-    static volatile float incr = 0.1f;
+    public double dt = Clock.getCurrentTime();
 
     @Override
     public void run() {
@@ -82,43 +77,18 @@ public class PlatformRenderClock extends Thread {
 
             // Advance the world state
             tickCount++;
-//            platformRenderSurface.update();
 
-            //////////
-//            Canvas canvas = null;
-//        SurfaceHolder holder = getHolder();
-
-//        if (!isUpdated) {
-
-//            isUpdated = true;
-//        }
-
-//            platformRenderSurface.world.update();
-
-//            double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt; // 1.0;
-
-            f += incr * dt;
-            if (f < -10.0f || f > 10.0f) {
-                incr *= -1;
-            }
-            Log.v("ffff", "dt: " + dt + ", f: " + f);
+            platformRenderSurface.world.update();
 
             Canvas canvas = holder.lockCanvas();
             try {
                 if (canvas != null) {
-//                    if (isUpdated) {
-//                        palette.canvas = canvas;
                     synchronized (holder) {
-                        platformRenderSurface.world.update();
                         // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
-//                        platformRenderSurface.world.draw(canvas);
 
-//                        Bitmap canvasBitmap = platformRenderSurface.canvasBitmap;
-//                        Matrix identityMatrix = platformRenderSurface.identityMatrix;
-
-                        // Adjust the Camera
                         canvas.save();
 
+                        // <CAMERA_VIEWPORT>
                         Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
                         Transform cameraPosition = camera.getComponent(Transform.class);
                         canvas.translate(
@@ -131,33 +101,34 @@ public class PlatformRenderClock extends Thread {
                                 (float) scale,
                                 (float) scale
                         );
+                        // </CAMERA_VIEWPORT>
 
+                        // <CLEAR_CANVAS>
                         canvas.drawColor(Color.WHITE);
+                        // </CLEAR_CANVAS>
 
+                        // <REFACTOR>
                         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        paint.setColor(Color.BLUE);
-
                         Palette palette = new Palette();
                         palette.canvas = canvas;
                         palette.paint = paint;
-                        platformRenderSurface.world.getSystem(RenderSystem.class).drawEntities(canvas, paint, palette);
+                        // </REFACTOR>
+
+                        // <UPDATE>
+                        // TODO: Draw Renderables.
+                        platformRenderSurface.drawEntities(canvas, paint, palette);
+                        // </UPDATE>
 
                         canvas.restore();
 
-                        if (World.ENABLE_DRAW_OVERLAY) {
-                            World.getWorld().getSystem(RenderSystem.class).drawOverlay(canvas, paint, platformRenderSurface);
+                        if (World.ENABLE_DEBUG_OVERLAY) {
+                            platformRenderSurface.drawOverlay(canvas, paint);
                         }
 
-                        World.getWorld().getSystem(RenderSystem.class).drawDebugOverlay(canvas, paint, platformRenderSurface);
-
-                        // Paint the bitmap to the "primary" canvas.
-//                        palette.canvas.drawBitmap(canvasBitmap, identityMatrix, null);
-
-                        // Paint the bitmap to the "primary" canvas.
-//                        canvas.drawBitmap(canvasBitmap, identityMatrix, null);
+                        if (World.ENABLE_DEBUG_GEOMETRY) {
+                            platformRenderSurface.drawDebugOverlay(canvas, paint);
+                        }
                     }
-//                        isUpdated = false;
-//                    }
                 }
             } finally {
                 if (canvas != null) {
@@ -165,17 +136,8 @@ public class PlatformRenderClock extends Thread {
                 }
             }
 
-            // draw
-//            Canvas canvas = holder.lockCanvas();
-//            if (canvas != null) {
-//                // canvas.draw(...);
-//                holder.unlockCanvasAndPost(canvas);
-//            }
-            ///////////
-
-            frameStopTime = Clock.getCurrentTime();
-
             // Store actual frames per second
+            frameStopTime = Clock.getCurrentTime();
             currentFPS = (1000.0f / (float) (frameStopTime - frameStartTime));
             currentFrameTime = frameStopTime - frameStartTime;
 
@@ -189,7 +151,6 @@ public class PlatformRenderClock extends Thread {
                 } else {
                     Thread.sleep(10);
                 }
-//                Thread.sleep(sleepDuration); // HACK
             } catch (Exception e) {
                 e.printStackTrace();
             }

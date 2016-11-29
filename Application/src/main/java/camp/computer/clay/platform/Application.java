@@ -333,12 +333,22 @@ public class Application extends FragmentActivity implements PlatformInterface {
                 return true;
             }
 
-            case KeyEvent.KEYCODE_O: {
+            case KeyEvent.KEYCODE_C: {
                 // Monitor
-                if (World.ENABLE_DRAW_OVERLAY) {
-                    World.ENABLE_DRAW_OVERLAY = false;
+                if (World.ENABLE_DEBUG_OVERLAY) {
+                    World.ENABLE_DEBUG_OVERLAY = false;
                 } else {
-                    World.ENABLE_DRAW_OVERLAY = true;
+                    World.ENABLE_DEBUG_OVERLAY = true;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_G: {
+                // Monitor
+                if (World.ENABLE_DEBUG_GEOMETRY) {
+                    World.ENABLE_DEBUG_GEOMETRY = false;
+                } else {
+                    World.ENABLE_DEBUG_GEOMETRY = true;
                 }
                 return true;
             }

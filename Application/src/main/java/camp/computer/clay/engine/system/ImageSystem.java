@@ -33,7 +33,7 @@ public class ImageSystem extends System {
             // </HACK>
         }
 
-//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Geometry.class, RelativeLayoutConstraint.class, Transform.class);
+//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, RelativeLayoutConstraint.class, Transform.class);
 //
 //        for (int i = 0; i < shapeEntities.size(); i++) {
 //            Entity entity = shapeEntities.get(i);
@@ -70,7 +70,7 @@ public class ImageSystem extends System {
 //            }
         }
 
-//        if (entity.hasComponent(Geometry.class)) {
+//        if (entity.hasComponent(Model.class)) {
 //            if (absoluteReferenceTransform != null) {
 //                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
 //                updateShapeRelativeTransform(entity, absoluteReferenceTransform);

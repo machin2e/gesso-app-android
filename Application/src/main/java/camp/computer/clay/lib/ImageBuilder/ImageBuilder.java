@@ -146,7 +146,7 @@ public class ImageBuilder {
                 String label = shape.getString("label");
                 String type = shape.getString("type");
 
-                // Geometry
+                // Model
                 double x = position.getDouble("x") * scaleFactor;
                 double y = position.getDouble("y") * scaleFactor;
                 double rotation = shape.getDouble("rotation");
@@ -176,7 +176,7 @@ public class ImageBuilder {
 
                 if (type.equals("Point")) {
 
-                    // NOTE: Geometry N/A
+                    // NOTE: Model N/A
 
                     Point point = new Point();
                     point.setLabel(label);
@@ -289,7 +289,7 @@ public class ImageBuilder {
                 String label = shape.getString("label");
                 String type = shape.getString("type");
 
-                // Geometry
+                // Model
                 double x = position.getDouble("x") * scaleFactor;
                 double y = position.getDouble("y") * scaleFactor;
                 double rotation = shape.getDouble("rotation");
@@ -319,7 +319,7 @@ public class ImageBuilder {
 
                 if (type.equals("Point")) {
 
-                    // NOTE: Geometry N/A
+                    // NOTE: Model N/A
 
                     Point point = new Point();
                     point.setLabel(label);

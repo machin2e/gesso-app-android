@@ -15,7 +15,6 @@ import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.lib.ImageBuilder.Shape;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.Geometry;
 
@@ -148,6 +147,7 @@ public class CameraSystem extends System {
 
     private void adjustScale(Entity camera, double duration) {
         Rectangle boundingBox = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getBoundingBox();
+        Log.v("BoundingBoxScale", "adjustScale: width: " + boundingBox.width + ", height: " + boundingBox.height);
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(camera, boundingBox, duration);
         }
@@ -178,18 +178,21 @@ public class CameraSystem extends System {
         boundingBox.setHeight(boundingBox.getHeight() * paddingMultiplier);
         */
 
+        Log.v("BoundingBoxScale", "scaleBB.width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+        Log.v("BoundingBoxScale", "Camera.width: " + getWidth(camera) + ", height: " + getHeight(camera));
+
         double horizontalScale = getWidth(camera) / boundingBox.getWidth();
         double verticalScale = getHeight(camera) / boundingBox.getHeight();
 
-        if (horizontalScale <= Camera.MAXIMUM_SCALE || horizontalScale <= Camera.MAXIMUM_SCALE) {
-            if (horizontalScale < verticalScale) {
-                setScale(camera, horizontalScale, duration);
-            } else if (horizontalScale > horizontalScale) {
-                setScale(camera, verticalScale, duration);
-            }
-        } else {
-            setScale(camera, Camera.MAXIMUM_SCALE, Camera.DEFAULT_SCALE_PERIOD);
+//        if (horizontalScale <= Camera.MAXIMUM_SCALE || horizontalScale <= Camera.MAXIMUM_SCALE) {
+        if (horizontalScale < verticalScale) {
+            setScale(camera, horizontalScale, duration);
+        } else if (horizontalScale > horizontalScale) {
+            setScale(camera, verticalScale, duration);
         }
+//        } else {
+//            setScale(camera, Camera.MAXIMUM_SCALE, Camera.DEFAULT_SCALE_PERIOD);
+//        }
     }
 
     public void setFocus(Entity camera, Entity entity) {
@@ -240,10 +243,14 @@ public class CameraSystem extends System {
                     }
                 }
             }
+
             // </REFACTOR>
 
-            Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();
-            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
+            Group<Entity> hostPathPortShapes = hostPathPorts.getImages().getShapes();
+            hostPathPortShapes.addAll(Portable.getExtensions(entity).getImages().getShapes());
+            Log.v("HostExtensionShapes", "extension shapes: " + Portable.getExtensions(entity).getImages().getShapes().size());
+            //Rectangle boundingBox = Model.getBoundingBox(hostPathPortShapes.getVertices());
+            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
             Log.v("PortCount", "ports.size: " + hostPathPortShapes.size());
 
@@ -288,8 +295,8 @@ public class CameraSystem extends System {
             Entity host = Portable.getHosts(entity).get(0);
             world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-            Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();
-            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
+            Group<Entity> hostPathPortShapes = hostPathPorts.getImages().getShapes();
+            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
             // Update scale and position
             setScale(camera, 1.0, 0);

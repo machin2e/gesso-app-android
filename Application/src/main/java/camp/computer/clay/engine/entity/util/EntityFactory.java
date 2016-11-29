@@ -9,10 +9,10 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
@@ -33,7 +33,6 @@ import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.lib.ImageBuilder.Circle;
 import camp.computer.clay.lib.ImageBuilder.ImageBuilder;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
@@ -42,6 +41,7 @@ import camp.computer.clay.lib.ImageBuilder.Text;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.Random;
@@ -130,7 +130,7 @@ public class EntityFactory {
         for (int i = 0; i < pinContactPoints.size(); i++) {
             Entity pinContactPoint = pinContactPoints.get(i);
             if (Label.getLabel(pinContactPoint).startsWith("Pin")) {
-                //Point contactPointShape = (Point) pinContactPoint.getComponent(Geometry.class).shape;
+                //Point contactPointShape = (Point) pinContactPoint.getComponent(Model.class).shape;
                 host.getComponent(Portable.class).headerContactGeometries.add(pinContactPoint);
             }
         }
@@ -415,7 +415,7 @@ public class EntityFactory {
                 Log.v("ExtPos", "ex: " + event.getPosition().x + ", y: " + event.getPosition().y);
                 for (int i = 0; i < vertices.size(); i++) {
                     Log.v("ExtPos", "x: " + vertices.get(i).x + ", y: " + vertices.get(i).y);
-                    if (Geometry.distance(vertices.get(i), event.getPosition()) < 20) {
+                    if (Model.distance(vertices.get(i), event.getPosition()) < 20) {
                         createImageEditor = true;
                     }
                 }
@@ -564,7 +564,7 @@ public class EntityFactory {
                     Path.setState(path, Component.State.EDITING);
 
                     Entity pathShape = Image.getShape(path, "Path");
-                    Segment pathSegment = (Segment) pathShape.getComponent(Geometry.class).shape;
+                    Segment pathSegment = (Segment) pathShape.getComponent(Model.class).shape;
                     pathSegment.setTarget(event.getPosition());
                     pathShape.getComponent(Visibility.class).visible = Visible.VISIBLE;
 
@@ -653,7 +653,7 @@ public class EntityFactory {
                     Entity sourcePortShape = Image.getShape(path, "Source Port");
                     if (event.getSecondaryTarget() == sourcePortShape) {
                         Log.v("handlePathEvent", "Touched Source");
-                        //sourcePortShape.getComponent(Geometry.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
+                        //sourcePortShape.getComponent(Model.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
                         sourcePortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
                         // TODO: sourcePortShape.getComponent(Physics.class).targetTransform.set(event.getPosition());
 
@@ -1122,13 +1122,13 @@ public class EntityFactory {
         return camera;
     }
 
-    public static Entity createGeometryEntity(final World world) {
+    public static Entity createModelEntity(final World world) {
 
         Entity shape = new Entity();
 
         // Components
-        shape.addComponent(new Geometry()); // Unique to Shape Entity
         shape.addComponent(new Label());
+        shape.addComponent(new Model()); // Unique to Shape Entity
         shape.addComponent(new Transform());
         shape.addComponent(new Physics());
         shape.addComponent(new Style());
@@ -1154,7 +1154,7 @@ public class EntityFactory {
         notification.addComponent(new Timer());
 
         // <HACK>
-        notification.getComponent(Timer.class).timeout = RenderSystem.DEFAULT_NOTIFICATION_TIMEOUT;
+        notification.getComponent(Timer.class).timeout = PlatformRenderSurface.DEFAULT_NOTIFICATION_TIMEOUT;
         // </HACK>
 
         // Image
@@ -1162,10 +1162,10 @@ public class EntityFactory {
 
         Text text = new Text();
         text.setText("DEFAULT_TEXT");
-        text.size = RenderSystem.NOTIFICATION_FONT_SIZE;
+        text.size = PlatformRenderSurface.NOTIFICATION_FONT_SIZE;
         text.setColor("#ff000000");
         text.setPosition(0, 0);
-        text.font = RenderSystem.NOTIFICATION_FONT;
+        text.font = PlatformRenderSurface.NOTIFICATION_FONT;
         Image.addShape(notification, text);
 
 //        imageBuilder.addShape(text);

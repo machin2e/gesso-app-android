@@ -34,7 +34,7 @@ public class Circle extends Shape {
 
     private void setupGeometry() {
 //        ArrayList<Transform> boundary = Boundary.innerBoundaries.get(this);
-//        boundary.addAll(Geometry.getRegularPolygon(position, this.radius, BOUNDARY_VERTEX_COUNT));
+//        boundary.addAll(Model.getRegularPolygon(position, this.radius, BOUNDARY_VERTEX_COUNT));
     }
 
     public double getRadius() {

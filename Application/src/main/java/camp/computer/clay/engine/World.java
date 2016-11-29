@@ -10,10 +10,10 @@ import java.util.List;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
@@ -31,7 +31,6 @@ import camp.computer.clay.engine.entity.util.EntityFactory;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.EventHandler;
 import camp.computer.clay.engine.manager.Manager;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.lib.ImageBuilder.Text;
@@ -89,7 +88,8 @@ public class World {
     public static double PATH_EDITVIEW_THICKNESS = 15.0;
 
     // <SETTINGS>
-    public static boolean ENABLE_DRAW_OVERLAY = true;
+    public static boolean ENABLE_DEBUG_OVERLAY = true;
+    public static boolean ENABLE_DEBUG_GEOMETRY = true;
     // </SETTINGS>
 
     // <TEMPORARY>
@@ -154,9 +154,9 @@ public class World {
         long updateStartTime = Clock.getCurrentTime();
         for (int i = 0; i < systems.size(); i++) {
             // <HACK>
-            if (systems.get(i).getClass() == RenderSystem.class /*|| systems.get(i).getClass() == CameraSystem.class*/) {
-                continue;
-            }
+//            if (systems.get(i).getClass() == RenderSystem.class /*|| systems.get(i).getClass() == CameraSystem.class*/) {
+//                continue;
+//            }
             // </HACK>
             systems.get(i).update();
         }
@@ -166,7 +166,7 @@ public class World {
     public void draw(Canvas canvas) {
         long renderStartTime = Clock.getCurrentTime();
 //        getSystem(CameraSystem.class).update();
-        getSystem(RenderSystem.class).update2(canvas);
+//        getSystem(RenderSystem.class).update();
         renderTime = Clock.getCurrentTime() - renderStartTime;
     }
 
@@ -188,8 +188,8 @@ public class World {
             entity = EntityFactory.createPlayerEntity(this);
         } else if (entityType == Notification.class) {
             entity = EntityFactory.createNotificationEntity(this);
-        } else if (entityType == Geometry.class) {
-            entity = EntityFactory.createGeometryEntity(this);
+        } else if (entityType == Model.class) {
+            entity = EntityFactory.createModelEntity(this);
         }
 
         // Add Entity to Manager
@@ -211,7 +211,7 @@ public class World {
         // </HACK>
 
 //        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
-        Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(Geometry.class).shape;
+        Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(Model.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 

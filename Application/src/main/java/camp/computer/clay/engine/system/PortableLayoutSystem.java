@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
@@ -503,10 +504,10 @@ public class PortableLayoutSystem extends System {
         double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
         // </FACTOR_OUT>
 
-        // Update Headers Geometry to match the corresponding ExtensionEntity Configuration
+        // Update Headers Model to match the corresponding ExtensionEntity Configuration
         Entity shape = Image.getShape(extension, "Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        Rectangle headerShape = (Rectangle) shape.getComponent(camp.computer.clay.engine.component.Geometry.class).shape;
+        Rectangle headerShape = (Rectangle) shape.getComponent(Model.class).shape;
         headerShape.setWidth(headerWidth);
 
         // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
@@ -526,8 +527,8 @@ public class PortableLayoutSystem extends System {
 
                 // Add new Port shape and set Position
                 // TODO: Find better place!
-//                Entity headerContactGeometry = world.createEntity(Geometry.class);
-//                headerContactGeometry.getComponent(Geometry.class).shape = headerContactShape;
+//                Entity headerContactGeometry = world.createEntity(Model.class);
+//                headerContactGeometry.getComponent(Model.class).shape = headerContactShape;
 //                headerContactGeometry.getComponent(Transform.class).set(x, 107);
 
                 // <ENTITY>

@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Style;
@@ -306,14 +305,15 @@ public class Group<E> implements List<E> {
     }
 
     // Assumes Group<Image>
-    public Group<Shape> getShapes() {
-        Group<Shape> shapes = new Group<>();
+    public Group<Entity> getShapes() {
+        Group<Entity> shapes = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = (Image) elements.get(i);
 //            shapes.addAll(image.getImage().getShapes());
             Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
             for (int j = 0; j < shapeEntities.size(); j++) {
-                shapes.add(shapeEntities.get(j).getComponent(Geometry.class).shape);
+//                shapes.add(shapeEntities.get(j).getComponent(Model.class).shape);
+                shapes.add(shapeEntities.get(j));
             }
         }
         return shapes;
@@ -392,7 +392,7 @@ public class Group<E> implements List<E> {
 //        for (int i = 0; i < elements.size(); i++) {
 //            Image image = (Image) elements.get(i);
 //
-//            double currentDistance = Geometry.distance(position, image.getPosition());
+//            double currentDistance = Model.distance(position, image.getPosition());
 //
 //            if (currentDistance < shortestDistance) {
 //                shortestDistance = currentDistance;
@@ -430,6 +430,7 @@ public class Group<E> implements List<E> {
 //            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
             //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
             imageBoundaries.add(entity.getComponent(Transform.class));
+//            imageBoundaries.addAll(entity.getComponent(Boundary.class).boundary);
         }
 
         return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);

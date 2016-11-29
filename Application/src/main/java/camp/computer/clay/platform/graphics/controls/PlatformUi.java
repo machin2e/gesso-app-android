@@ -48,6 +48,7 @@ import camp.computer.clay.model.Script;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.communication.HttpRequestTasks;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 import camp.computer.clay.util.Random;
 
@@ -2017,7 +2018,7 @@ public class PlatformUi {
                 linearLayout.addView(textView);
 
                 // EditText: Script Editor
-                Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), RenderSystem.NOTIFICATION_FONT);
+                Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), PlatformRenderSurface.NOTIFICATION_FONT);
                 // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 
                 EditText scriptEditorView = new EditText(context);
