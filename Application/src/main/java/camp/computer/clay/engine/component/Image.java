@@ -55,7 +55,7 @@ public class Image extends Component {
 
         shapeEntity.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(entity);
 
-        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(shape.getPosition());
+//        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(shape.getPosition());
 //        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.setRotation(shape.getRotation());
 
 //        shapeEntity.getComponent(Transform.class).rotation = shape.getRotation();

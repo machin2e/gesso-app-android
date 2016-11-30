@@ -68,11 +68,10 @@ public class Clay {
         world.addSystem(new ImageSystem(world));
         world.addSystem(new StyleSystem(world));
         world.addSystem(new PhysicsSystem(world));
-        world.addSystem(new BoundarySystem(world));
         world.addSystem(new PortableLayoutSystem(world));
-//        world.addSystem(new CameraSystem(world));
-        world.addSystem(new RenderSystem(world));
+        world.addSystem(new BoundarySystem(world));
         world.addSystem(new CameraSystem(world));
+        world.addSystem(new RenderSystem(world));
 
         // Create Camera
         world.createEntity(Camera.class);

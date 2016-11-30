@@ -198,6 +198,18 @@ public class Group<E> implements List<E> {
             }
         };
 
+        // Assumes Group<Entity>. Returns the Positions of the contained Entities.
+        public static Mapper getComponent = new Mapper<Entity, Component, Class<? extends Component>>() {
+            @Override
+            public Component map(Entity entity, Class<? extends Component> componentType) {
+                if (entity != null && entity.hasComponent(componentType)) {
+                    return entity.getComponent(componentType);
+                } else {
+                    return null;
+                }
+            }
+        };
+
         // Assumes Group<Entity>
         public static Mapper getImage = new Mapper<Entity, Image, Void>() {
             @Override
@@ -299,6 +311,7 @@ public class Group<E> implements List<E> {
         map(Mappers.setVisibility, visible);
     }
 
+    // <REFACTOR>
     // Assumes Group<Entity>
     public Group<Image> getImages() {
         return map(Mappers.getImage, null);
@@ -309,20 +322,27 @@ public class Group<E> implements List<E> {
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = (Image) elements.get(i);
-//            shapes.addAll(image.getImage().getShapes());
             Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
             for (int j = 0; j < shapeEntities.size(); j++) {
-//                shapes.add(shapeEntities.get(j).getComponent(Model.class).shape);
                 shapes.add(shapeEntities.get(j));
             }
         }
         return shapes;
     }
+    // <REFACTOR>
 
+    // TODO: <REPLACE_WITH_GET_TRANSFORM>
     // Expects Group<Entity>
     // Requires components: Transform
     public Group<Transform> getPositions() {
         return map(Mappers.getPosition, null);
+    }
+    // TODO: </REPLACE_WITH_GET_TRANSFORM>
+
+    // Expects Group<Entity>
+    // Requires components: Passed in as argument
+    public <C extends Component> Group<C> getComponent(Class<C> componentType) {
+        return map(Mappers.getComponent, componentType);
     }
 
     /**
@@ -409,6 +429,7 @@ public class Group<E> implements List<E> {
         return camp.computer.clay.util.Geometry.getCenterPoint(getPositions());
     }
 
+    // TODO: <MERGE_WITH_GET_BOUNDARY_VERTICES>
     // Expects Group<Shape>
     public Group<Transform> getVertices() {
         Group<Transform> positions = new Group<>();
@@ -418,6 +439,18 @@ public class Group<E> implements List<E> {
             // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.get(shape));
         }
         return positions;
+    }
+    // TODO: </MERGE_WITH_GET_BOUNDARY_VERTICES>
+
+    // Expects Group<Entity>
+    public Group<Transform> getBoundaryVertices() {
+        Group<Transform> boundaryVertices = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            Entity entity = (Entity) elements.get(i);
+            boundaryVertices.addAll(entity.getComponent(Boundary.class).boundary); // HACK: (shouldn't get Boundary if asking for Vertices. DISTINGUISH THESE SOMEHOW!)
+            // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.get(shape));
+        }
+        return boundaryVertices;
     }
 
     // Expects Group<Entity>
@@ -429,8 +462,9 @@ public class Group<E> implements List<E> {
             // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
 //            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
             //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
-            imageBoundaries.add(entity.getComponent(Transform.class));
 //            imageBoundaries.addAll(entity.getComponent(Boundary.class).boundary);
+
+            imageBoundaries.add(entity.getComponent(Transform.class));
         }
 
         return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);

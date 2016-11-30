@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -22,12 +21,12 @@ import java.util.List;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -53,14 +52,8 @@ import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
     // World Rendering Context
-    public Bitmap canvasBitmap = null;
-    public Canvas canvas = null;
-    private int canvasWidth;
-    private int canvasHeight;
-    public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    public Matrix identityMatrix;
-
-//    public Palette palette = new Palette();
+//    public Canvas canvas = null;
+//    public Matrix identityMatrix;
 
     // World PlatformRenderClock
     private SurfaceHolder surfaceHolder;
@@ -68,7 +61,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public PlatformRenderClock platformRenderClock;
 
     // Coordinate System (Grid)
-    public Transform originPosition = new Transform();
+    public Transform originTransform = new Transform();
 
     // World
     public World world;
@@ -79,42 +72,31 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(layoutParams);
-
-//        palette.canvas = canvas;
-//        palette.paint = paint;
     }
 
     public PlatformRenderSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-//        palette.canvas = canvas;
-//        palette.paint = paint;
     }
 
     public PlatformRenderSurface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-//        palette.canvas = canvas;
-//        palette.paint = paint;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
-        // Get dimensions of the Surface
-        canvasWidth = getWidth();
-        canvasHeight = getHeight();
-
         // Create a bitmap to use as a drawing buffer equal in size to the full size of the Surface
-        canvasBitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas();
+        Bitmap canvasBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas();
         canvas.setBitmap(canvasBitmap);
 
         // Create Identity Matrix
-        identityMatrix = new Matrix();
+        // Matrix identityMatrix = new Matrix();
 
         // Center the world coordinate system
-        originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+        originTransform.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+
+        surfaceHolder = getHolder();
     }
 
     @Override
@@ -157,6 +139,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // Remove this?
 //        update();
 
+        // TODO: surfaceHolder = getHolder(); for resuming application. Needed?
     }
 
     public void onPause() {
@@ -177,6 +160,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
+    public SurfaceHolder getSurfaceHolder() {
+        return surfaceHolder;
+    }
+
     private Event previousEvent = null;
 
     Entity camera = null;
@@ -184,9 +171,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     // https://developer.android.com/training/gestures/scale.html
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
-
-//        Log.v("HoldCallback", "started timer");
-//        startTimer();
 
         if (this.world == null) {
             return false;
@@ -224,6 +208,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
+                double unscaledSurfaceX = 0;
+                double unscaledSurfaceY = 0;
+
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
@@ -232,14 +219,18 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     event.surfaceCoordinates[id].x = motionEvent.getX(i);
                     event.surfaceCoordinates[id].y = motionEvent.getY(i);
 
+                    unscaledSurfaceX = (motionEvent.getX(i) - (originTransform.x + cameraTransform.x));
+                    unscaledSurfaceY = (motionEvent.getY(i) - (originTransform.y + cameraTransform.y));
+
                     // TODO: Update equations so cameraScale is always the correct scale, the current scale, and computed as needed.
-                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + cameraTransform.x)) / cameraScale;
-                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + cameraTransform.y)) / cameraScale;
+                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originTransform.x + cameraTransform.x)) / cameraScale;
+                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originTransform.y + cameraTransform.y)) / cameraScale;
 
                 }
 
                 Log.v("PlatformRenderSurface", "x: " + motionEvent.getX() + ", y: " + motionEvent.getY());
-                Log.v("PlatformRenderSurface", "x': " + event.pointerCoordinates[0].x + ", y': " + event.pointerCoordinates[0].y);
+                Log.v("PlatformRenderSurface", "x': " + unscaledSurfaceX + ", y': " + unscaledSurfaceY);
+                Log.v("PlatformRenderSurface", "x'': " + event.pointerCoordinates[0].x + ", y'': " + event.pointerCoordinates[0].y);
                 Log.v("PlatformRenderSurface", "---");
 
                 // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
@@ -272,6 +263,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
+
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
@@ -299,6 +291,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
+
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
@@ -318,25 +311,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         @Override
         public void run() {
 
-            int pointerIndex = 0;
-
-//            if (getFirstEvent().isPointing[pointerIndex]) {
-//                if (getDragDistance() < Event.MINIMUM_MOVE_DISTANCE) {
-
-//            Event event = new Event();
-//            event.setType(Event.Type.HOLD);
-//            event.pointerIndex = getFirstEvent().pointerIndex;
-//            event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-//            getFirstEvent().getInputSystem().queueEvent(event);
-//
-//            isHolding[pointerIndex] = true;
-
             if (previousEvent.getDistance() < Event.MINIMUM_MOVE_DISTANCE) {
                 InputSystem inputSystem = world.getSystem(InputSystem.class);
 
                 Event event = new Event();
-                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originTransform.x + perspectivePosition.x)) / perspectiveScale;
+                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originTransform.y + perspectivePosition.y)) / perspectiveScale;
                 event.setType(Event.Type.HOLD);
                 event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
 
@@ -358,49 +338,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     };
 
-    /**
-     * This is heart of the platform-level game loop. This function is invoked by a secondary
-     * thread to the UI thread (see {@code PlatformRenderClock}).
-     */
-//    SurfaceHolder holder = getHolder();
-//
-//    public boolean isUpdated = false;
-//    public void update() {
-//
-//        if (world == null) {
-//            return;
-//        }
-//
-//        world.update();
-//
-//////        Canvas canvas = null;
-//////        SurfaceHolder holder = getHolder();
-////
-//////        if (!isUpdated) {
-////        world.update();
-////        isUpdated = true;
-//////        }
-////
-////        try {
-////            canvas = holder.lockCanvas();
-////            if (canvas != null) {
-////                if (isUpdated) {
-////                    palette.canvas = canvas;
-////                    synchronized (holder) {
-////                        // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
-////                        world.draw();
-////                    }
-////                    isUpdated = false;
-////                }
-////            }
-////        } finally {
-////            if (canvas != null) {
-////                holder.unlockCanvasAndPost(canvas);
-////            }
-////        }
-//    }
-
-    // TODO: Remove this! Render shouldn't need to know about the whole world!
+    // <TODO: REMOVE_REFERENCE_TO_WORLD>
     public void setWorld(World world) {
         this.world = world;
 
@@ -409,20 +347,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         world.getSystem(CameraSystem.class).setWidth(camera, DeviceDimensionsHelper.getDisplayWidth(Application.getContext()));
         world.getSystem(CameraSystem.class).setHeight(camera, DeviceDimensionsHelper.getDisplayHeight(Application.getContext()));
     }
+    // </TODO: REMOVE_REFERENCE_TO_WORLD>
 
-    //public void drawEntities(Palette palette) {
-    public void drawEntities(Canvas canvas, Paint paint, Palette palette) {
-
-        // TODO: This call is expensive. Make it way faster. Cache? Sublist?
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
-//        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class);
+    public void drawRenderableEntities(Group<Entity> entities, Canvas canvas, Paint paint, Palette palette) {
 
         for (int j = 0; j < entities.size(); j++) {
             Entity entity = entities.get(j);
-
-            // <HACK>
-            PlatformRenderSurface platformRenderSurface = Application.getInstance().platformRenderSurface;
-            // </HACK>
 
             if (entity.hasComponent(Path.class)) {
 
@@ -430,10 +360,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    platformRenderSurface.drawEditablePath(entity, canvas, paint, palette);
+                    drawEditablePath(entity, canvas, paint, palette);
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
-                        platformRenderSurface.drawOverviewPath(entity, canvas, paint, palette);
+                        drawOverviewPath(entity, canvas, paint, palette);
                     }
                 }
 
@@ -447,7 +377,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     canvas.save();
                     Group<Entity> shapes = Image.getShapes(entity);
                     for (int i = 0; i < shapes.size(); i++) {
-                        platformRenderSurface.drawShape(shapes.get(i), canvas, paint);
+                        drawShape(shapes.get(i), canvas, paint);
                     }
                     canvas.restore();
                 }
@@ -470,22 +400,26 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
     public static float OVERLAY_FONT_SIZE = 25;
     public static String OVERLAY_FONT_COLOR = "#ffff0000";
+
+    public static String GEOMETRY_ANNOTATION_FONT = "fonts/ProggySquare.ttf";
+    public static float GEOMETRY_ANNOTATION_FONT_SIZE = 35;
+    public static String GEOMETRY_ANNOTATION_FONT_COLOR = "#ffff0000";
+    public static int GEOMETRY_ANNOTATION_LINE_SPACING = 10;
     // </REFACTOR_INTO_ENGINE>
 
-    private static Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), OVERLAY_FONT);
-    private static Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+    private static Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), OVERLAY_FONT);
+    private static Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
+
+    private static Typeface geometryAnnotationTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), GEOMETRY_ANNOTATION_FONT);
+    private static Typeface geometryAnnotationTypefaceBold = Typeface.create(geometryAnnotationTypeface, Typeface.NORMAL);
 
     double minFps = Double.MAX_VALUE;
     double maxFps = Double.MIN_VALUE;
 
     public void drawOverlay(Canvas canvas, Paint paint) {
 
-//        Canvas canvas = platformRenderSurface.canvas;
-//        Paint paint = platformRenderSurface.paint;
-        // World world = platformRenderSurface.getWorld(););
-
         // Font
-        paint.setTypeface(boldTypeface);
+        paint.setTypeface(overlayTypefaceBold);
 
         int linePosition = 0;
 
@@ -653,13 +587,23 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <CAMERA_POSITION_MONITOR>
         canvas.save();
-        String cameraPositionText = "Camera Position: " + camera.getComponent(Transform.class).x + ", " + camera.getComponent(Transform.class).x;
+        String cameraPositionText = "Camera Position: " + camera.getComponent(Transform.class).x + ", " + camera.getComponent(Transform.class).y;
         Rect cameraPositionTextBounds = new Rect();
         paint.getTextBounds(cameraPositionText, 0, cameraPositionText.length(), cameraPositionTextBounds);
         linePosition += OVERLAY_LINE_SPACING + cameraPositionTextBounds.height();
         canvas.drawText(cameraPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_POSITION_MONITOR>
+
+        // <CAMERA_TARGET_POSITION_MONITOR>
+        canvas.save();
+        String cameraTargetPositionText = "Camera Target: " + camera.getComponent(Physics.class).targetTransform.x + ", " + camera.getComponent(Physics.class).targetTransform.y;
+        Rect cameraTargetPositionTextBounds = new Rect();
+        paint.getTextBounds(cameraTargetPositionText, 0, cameraTargetPositionText.length(), cameraTargetPositionTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + cameraTargetPositionTextBounds.height();
+        canvas.drawText(cameraTargetPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </CAMERA_TARGET_POSITION_MONITOR>
 
 //        // <BOUNDARY_COUNT>
 //        canvas.save();
@@ -672,14 +616,144 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        // </BOUNDARY_COUNT>
     }
 
-    public void drawDebugOverlay(Canvas canvas, Paint paint) {
+    public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
 
-//        Canvas canvas = platformRenderSurface.canvas;
-//        Paint paint = platformRenderSurface.paint;
-        // World world = platformRenderSurface.getWorld(););
+        // <BOUNDARY>
+        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getImages().getShapes();
+        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getImages().getShapes();
+        Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getImages().getShapes();
+        paint.setColor(Color.parseColor(GEOMETRY_ANNOTATION_FONT_COLOR));
+        paint.setStrokeWidth(2.0f);
+        paint.setStyle(Paint.Style.STROKE);
+
+        for (int i = 0; i < entities2.size(); i++) {
+            Boundary boundaryComponent = entities2.get(i).getComponent(Boundary.class);
+
+            // Outline
+            if (boundaryComponent != null) {
+                canvas.save();
+                drawPolygon(boundaryComponent.boundary, canvas, paint, null);
+                canvas.restore();
+            }
+
+            // Vertices
+            if (boundaryComponent.boundary != null) {
+                for (int j = 0; j < boundaryComponent.boundary.size(); j++) {
+                    canvas.save();
+                    canvas.drawCircle(
+                            (float) boundaryComponent.boundary.get(j).x,
+                            (float) boundaryComponent.boundary.get(j).y,
+                            5,
+                            paint
+                    );
+                    canvas.restore();
+                }
+            }
+        }
+        // </BOUNDARY>
+
+        // <TRANSFORM_POSITION>
+        // Style
+        paint.setColor(Color.parseColor(GEOMETRY_ANNOTATION_FONT_COLOR));
+        paint.setStrokeWidth(1.0f);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(GEOMETRY_ANNOTATION_FONT_SIZE);
 
         // Font
-        paint.setTypeface(boldTypeface);
+        paint.setTypeface(geometryAnnotationTypeface);
+
+        float linePosition = 0f;
+        String lineText = "";
+        Rect textBounds = new Rect();
+
+        for (int i = 0; i < entities.size(); i++) {
+
+            Transform transformComponent = entities.get(i).getComponent(Transform.class);
+
+            linePosition = (float) transformComponent.y;
+
+            canvas.save();
+
+            // <X>
+            canvas.save();
+            lineText = "x: " + (float) transformComponent.x;
+            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
+            canvas.restore();
+            // </X>
+
+            // <Y>
+            canvas.save();
+            lineText = "y: " + (float) transformComponent.y;
+            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
+            canvas.restore();
+            // </Y>
+
+            // <ROTATION>
+            canvas.save();
+            lineText = "r: " + (float) transformComponent.rotation;
+            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
+            canvas.restore();
+            // </ROTATION>
+
+            canvas.restore();
+        }
+        // </TRANSFORM_POSITION>
+
+        // <CAMERA_BOUNDING_BOX>
+        paint.setStrokeWidth(2.0f);
+        paint.setStyle(Paint.Style.STROKE);
+
+        Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        if (camera != null) {
+            Rectangle boundingBox = camera.getComponent(Camera.class).boundingBox;
+
+            if (boundingBox != null) {
+                canvas.save();
+                canvas.drawRect(
+                        (float) (boundingBox.getPosition().x - boundingBox.getWidth() / 2.0),
+                        (float) (boundingBox.getPosition().y + boundingBox.getWidth() / 2.0),
+                        (float) (boundingBox.getPosition().x + boundingBox.getWidth() / 2.0),
+                        (float) (boundingBox.getPosition().y - boundingBox.getWidth() / 2.0),
+                        paint
+                );
+                canvas.restore();
+            }
+        }
+        // </CAMERA_BOUNDING_BOX>
+
+        // <CAMERA_BOUNDARY>
+        paint.setStrokeWidth(1.0f);
+        paint.setStyle(Paint.Style.FILL);
+
+        if (camera != null) {
+            List<Transform> boundary = camera.getComponent(Camera.class).boundary;
+
+            if (boundary != null) {
+                for (int i = 0; i < boundary.size(); i++) {
+                    canvas.save();
+                    canvas.drawCircle(
+                            (float) boundary.get(i).x,
+                            (float) boundary.get(i).y,
+                            5,
+                            paint
+                    );
+                    canvas.restore();
+                }
+            }
+        }
+        // </CAMERA_BOUNDARY>
+    }
+
+    public void drawGeometryOverlay(Canvas canvas, Paint paint) {
+
+        // Font
+        paint.setTypeface(overlayTypefaceBold);
 
         // <DISPLAY_SURFACE_AXES>
         canvas.save();
@@ -710,6 +784,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // </DISPLAY_SURFACE_AXES>
     }
 
+    // <TODO: REFACTOR>
     // TODO: 11/16/2016 Optimize! Big and slow! Should be fast!
     public void drawEditablePath(Entity path, Canvas canvas, Paint paint, Palette palette) {
 
@@ -721,19 +796,21 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         if (!isSingletonPath) {
 
-            Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
+//            Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
 
             Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(Model.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
             Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(Model.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
 
             sourcePortShape.setColor(hostSourcePortShape.getColor());
 
-            if (Path.getState(path) != Component.State.EDITING) {
-                // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
-                // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
-                Image.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
-                Image.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
-            }
+//            // <REFACTOR>
+//            if (Path.getState(path) != Component.State.EDITING) {
+//                // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
+//                // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
+//                Image.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+//                Image.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
+//            }
+//            // </REFACTOR>
 
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);
@@ -756,9 +833,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // </REFACTOR>
 
             // Draw shapes in Path
-            drawSegment(Image.getShape(path, "Source Port").getComponent(Transform.class), Image.getShape(path, "Target Port").getComponent(Transform.class), canvas, paint, palette); // drawShape(segment, palette);
-            drawShape(Image.getShape(path, "Source Port"), canvas, paint); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
-            drawShape(Image.getShape(path, "Target Port"), canvas, paint); // drawCircle((Circle) targetPortShape, palette); // drawShape(targetPortShape, palette);
+            drawSegment(Image.getShape(path, "Source Port").getComponent(Transform.class), Image.getShape(path, "Target Port").getComponent(Transform.class), canvas, paint, palette);
+            drawShape(Image.getShape(path, "Source Port"), canvas, paint);
+            drawShape(Image.getShape(path, "Target Port"), canvas, paint);
 
             // <DRAW_BOUNDARY>
             palette.paint.setStrokeWidth(3.0f);
@@ -772,29 +849,33 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // Singleton Path
 
-            Entity sourcePortPathShapeE = Image.getShape(path, "Source Port");
-            Shape sourcePortShape = sourcePortPathShapeE.getComponent(Model.class).shape;
+            Entity sourcePortPathShape = Image.getShape(path, "Source Port");
+            Shape sourcePortModel = sourcePortPathShape.getComponent(Model.class).shape;
 
-            path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
-
-            if (Path.getState(path) != Component.State.EDITING) {
-                sourcePortPathShapeE.getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
-            }
+//            // <REFACTOR>
+//            path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
+//
+//            if (Path.getState(path) != Component.State.EDITING) {
+//                sourcePortPathShape.getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+//            }
+//            // </REFACTOR>
 
             // Color. Update color of mPort shape based on its type.
             Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-            sourcePortShape.setColor(pathColor);
+            sourcePortModel.setColor(pathColor);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
             Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Model.class).shape;
             segment.setOutlineThickness(15.0);
-            segment.setOutlineColor(sourcePortShape.getColor());
+            segment.setOutlineColor(sourcePortModel.getColor());
 
-            segment.setSource(sourcePortPathShapeE.getComponent(Transform.class));
-            if (Path.getState(path) != Component.State.EDITING) {
-                segment.setTarget(sourcePortPathShapeE.getComponent(Transform.class));
-            }
+//            // <REFACTOR>
+//            segment.setSource(sourcePortPathShape.getComponent(Transform.class));
+//            if (Path.getState(path) != Component.State.EDITING) {
+//                segment.setTarget(sourcePortPathShape.getComponent(Transform.class));
+//            }
+//            // </REFACTOR>
 
             // <REFACTOR>
             palette.outlineThickness = World.PATH_OVERVIEW_THICKNESS;
@@ -803,14 +884,14 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // Draw shapes in Path
             drawShape(Image.getShape(path, "Path"), canvas, paint); // drawSegment(segment, palette);
-            drawShape(sourcePortPathShapeE, canvas, paint); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
+            drawShape(sourcePortPathShape, canvas, paint); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
             // drawShape(targetPortShape);
 
             // Draw Boundary
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(Boundary.get(sourcePortPathShapeE), canvas, paint, palette);
+            drawPolygon(Boundary.get(sourcePortPathShape), canvas, paint, palette);
 
         }
     }
@@ -834,12 +915,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             if (host.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(hostPort)
                     && extension.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(extensionPort)) {
 
-                int hostPortIndex = Port.getIndex(hostPort);
-                int extensionPortIndex = Port.getIndex(extensionPort);
-//                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getPosition();
-//                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getPosition();
-                Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
-                Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
+//                int hostPortIndex = Port.getIndex(hostPort);
+//                int extensionPortIndex = Port.getIndex(extensionPort);
+////                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getPosition();
+////                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getPosition();
+//                Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
+//                Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
 
                 // Draw connection between Ports
                 palette.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
@@ -847,15 +928,17 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
                 Entity shapeEntity = Image.getShape(path, "Path");
-                Segment segment = (Segment) shapeEntity.getComponent(Model.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
+                Segment segment = (Segment) shapeEntity.getComponent(Model.class).shape;
                 segment.setOutlineThickness(10.0);
                 segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
 
                 palette.outlineThickness = 10.0;
                 palette.outlineColor = camp.computer.clay.util.Color.getColor(Port.getType(extensionPort));
 
-                segment.setSource(hostContactTransform);
-                segment.setTarget(extensionContactTransform);
+//                // <REFACTOR>
+//                segment.setSource(hostContactTransform);
+//                segment.setTarget(extensionContactTransform);
+//                // </REFACTOR>
 
                 drawShape(shapeEntity, canvas, paint);
             }
@@ -863,24 +946,19 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
     // </PATH_IMAGE_HELPERS>
 
-    //public void drawShape(Entity shape, Palette palette) {
     public void drawShape(Entity shape, Canvas canvas, Paint paint) {
 
         // <HACK>
-        shape.getComponent(Model.class).shape.setPosition(
-                shape.getComponent(Transform.class)
-        );
-        shape.getComponent(Model.class).shape.setRotation(
-                shape.getComponent(Transform.class).getRotation()
-        );
+//        shape.getComponent(Model.class).shape.setPosition(
+//                shape.getComponent(Transform.class)
+//        );
+//        shape.getComponent(Model.class).shape.setRotation(
+//                shape.getComponent(Transform.class).getRotation()
+//        );
 
         Shape s = shape.getComponent(Model.class).shape;
 
         // Palette
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(s.outlineColorCode);
-        paint.setStrokeWidth((float) s.getOutlineThickness());
-
         Palette palette = new Palette();
         palette.color = s.getColor();
         palette.outlineColor = s.getOutlineColor();
@@ -911,6 +989,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
         // </HACK>
     }
+    // </TODO: REFACTOR>
 
     public void drawSegment(Transform source, Transform target, Canvas canvas, Paint paint, Palette palette) {
 
@@ -1015,9 +1094,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         paint.setTextSize((float) size);
 
         // Font
-//        Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
-//        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
-//        paint.setTypeface(boldTypeface);
+//        Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
+//        Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
+//        paint.setTypeface(overlayTypefaceBold);
 
         // Style (Guaranteed)
         String printText = text.toUpperCase();
@@ -1035,7 +1114,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawPolygon(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
 
         // <HACK>
-        if (vertices == null) {
+        if (vertices == null || vertices.size() < 1) {
             return;
         }
         // </HACK>

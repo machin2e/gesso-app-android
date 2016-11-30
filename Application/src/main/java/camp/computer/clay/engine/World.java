@@ -88,8 +88,9 @@ public class World {
     public static double PATH_EDITVIEW_THICKNESS = 15.0;
 
     // <SETTINGS>
-    public static boolean ENABLE_DEBUG_OVERLAY = true;
-    public static boolean ENABLE_DEBUG_GEOMETRY = true;
+    public static boolean ENABLE_OVERLAY = true;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
+    public static boolean ENABLE_GEOMETRY_OVERLAY = true;
     // </SETTINGS>
 
     // <TEMPORARY>

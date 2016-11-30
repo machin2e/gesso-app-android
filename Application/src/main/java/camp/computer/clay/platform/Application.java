@@ -15,7 +15,10 @@ import android.widget.FrameLayout;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
@@ -335,23 +338,51 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
             case KeyEvent.KEYCODE_C: {
                 // Monitor
-                if (World.ENABLE_DEBUG_OVERLAY) {
-                    World.ENABLE_DEBUG_OVERLAY = false;
+                if (World.ENABLE_OVERLAY) {
+                    World.ENABLE_OVERLAY = false;
                 } else {
-                    World.ENABLE_DEBUG_OVERLAY = true;
+                    World.ENABLE_OVERLAY = true;
                 }
                 return true;
             }
 
             case KeyEvent.KEYCODE_G: {
                 // Monitor
-                if (World.ENABLE_DEBUG_GEOMETRY) {
-                    World.ENABLE_DEBUG_GEOMETRY = false;
+                if (World.ENABLE_GEOMETRY_OVERLAY) {
+                    World.ENABLE_GEOMETRY_OVERLAY = false;
                 } else {
-                    World.ENABLE_DEBUG_GEOMETRY = true;
+                    World.ENABLE_GEOMETRY_OVERLAY = true;
                 }
                 return true;
             }
+
+            case KeyEvent.KEYCODE_1: {
+                // Monitor
+                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale -= 0.10;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_2: {
+                // Monitor
+                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale = 1.0;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_3: {
+                // Monitor
+                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale += 0.10;
+                }
+                return true;
+            }
+
         }
         return super.onKeyDown(keyCode, event);
     }

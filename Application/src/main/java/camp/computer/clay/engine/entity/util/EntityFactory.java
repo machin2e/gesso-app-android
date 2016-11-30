@@ -203,9 +203,6 @@ public class EntityFactory {
                     }
                 }
 
-                // Camera
-                world.getSystem(CameraSystem.class).setFocus(camera, host);
-
                 if (Portable.getExtensions(host).size() > 0) {
 
                     // <HACK>
@@ -252,6 +249,9 @@ public class EntityFactory {
                         // Application.getPlatform().openInteractiveAssemblyTaskOverview();
                     }
                 }
+
+                // Camera
+                world.getSystem(CameraSystem.class).setFocus(camera, host);
             }
         });
         // </EVENT_HANDLERS>
@@ -512,7 +512,7 @@ public class EntityFactory {
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         pathShapeUuid = Image.addShape(path, circle);
-        Entity shapeEntity = world.Manager.get(pathShapeUuid);
+//        Entity shapeEntity = world.Manager.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set();
         // </HACK>

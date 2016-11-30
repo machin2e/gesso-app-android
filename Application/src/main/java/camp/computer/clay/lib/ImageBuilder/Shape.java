@@ -28,10 +28,10 @@ public abstract class Shape {
     }
 
     public Transform getPosition() {
-        // <HACK>
-        position.set(0, 0);
-        position.rotation = 0;
-        // </HACK>
+//        // <HACK>
+//        position.set(0, 0);
+//        position.rotation = 0;
+//        // </HACK>
         return position;
     }
 

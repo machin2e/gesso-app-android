@@ -4,22 +4,26 @@ import android.util.Log;
 
 import java.util.List;
 
-import camp.computer.clay.engine.component.Model;
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
+import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.ImageBuilder.Point;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.ImageBuilder.Segment;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.util.Geometry;
 
@@ -39,8 +43,96 @@ public class PortableLayoutSystem extends System {
             Entity entity = entities.get(i);
             if (entity.hasComponent(Extension.class)) {
                 updateExtensionGeometry(entity);
+            } else if (entity.hasComponent(Path.class)) {
+                updatePathGeometry(entity);
             }
         }
+    }
+
+    private void updatePathGeometry(Entity path) {
+        Visibility visibility = path.getComponent(Visibility.class);
+        if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+            updateEditablePath(path);
+        } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
+            if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
+                updateOverviewPath(path);
+            }
+        }
+    }
+
+    private void updateEditablePath(Entity path) {
+
+        boolean isSingletonPath = (Path.getTarget(path) == null);
+
+        if (!isSingletonPath) {
+
+            Entity sourcePort = Path.getSource(path);
+            Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
+            Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
+
+            // <REFACTOR>
+            if (Path.getState(path) != Component.State.EDITING) {
+                // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
+                // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
+                Image.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+                Image.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
+            }
+            // </REFACTOR>
+
+        } else {
+
+            Entity sourcePort = Path.getSource(path);
+            Entity sourcePortPathShape = Image.getShape(path, "Source Port");
+            Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
+
+            // <REFACTOR>
+            path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
+
+            if (Path.getState(path) != Component.State.EDITING) {
+                sourcePortPathShape.getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+            }
+            // </REFACTOR>
+
+            // <REFACTOR>
+            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Model.class).shape;
+            segment.setSource(sourcePortPathShape.getComponent(Transform.class));
+            if (Path.getState(path) != Component.State.EDITING) {
+                segment.setTarget(sourcePortPathShape.getComponent(Transform.class));
+            }
+            // </REFACTOR>
+
+        }
+    }
+
+    private void updateOverviewPath(Entity path) {
+
+        boolean isSingletonPath = (Path.getTarget(path) == null);
+
+        if (!isSingletonPath) {
+
+            // <REFACTOR>
+            // Get Host and Extension Ports
+            Entity hostPort = Path.getSource(path);
+            Entity extensionPort = Path.getTarget(path);
+
+            Entity host = hostPort.getParent();
+            Entity extension = extensionPort.getParent();
+
+            int hostPortIndex = Port.getIndex(hostPort);
+            int extensionPortIndex = Port.getIndex(extensionPort);
+//                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getPosition();
+//                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getPosition();
+            Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
+            Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
+
+            Entity shapeEntity = Image.getShape(path, "Path");
+            Segment segment = (Segment) shapeEntity.getComponent(Model.class).shape;
+            segment.setSource(hostContactTransform);
+            segment.setTarget(extensionContactTransform);
+            // </REFACTOR>
+
+        }
+
     }
 
     // Update Port configurations based on contained Paths
@@ -60,6 +152,7 @@ public class PortableLayoutSystem extends System {
             }
             // </HACK>
 
+            // <REFACTOR>
             Path.Type pathType = Path.getType(path);
             if (pathType == Path.Type.NONE) {
                 Port.setType(sourcePort, Port.Type.NONE);
@@ -94,6 +187,7 @@ public class PortableLayoutSystem extends System {
                     Port.setType(targetPort, Port.Type.POWER_TTL);
                 }
             }
+            // </REFACTOR>
         }
     }
 
@@ -521,29 +615,21 @@ public class PortableLayoutSystem extends System {
 //                headerContactGeometry.getComponent(Transform.class).x = x;
                 headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
             } else {
-                Point headerContactShape = new Point();
-//                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactShape);
-//                portableImage.getImage().addShape(point);
-
-                // Add new Port shape and set Position
-                // TODO: Find better place!
-//                Entity headerContactGeometry = world.createEntity(Model.class);
-//                headerContactGeometry.getComponent(Model.class).shape = headerContactShape;
-//                headerContactGeometry.getComponent(Transform.class).set(x, 107);
-
                 // <ENTITY>
-                long eid = Image.addShape(extension, headerContactShape);
                 // <HACK>
-                // Set Label
+                // Add header contact shape
+                Point headerContactShape = new Point();
+                long eid = Image.addShape(extension, headerContactShape);
                 Entity headerContactGeometry = world.Manager.get(eid); // HACK
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
                 //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
 
                 // <REFACTOR_TO_REDUCE_REDUNDANCY>
-                Image.addShape(extension, headerContactShape);
+//                Image.addShape(extension, headerContactShape);
                 extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                //headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 0);
                 // </REFACTOR_TO_REDUCE_REDUNDANCY>
 
             }

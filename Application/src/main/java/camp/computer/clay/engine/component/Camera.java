@@ -1,5 +1,10 @@
 package camp.computer.clay.engine.component;
 
+import java.util.List;
+
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+
 public class Camera extends Component {
 
     public static final int DEFAULT_SCALE_PERIOD = 200;
@@ -10,6 +15,11 @@ public class Camera extends Component {
 
     public static double SCALE_LEVEL_1 = 0.8;
     public static double SCALE_LEVEL_2 = 1.5;
+
+    public Entity previousFocus = null;
+    public Entity focus = null;
+    public Rectangle boundingBox = null;
+    public List<Transform> boundary = null;
 
     // <DELETE>
     // Width of perspective --- actions (e.g., touches) are interpreted relative to this point

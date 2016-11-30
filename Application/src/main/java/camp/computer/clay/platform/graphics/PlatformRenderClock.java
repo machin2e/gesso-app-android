@@ -7,8 +7,10 @@ import android.view.SurfaceHolder;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.util.time.Clock;
 
 /**
@@ -19,11 +21,10 @@ import camp.computer.clay.util.time.Clock;
 public class PlatformRenderClock extends Thread {
 
     // <SETTINGS>
-    final public static int DEFAULT_TARGET_FPS = 30;
+    public static int DEFAULT_TARGET_FPS = 30;
+    public static int DEFAULT_FRAME_SLEEP_TIME = 10;
 
     private int targetFPS = DEFAULT_TARGET_FPS;
-
-    public int sleepDuration = 2;
     // </SETTINGS>
 
     // <STATISTICS>
@@ -46,16 +47,13 @@ public class PlatformRenderClock extends Thread {
         this.isRunning = isRunning;
     }
 
-    private double frameTime;
     public double dt = Clock.getCurrentTime();
 
     @Override
     public void run() {
 
-//        Canvas canvas = null;
-
         long framePeriod = 1000 / targetFPS; // Period in milliseconds
-        long frameStartTime;
+        long frameStartTime = 0;
         long frameStopTime;
         long frameSleepTime;
         long sleepStartTime = 0;
@@ -63,71 +61,77 @@ public class PlatformRenderClock extends Thread {
         while (isRunning) {
 
             // We need to make sure that the surface is ready
-            SurfaceHolder holder = platformRenderSurface.getHolder();
+            SurfaceHolder holder = platformRenderSurface.getSurfaceHolder();
             if (!holder.getSurface().isValid()) {
                 continue;
             }
 
-            dt = Clock.getCurrentTime() - frameTime;
-            frameTime = Clock.getCurrentTime();
-
-            currentSleepTime = Clock.getCurrentTime() - sleepStartTime;
-
+            dt = Clock.getCurrentTime() - frameStartTime;
             frameStartTime = Clock.getCurrentTime();
 
             // Advance the world state
             tickCount++;
 
-            platformRenderSurface.world.update();
+//            platformRenderSurface.world.update();
 
             Canvas canvas = holder.lockCanvas();
+
+            // <REFACTOR>
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            Palette palette = new Palette();
+            palette.canvas = canvas;
+            palette.paint = paint;
+            // </REFACTOR>
+
             try {
                 if (canvas != null) {
                     synchronized (holder) {
-                        // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
+
+                        // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK HIERARCHY!!!!!!!!!!!!! FUCK!!!!!!!!
+
+                        platformRenderSurface.world.update();
 
                         canvas.save();
 
                         // <CAMERA_VIEWPORT>
                         Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
-                        Transform cameraPosition = camera.getComponent(Transform.class);
+                        Transform cameraTransform = camera.getComponent(Transform.class);
                         canvas.translate(
-                                (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
-                                (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
+                                (float) (platformRenderSurface.originTransform.x + cameraTransform.x) /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
+                                (float) (platformRenderSurface.originTransform.y + cameraTransform.y) /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
                         );
 
-                        double scale = cameraPosition.scale;
-                        canvas.scale(
-                                (float) scale,
-                                (float) scale
-                        );
+                        canvas.scale((float) cameraTransform.scale, (float) cameraTransform.scale);
                         // </CAMERA_VIEWPORT>
 
                         // <CLEAR_CANVAS>
                         canvas.drawColor(Color.WHITE);
                         // </CLEAR_CANVAS>
 
-                        // <REFACTOR>
-                        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        Palette palette = new Palette();
-                        palette.canvas = canvas;
-                        palette.paint = paint;
-                        // </REFACTOR>
+                        Group<Entity> entities = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
 
                         // <UPDATE>
                         // TODO: Draw Renderables.
-                        platformRenderSurface.drawEntities(canvas, paint, palette);
+                        // TODO: This call is expensive. Make it way faster. Cache? Sublist?
+                        platformRenderSurface.drawRenderableEntities(entities, canvas, paint, palette);
                         // </UPDATE>
+
+                        if (World.ENABLE_GEOMETRY_ANNOTATIONS) {
+                            platformRenderSurface.drawGeometryAnnotations(entities, canvas, paint);
+                        }
 
                         canvas.restore();
 
-                        if (World.ENABLE_DEBUG_OVERLAY) {
+                        // <OVERLAY>
+                        if (World.ENABLE_OVERLAY) {
                             platformRenderSurface.drawOverlay(canvas, paint);
                         }
 
-                        if (World.ENABLE_DEBUG_GEOMETRY) {
-                            platformRenderSurface.drawDebugOverlay(canvas, paint);
+                        if (World.ENABLE_GEOMETRY_OVERLAY) {
+                            platformRenderSurface.drawGeometryOverlay(canvas, paint);
                         }
+                        // </OVERLAY>
+
                     }
                 }
             } finally {
@@ -149,11 +153,12 @@ public class PlatformRenderClock extends Thread {
                 if (frameSleepTime > 0) {
                     Thread.sleep(frameSleepTime);
                 } else {
-                    Thread.sleep(10);
+                    Thread.sleep(DEFAULT_FRAME_SLEEP_TIME);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            currentSleepTime = Clock.getCurrentTime() - sleepStartTime;
         }
     }
 
