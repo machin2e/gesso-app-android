@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
 
 public class InputSystem extends System {
@@ -84,8 +84,8 @@ public class InputSystem extends System {
         } else {
 
             // Annotate the Event
-            Group<Entity> primaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Image.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
-            Group<Entity> secondaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).filterContains(event.getPosition());
+            Group<Entity> primaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
+            Group<Entity> secondaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
 
             if (primaryTargets.size() > 0) {
                 primaryTarget = primaryTargets.get(primaryTargets.size() - 1); // Get primary target from the top layer (will be last in the list of targets)
@@ -95,9 +95,9 @@ public class InputSystem extends System {
             }
             event.setTarget(primaryTarget);
 
-            if (primaryTarget.hasComponent(Image.class)) { // Needed because entities like Camera without Image component are also processed here.
+            if (primaryTarget.hasComponent(Model.class)) { // Needed because entities like Camera without Model component are also processed here.
                 for (int i = 0; i < secondaryTargets.size(); i++) {
-                    if (Image.getShapes(primaryTarget).contains(secondaryTargets.get(i))) {
+                    if (Model.getShapes(primaryTarget).contains(secondaryTargets.get(i))) {
                         event.setSecondaryTarget(secondaryTargets.get(i));
                     }
                 }

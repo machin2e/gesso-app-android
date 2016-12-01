@@ -10,9 +10,9 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
@@ -61,12 +61,12 @@ public class EntityFactory {
         host.addComponent(new Portable()); // Add Portable Component (so can add Ports)
         host.addComponent(new Transform());
         host.addComponent(new Physics());
-        host.addComponent(new Image());
+        host.addComponent(new Model());
         host.addComponent(new Style());
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
-        // Portable Component (Image Component depends on this)
+        // Portable Component (Model Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
             Entity port = world.createEntity(Port.class);
@@ -82,13 +82,13 @@ public class EntityFactory {
             Portable.addPort(host, port);
         }
 
-        // Load geometry from file into Image Component
+        // Load geometry from file into Model Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
         ImageBuilder imageBuilder = ImageBuilder.open2("Host.json", host);
 
         // <GEOMETRY_LOADER>
 //        for (int i = 0; i < imageBuilder.getShapes().size(); i++) {
-//            long eid = Image.addShape(host, imageBuilder.getShapes().get(i));
+//            long eid = Model.addShape(host, imageBuilder.getShapes().get(i));
 //            // <HACK>
 //            // Set Label
 //            Entity shape = world.Manager.get(eid);
@@ -126,11 +126,11 @@ public class EntityFactory {
         }
         // Add pin contact points to PortableComponent
         // <HACK>
-        Group<Entity> pinContactPoints = host.getComponent(Image.class).getShapes(host);
+        Group<Entity> pinContactPoints = host.getComponent(Model.class).getShapes(host);
         for (int i = 0; i < pinContactPoints.size(); i++) {
             Entity pinContactPoint = pinContactPoints.get(i);
             if (Label.getLabel(pinContactPoint).startsWith("Pin")) {
-                //Point contactPointShape = (Point) pinContactPoint.getComponent(Model.class).shape;
+                //Point contactPointShape = (Point) pinContactPoint.getComponent(Primitive.class).shape;
                 host.getComponent(Portable.class).headerContactGeometries.add(pinContactPoint);
             }
         }
@@ -281,7 +281,7 @@ public class EntityFactory {
         extension.addComponent(new Portable());
         extension.addComponent(new Transform());
         extension.addComponent(new Physics());
-        extension.addComponent(new Image());
+        extension.addComponent(new Model());
         extension.addComponent(new Style());
         extension.addComponent(new Boundary());
         extension.addComponent(new Visibility());
@@ -313,7 +313,7 @@ public class EntityFactory {
 //
 //        Rectangle rectangle;
 //
-//        // Create Shapes for Image
+//        // Create Shapes for Model
 //        rectangle = new Rectangle();
 //        int randomHeight = Random.generateRandomInteger(125, 200);
 //        rectangle.setHeight(randomHeight); // was 200
@@ -322,7 +322,7 @@ public class EntityFactory {
 //        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
 //        rectangle.setOutlineThickness(0);
 //        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-////        extension.getComponent(Image.class).addShape(rectangle);
+////        extension.getComponent(Model.class).addShape(rectangle);
 //        rectangle.isBoundary = true;
 //        imageBuilder.addShape(rectangle);
 //
@@ -333,10 +333,10 @@ public class EntityFactory {
 //        rectangle.setRotation(0);
 //        rectangle.setColor("#3b3b3b");
 //        rectangle.setOutlineThickness(0);
-////        extension.getComponent(Image.class).addShape(rectangle);
+////        extension.getComponent(Model.class).addShape(rectangle);
 //        imageBuilder.addShape(rectangle);
 //
-//        extension.getComponent(Image.class).setImage(imageBuilder);
+//        extension.getComponent(Model.class).setImage(imageBuilder);
 //        // </LOAD_GEOMETRY_FROM_FILE>
 
         // <LOAD_GEOMETRY_FROM_FILE>
@@ -346,7 +346,7 @@ public class EntityFactory {
         long shapeUuid;
         Entity shape;
 
-        // Create Shapes for Image
+        // Create Shapes for Model
         rectangle = new Rectangle();
         int randomHeight = Random.generateRandomInteger(125, 200);
         rectangle.setHeight(randomHeight); // was 200
@@ -355,10 +355,10 @@ public class EntityFactory {
         rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-//        extension.getComponent(Image.class).addShape(rectangle);
+//        extension.getComponent(Model.class).addShape(rectangle);
 //        rectangle.isBoundary = true;
 //        imageBuilder.addShape(rectangle);
-        shapeUuid = Image.addShape(extension, rectangle);
+        shapeUuid = Model.addShape(extension, rectangle);
         shape = world.Manager.get(shapeUuid);
         Label.setLabel(shape, "Board");
 
@@ -370,17 +370,17 @@ public class EntityFactory {
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-//        extension.getComponent(Image.class).addShape(rectangle);
+//        extension.getComponent(Model.class).addShape(rectangle);
 //        imageBuilder.addShape(rectangle);
-        shapeUuid = Image.addShape(extension, rectangle);
+        shapeUuid = Model.addShape(extension, rectangle);
         shape = world.Manager.get(shapeUuid);
         shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
         Label.setLabel(shape, "Header");
 
-//        extension.getComponent(Image.class).setImage(imageBuilder);
+//        extension.getComponent(Model.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
-        // Load geometry from file into Image Component
+        // Load geometry from file into Model Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
 
         // <EVENT_HANDLERS>
@@ -410,12 +410,12 @@ public class EntityFactory {
 
                 /*
                 // TODO:
-                Shape board = extension.getComponent(Image.class).getImage().getShape("Board");
+                Shape board = extension.getComponent(Model.class).getModel().getShape("Board");
                 List<Transform> vertices = board.getVertices();
                 Log.v("ExtPos", "ex: " + event.getPosition().x + ", y: " + event.getPosition().y);
                 for (int i = 0; i < vertices.size(); i++) {
                     Log.v("ExtPos", "x: " + vertices.get(i).x + ", y: " + vertices.get(i).y);
-                    if (Model.distance(vertices.get(i), event.getPosition()) < 20) {
+                    if (Primitive.distance(vertices.get(i), event.getPosition()) < 20) {
                         createImageEditor = true;
                     }
                 }
@@ -460,7 +460,7 @@ public class EntityFactory {
                         path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                     }
                 }
-                // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visible.VISIBLE);
+                // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getModels().setVisibility(Visible.VISIBLE);
 
                 // TODO: 11/13/2016 Set Title
 
@@ -481,7 +481,7 @@ public class EntityFactory {
         path.addComponent(new Path()); // Unique to Path
         path.addComponent(new Transform());
         path.addComponent(new Physics());
-        path.addComponent(new Image());
+        path.addComponent(new Model());
         path.addComponent(new Style());
         path.addComponent(new Boundary());
         path.addComponent(new Visibility());
@@ -496,7 +496,7 @@ public class EntityFactory {
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
 //        imageBuilder.addShape(segment);
-        long pathShapeUuid = Image.addShape(path, segment);
+        long pathShapeUuid = Model.addShape(path, segment);
 
         // <HACK>
         // Set Label
@@ -511,7 +511,7 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        pathShapeUuid = Image.addShape(path, circle);
+        pathShapeUuid = Model.addShape(path, circle);
 //        Entity shapeEntity = world.Manager.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set();
@@ -530,7 +530,7 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        pathShapeUuid = Image.addShape(path, circle);
+        pathShapeUuid = Model.addShape(path, circle);
 
         // <HACK>
         // Set Label
@@ -541,8 +541,8 @@ public class EntityFactory {
         // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
         // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
-//        path.getComponent(Image.class).setImage(imageBuilder);
-        path.getComponent(Image.class).layerIndex = 10;
+//        path.getComponent(Model.class).setImage(imageBuilder);
+        path.getComponent(Model.class).layerIndex = 10;
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
@@ -563,8 +563,8 @@ public class EntityFactory {
 
                     Path.setState(path, Component.State.EDITING);
 
-                    Entity pathShape = Image.getShape(path, "Path");
-                    Segment pathSegment = (Segment) pathShape.getComponent(Model.class).shape;
+                    Entity pathShape = Model.getShape(path, "Path");
+                    Segment pathSegment = (Segment) pathShape.getComponent(Primitive.class).shape;
                     pathSegment.setTarget(event.getPosition());
                     pathShape.getComponent(Visibility.class).visible = Visible.VISIBLE;
 
@@ -650,17 +650,17 @@ public class EntityFactory {
 
                     // Multi-Port Path (non-singleton)
 
-                    Entity sourcePortShape = Image.getShape(path, "Source Port");
+                    Entity sourcePortShape = Model.getShape(path, "Source Port");
                     if (event.getSecondaryTarget() == sourcePortShape) {
                         Log.v("handlePathEvent", "Touched Source");
-                        //sourcePortShape.getComponent(Model.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
+                        //sourcePortShape.getComponent(Primitive.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
                         sourcePortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
                         // TODO: sourcePortShape.getComponent(Physics.class).targetTransform.set(event.getPosition());
 
                         Path.setState(path, Component.State.EDITING);
                     }
 
-                    Entity targetPortShape = Image.getShape(path, "Target Port");
+                    Entity targetPortShape = Model.getShape(path, "Target Port");
                     if (event.getSecondaryTarget() == targetPortShape) {
                         Log.v("handlePathEvent", "Touched Target");
                         targetPortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
@@ -681,8 +681,8 @@ public class EntityFactory {
                     return;
                 }
 
-                Entity sourcePortShape = Image.getShape(path, "Source Port"); // path.getComponent(Image.class).getImage().getShape("Source Port");
-                Entity targetPortShape = Image.getShape(path, "Target Port"); // path.getComponent(Image.class).getImage().getShape("Target Port");
+                Entity sourcePortShape = Model.getShape(path, "Source Port"); // path.getComponent(Model.class).getModel().getShape("Source Port");
+                Entity targetPortShape = Model.getShape(path, "Target Port"); // path.getComponent(Model.class).getModel().getShape("Target Port");
 
                 Log.v("handlePathEvent", "UNSELECT PATH.");
 
@@ -770,8 +770,8 @@ public class EntityFactory {
                                 // Remap the Path's Ports
 
                                 // Check if source or target in Path was moved, and reassign it
-                                Entity sourcePortShape2 = Image.getShape(path, "Source Port"); // path.getComponent(Image.class).getImage().getShape("Source Port");
-                                Entity targetPortShape2 = Image.getShape(path, "Target Port"); // path.getComponent(Image.class).getImage().getShape("Target Port");
+                                Entity sourcePortShape2 = Model.getShape(path, "Source Port"); // path.getComponent(Model.class).getModel().getShape("Source Port");
+                                Entity targetPortShape2 = Model.getShape(path, "Target Port"); // path.getComponent(Model.class).getModel().getShape("Target Port");
                                 if (camp.computer.clay.util.Geometry.contains(Boundary.get(sourcePortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable
@@ -994,7 +994,7 @@ public class EntityFactory {
         // Add Components
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
-        port.addComponent(new Image());
+        port.addComponent(new Model());
         port.addComponent(new Style());
         port.addComponent(new Physics());
         port.addComponent(new Boundary());
@@ -1004,7 +1004,7 @@ public class EntityFactory {
         // <LOAD_GEOMETRY_FROM_FILE>
 //        ImageBuilder imageBuilder = new ImageBuilder();
 
-        // Create Shapes for Image
+        // Create Shapes for Model
         Circle circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Port"); // TODO: Give proper name...
@@ -1012,7 +1012,7 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        long portShapeUuid = Image.addShape(port, circle);
+        long portShapeUuid = Model.addShape(port, circle);
 
         // <HACK>
         // Set Label
@@ -1020,7 +1020,7 @@ public class EntityFactory {
         portShape.getComponent(Label.class).label = "Port";
         // </HACK>
 
-//        port.getComponent(Image.class).setImage(imageBuilder);
+//        port.getComponent(Model.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // <EVENT_HANDLERS>
@@ -1122,13 +1122,13 @@ public class EntityFactory {
         return camera;
     }
 
-    public static Entity createModelEntity(final World world) {
+    public static Entity createPrimitiveEntity(final World world) {
 
         Entity shape = new Entity();
 
         // Components
         shape.addComponent(new Label());
-        shape.addComponent(new Model()); // Unique to Shape Entity
+        shape.addComponent(new Primitive()); // Unique to Shape Entity
         shape.addComponent(new Transform());
         shape.addComponent(new Physics());
         shape.addComponent(new Style());
@@ -1148,7 +1148,7 @@ public class EntityFactory {
         // Components
         notification.addComponent(new Notification()); // Unique to Notification Entity
         notification.addComponent(new Transform());
-        notification.addComponent(new Image());
+        notification.addComponent(new Model());
         notification.addComponent(new Style());
         notification.addComponent(new Visibility());
         notification.addComponent(new Timer());
@@ -1157,7 +1157,7 @@ public class EntityFactory {
         notification.getComponent(Timer.class).timeout = PlatformRenderSurface.DEFAULT_NOTIFICATION_TIMEOUT;
         // </HACK>
 
-        // Image
+        // Model
 //        ImageBuilder imageBuilder = new ImageBuilder();
 
         Text text = new Text();
@@ -1166,15 +1166,15 @@ public class EntityFactory {
         text.setColor("#ff000000");
         text.setPosition(0, 0);
         text.font = PlatformRenderSurface.NOTIFICATION_FONT;
-        Image.addShape(notification, text);
+        Model.addShape(notification, text);
 
 //        imageBuilder.addShape(text);
 
         // <HACK>
-        notification.getComponent(Image.class).layerIndex = 20;
+        notification.getComponent(Model.class).layerIndex = 20;
         // </HACK>
 
-//        notification.getComponent(Image.class).setImage(imageBuilder);
+//        notification.getComponent(Model.class).setImage(imageBuilder);
 
         return notification;
     }

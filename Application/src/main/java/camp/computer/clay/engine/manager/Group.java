@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
@@ -179,7 +179,7 @@ public class Group<E> implements List<E> {
             @Override
             public Entity map(Entity entity, Double transparency) {
 //                if (entity instanceof HostEntity) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == HostEntity.getTypeUuid()
-                if (entity.getComponent(Image.class) != null) {
+                if (entity.getComponent(Model.class) != null) {
                     entity.getComponent(Style.class).setTransparency(entity, transparency);
                 }
                 return entity;
@@ -211,11 +211,11 @@ public class Group<E> implements List<E> {
         };
 
         // Assumes Group<Entity>
-        public static Mapper getImage = new Mapper<Entity, Image, Void>() {
+        public static Mapper getModel = new Mapper<Entity, Model, Void>() {
             @Override
-            public Image map(Entity entity, Void data) {
-                if (entity.getComponent(Image.class) != null) {
-                    return entity.getComponent(Image.class);
+            public Model map(Entity entity, Void data) {
+                if (entity.getComponent(Model.class) != null) {
+                    return entity.getComponent(Model.class);
                 } else {
                     return null;
                 }
@@ -254,7 +254,7 @@ public class Group<E> implements List<E> {
     }
 
     // Exepcts Group<Entity>
-    // Requires components: Image
+    // Requires components: Model
     public Group<Entity> sortByLayer() {
         Group<Entity> group = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
@@ -266,7 +266,7 @@ public class Group<E> implements List<E> {
             boolean isEntityInserted = false;
             for (int j = 0; j < group.size(); j++) {
                 Entity sortedEntity = (Entity) group.get(j); // HACK: Forcing typecast to Entity
-                if (entity.getComponent(Image.class).layerIndex < sortedEntity.getComponent(Image.class).layerIndex) {
+                if (entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex) {
                     group.add(j, entity);
                     isEntityInserted = true;
                     break;
@@ -301,7 +301,7 @@ public class Group<E> implements List<E> {
     }
 
     // Expects Group<Entity>
-    // Requires components: Image
+    // Requires components: Model
     public void setTransparency(double transparency) {
         map(Mappers.setTransparency, transparency);
     }
@@ -313,16 +313,16 @@ public class Group<E> implements List<E> {
 
     // <REFACTOR>
     // Assumes Group<Entity>
-    public Group<Image> getImages() {
-        return map(Mappers.getImage, null);
+    public Group<Model> getModels() {
+        return map(Mappers.getModel, null);
     }
 
-    // Assumes Group<Image>
+    // Assumes Group<Model>
     public Group<Entity> getShapes() {
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
-            Image image = (Image) elements.get(i);
-            Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
+            Model model = (Model) elements.get(i);
+            Group<Entity> shapeEntities = Model.getShapes(model.getEntity());
             for (int j = 0; j < shapeEntities.size(); j++) {
                 shapes.add(shapeEntities.get(j));
             }
@@ -399,20 +399,20 @@ public class Group<E> implements List<E> {
     }
 
     /**
-     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     * Finds and returns the nearest <em>visible</em> <code>Model</code>.
      *
      * @return
      */
-//    // HACK: Expects Group<Image>
-//    public Image getNearestImage(Transform position) {
+//    // HACK: Expects Group<Model>
+//    public Model getNearestImage(Transform position) {
 //
 //        double shortestDistance = Float.MAX_VALUE;
-//        Image nearestImage = null;
+//        Model nearestImage = null;
 //
 //        for (int i = 0; i < elements.size(); i++) {
-//            Image image = (Image) elements.get(i);
+//            Model image = (Model) elements.get(i);
 //
-//            double currentDistance = Model.distance(position, image.getPosition());
+//            double currentDistance = Primitive.distance(position, image.getPosition());
 //
 //            if (currentDistance < shortestDistance) {
 //                shortestDistance = currentDistance;
@@ -423,7 +423,7 @@ public class Group<E> implements List<E> {
 //        return nearestImage;
 //    }
 
-    // HACK: Expects Group<Image>
+    // HACK: Expects Group<Model>
     // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
     public Transform getCenterPoint() {
         return camp.computer.clay.util.Geometry.getCenterPoint(getPositions());

@@ -18,9 +18,9 @@ public class Style extends Component {
     public static void setTransparency(Entity entity, final double transparency) {
 
         /*
-//        Image image = entity.getComponent(Image.class);
-//        List<Shape> shapes = image.getImage().getShapes();
-        Group<Entity> shapes = Image.getShapes(entity);
+//        Model image = entity.getComponent(Model.class);
+//        List<Shape> shapes = image.getModel().getShapes();
+        Group<Entity> shapes = Model.getShapes(entity);
 
         entity.getComponent(Style.class).targetTransparency = transparency;
 

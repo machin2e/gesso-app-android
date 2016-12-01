@@ -2390,7 +2390,7 @@ public class PlatformUi {
                             }
                             // </HACK>
 
-                            // Add point to Image
+                            // Add point to Model
                             imagePoints.add(new Transform(motionEvent.getX(), motionEvent.getY()));
 
                             // Set background color

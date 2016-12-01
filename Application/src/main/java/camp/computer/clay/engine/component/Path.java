@@ -158,7 +158,7 @@ public class Path extends Component {
 
 //        // <REFACTOR_INTO_SYSTEM>
 //        // Set up layout constraint
-//        Entity pathSourcePort = Image.getShape(path, "Source Port");
+//        Entity pathSourcePort = Model.getShape(path, "Source Port");
 //        if (!pathSourcePort.hasComponent(RelativeLayoutConstraint.class)) {
 //            pathSourcePort.addComponent(new RelativeLayoutConstraint());
 //        }
@@ -180,7 +180,7 @@ public class Path extends Component {
 
 //        // <REFACTOR_INTO_SYSTEM>
 //        // Set up layout constraint
-//        Entity pathTargetPort = Image.getShape(path, "Target Port");
+//        Entity pathTargetPort = Model.getShape(path, "Target Port");
 //        if (!pathTargetPort.hasComponent(RelativeLayoutConstraint.class)) {
 //            pathTargetPort.addComponent(new RelativeLayoutConstraint());
 //        }

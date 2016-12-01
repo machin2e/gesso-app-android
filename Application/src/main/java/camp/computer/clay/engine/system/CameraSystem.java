@@ -6,7 +6,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
@@ -155,7 +155,7 @@ public class CameraSystem extends System {
 //    private void adjustScale(Entity camera, double duration) {
 //        // <REFACTOR>
 //        //Rectangle boundingBox = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getBoundingBox();
-//        Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getImages().getShapes().getBoundaryVertices());
+//        Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
 //        // </REFACTOR>
 //        Log.v("BoundingBoxScale", "adjustScale: width: " + boundingBox.width + ", height: " + boundingBox.height);
 //        if (boundingBox.width > 0 && boundingBox.height > 0) {
@@ -249,7 +249,7 @@ public class CameraSystem extends System {
             // </REFACTOR>
 
             // Update scale and position
-            Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getImages().getShapes().getBoundaryVertices());
+            Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
             adjustScale(camera, boundingBox);
 //            adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
 //            adjustPosition(camera);
@@ -291,19 +291,19 @@ public class CameraSystem extends System {
 
             // </REFACTOR>
 
-            Group<Entity> hostPathPortShapes = hostPathPorts.getImages().getShapes();
+            Group<Entity> hostPathPortShapes = hostPathPorts.getModels().getShapes();
             Log.v("HostExtensionShapes", "Host:");
             Log.v("HostExtensionShapes", "\tx: " + entity.getComponent(Transform.class).x + ", y: " + entity.getComponent(Transform.class).y);
             for (int i = 0; i < hostPathPortShapes.size(); i++) {
                 Log.v("HostExtensionShapes", "\tx: " + hostPathPortShapes.get(i).getComponent(Transform.class).x + ", y: " + hostPathPortShapes.get(i).getComponent(Transform.class).y);
             }
 
-            Group<Entity> extensionGeometry = Portable.getExtensions(entity).getImages().getShapes();
-            Log.v("HostExtensionShapes", "Extension (shapeCount: " + Portable.getExtensions(entity).getImages().getShapes().size() + ")");
+            Group<Entity> extensionGeometry = Portable.getExtensions(entity).getModels().getShapes();
+            Log.v("HostExtensionShapes", "Extension (shapeCount: " + Portable.getExtensions(entity).getModels().getShapes().size() + ")");
             for (int i = 0; i < extensionGeometry.size(); i++) {
                 Log.v("HostExtensionShapes", "\tx: " + extensionGeometry.get(i).getComponent(Transform.class).x + ", y: " + extensionGeometry.get(i).getComponent(Transform.class).y);
             }
-            //Rectangle boundingBox = Model.getBoundingBox(hostPathPortShapes.getVertices());
+            //Rectangle boundingBox = Primitive.getBoundingBox(hostPathPortShapes.getVertices());
             hostPathPortShapes.addAll(extensionGeometry);
 
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getBoundaryVertices());
@@ -364,8 +364,8 @@ public class CameraSystem extends System {
             Entity host = Portable.getHosts(entity).get(0);
             world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-            Group<Entity> extensionPathPortShapes = extensionPathPorts.getImages().getShapes();
-            extensionPathPortShapes.addAll(Image.getShapes(entity)); // HACK: Add Extension shapes
+            Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getShapes();
+            extensionPathPortShapes.addAll(Model.getShapes(entity)); // HACK: Add Extension shapes
             Rectangle boundingBox = Geometry.getBoundingBox(extensionPathPortShapes.getBoundaryVertices());
 
             // <REFACTOR>

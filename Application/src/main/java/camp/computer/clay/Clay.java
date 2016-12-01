@@ -15,7 +15,7 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
-import camp.computer.clay.engine.system.ImageSystem;
+import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
@@ -65,7 +65,7 @@ public class Clay {
         // Create World
         world = new World();
         world.addSystem(new InputSystem(world));
-        world.addSystem(new ImageSystem(world));
+        world.addSystem(new ModelSystem(world));
         world.addSystem(new StyleSystem(world));
         world.addSystem(new PhysicsSystem(world));
         world.addSystem(new PortableLayoutSystem(world));

@@ -14,6 +14,7 @@ public abstract class Shape {
 
     //    protected Transform imagePosition = null;
     protected Transform position = new Transform(0, 0);
+    // TODO: private Transform facingAngle/normal; // Consider placing into Transform.
     // </TODO>
 
     protected String color = "#fff7f7f7";
@@ -71,22 +72,6 @@ public abstract class Shape {
     public int outlineColorCode = android.graphics.Color.BLACK;
     // </ANDROID>
 
-//    public void setTransparency(final double transparency) {
-//        this.targetTransparency = transparency;
-//
-//        // Color
-//        int intColor = android.graphics.Color.parseColor(getColor());
-//        intColor = Color.setTransparency(intColor, this.targetTransparency);
-//        setColor(Color.getHexColorString(intColor));
-//
-//        // Outline Color
-//        int outlineColorIndex = android.graphics.Color.parseColor(getOutlineColor());
-//        outlineColorIndex = Color.setTransparency(outlineColorIndex, this.targetTransparency);
-//        setOutlineColor(Color.getHexColorString(outlineColorIndex));
-//
-//        this.transparency = this.targetTransparency;
-//    }
-
     public void setOutlineColor(String color) {
         this.outlineColor = color;
 
@@ -107,6 +92,7 @@ public abstract class Shape {
         return outlineThickness;
     }
 
+    // <REFACTOR>
     public void setLabel(String label) {
         this.label = label;
     }
@@ -114,4 +100,5 @@ public abstract class Shape {
     public String getLabel() {
         return this.label;
     }
+    // </REFACTOR>
 }

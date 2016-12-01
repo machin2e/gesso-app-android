@@ -11,9 +11,9 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
@@ -189,8 +189,8 @@ public class World {
             entity = EntityFactory.createPlayerEntity(this);
         } else if (entityType == Notification.class) {
             entity = EntityFactory.createNotificationEntity(this);
-        } else if (entityType == Model.class) {
-            entity = EntityFactory.createModelEntity(this);
+        } else if (entityType == Primitive.class) {
+            entity = EntityFactory.createPrimitiveEntity(this);
         }
 
         // Add Entity to Manager
@@ -211,8 +211,8 @@ public class World {
         notification.getComponent(Transform.class).rotation = 0;
         // </HACK>
 
-//        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
-        Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(Model.class).shape;
+//        Text text2 = (Text) notification.getComponent(Model.class).getModel().getShapes().get(0);
+        Text text2 = (Text) Model.getShapes(notification).get(0).getComponent(Primitive.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 
@@ -234,7 +234,7 @@ public class World {
         prototypeExtension.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypeExtension.addComponent(new Transform());
         prototypeExtension.addComponent(new Physics());
-        prototypeExtension.addComponent(new Image());
+        prototypeExtension.addComponent(new Model());
         prototypeExtension.addComponent(new Boundary());
         prototypeExtension.addComponent(new Style());
         prototypeExtension.addComponent(new Visibility());
@@ -243,7 +243,7 @@ public class World {
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        Image.addShape(prototypeExtension, rectangle);
+        Model.addShape(prototypeExtension, rectangle);
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 

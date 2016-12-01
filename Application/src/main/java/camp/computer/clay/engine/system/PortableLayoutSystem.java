@@ -9,8 +9,8 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -38,7 +38,7 @@ public class PortableLayoutSystem extends System {
         updatePathPortConfiguration();
         updatePortConfiguration();
 
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Image.class, Transform.class);
+        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, Transform.class);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.hasComponent(Extension.class)) {
@@ -67,23 +67,23 @@ public class PortableLayoutSystem extends System {
         if (!isSingletonPath) {
 
             Entity sourcePort = Path.getSource(path);
-            Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
-            Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
+            Entity sourcePortShapeE = Model.getShape(sourcePort, "Port");
+            Entity targetPortShapeE = Model.getShape(Path.getTarget(path), "Port");
 
             // <REFACTOR>
             if (Path.getState(path) != Component.State.EDITING) {
                 // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
                 // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
-                Image.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
-                Image.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
+                Model.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+                Model.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
             }
             // </REFACTOR>
 
         } else {
 
             Entity sourcePort = Path.getSource(path);
-            Entity sourcePortPathShape = Image.getShape(path, "Source Port");
-            Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
+            Entity sourcePortPathShape = Model.getShape(path, "Source Port");
+            Entity sourcePortShapeE = Model.getShape(sourcePort, "Port");
 
             // <REFACTOR>
             path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
@@ -94,7 +94,7 @@ public class PortableLayoutSystem extends System {
             // </REFACTOR>
 
             // <REFACTOR>
-            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Model.class).shape;
+            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
             segment.setSource(sourcePortPathShape.getComponent(Transform.class));
             if (Path.getState(path) != Component.State.EDITING) {
                 segment.setTarget(sourcePortPathShape.getComponent(Transform.class));
@@ -125,8 +125,8 @@ public class PortableLayoutSystem extends System {
             Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
             Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
 
-            Entity shapeEntity = Image.getShape(path, "Path");
-            Segment segment = (Segment) shapeEntity.getComponent(Model.class).shape;
+            Entity shapeEntity = Model.getShape(path, "Path");
+            Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
             segment.setSource(hostContactTransform);
             segment.setTarget(extensionContactTransform);
             // </REFACTOR>
@@ -398,7 +398,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Entity boardShape = Image.getShape(host, "Board"); // host.getComponent(Image.class).getImage().getShape("Board");
+        Entity boardShape = Model.getShape(host, "Board"); // host.getComponent(Model.class).getModel().getShape("Board");
         List<Transform> hostShapeBoundary = Boundary.get(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
@@ -411,7 +411,7 @@ public class PortableLayoutSystem extends System {
             }
 
             Entity hostPort = Path.getHostPort(Port.getPaths(extensionPort).get(0)); // HACK: Using hard-coded index 0.
-            Transform hostPortPosition = Image.getShape(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
+            Transform hostPortPosition = Model.getShape(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Model.class).getModel().getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
@@ -525,7 +525,7 @@ public class PortableLayoutSystem extends System {
     }
 
     private void updateExtensionHeaderIndex(Entity host, Entity extension) {
-        if (extension.getComponent(Image.class) == null || Portable.getHosts(extension).size() == 0) {
+        if (extension.getComponent(Model.class) == null || Portable.getHosts(extension).size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(host, extension);
@@ -535,7 +535,7 @@ public class PortableLayoutSystem extends System {
     // <HOST_LAYOUT>
 
     /**
-     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Image}s.
+     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Model}s.
      * <p>
      * To enable layout algorithms to be changed at runtime, {@code adjustLayout()} adopts the
      * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
@@ -553,7 +553,7 @@ public class PortableLayoutSystem extends System {
     }
 
     /**
-     * Update the {@code Image} to match the state of the corresponding {@code Entity}.
+     * Update the {@code Model} to match the state of the corresponding {@code Entity}.
      */
     public void updateExtensionGeometry(Entity extension) {
 
@@ -598,10 +598,10 @@ public class PortableLayoutSystem extends System {
         double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
         // </FACTOR_OUT>
 
-        // Update Headers Model to match the corresponding ExtensionEntity Configuration
-        Entity shape = Image.getShape(extension, "Header");
+        // Update Headers Primitive to match the corresponding ExtensionEntity Configuration
+        Entity shape = Model.getShape(extension, "Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        Rectangle headerShape = (Rectangle) shape.getComponent(Model.class).shape;
+        Rectangle headerShape = (Rectangle) shape.getComponent(Primitive.class).shape;
         headerShape.setWidth(headerWidth);
 
         // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
@@ -619,13 +619,13 @@ public class PortableLayoutSystem extends System {
                 // <HACK>
                 // Add header contact shape
                 Point headerContactShape = new Point();
-                long eid = Image.addShape(extension, headerContactShape);
+                long eid = Model.addShape(extension, headerContactShape);
                 Entity headerContactGeometry = world.Manager.get(eid); // HACK
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
                 //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
 
                 // <REFACTOR_TO_REDUCE_REDUNDANCY>
-//                Image.addShape(extension, headerContactShape);
+//                Model.addShape(extension, headerContactShape);
                 extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
                 //headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);

@@ -37,7 +37,7 @@ public class Boundary extends Component {
 //    }
 
     /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+     * Returns {@code true} if any of the {@code Shape}s in the {@code Model} contain the
      * {@code point}.
      *
      * @param point
@@ -46,10 +46,10 @@ public class Boundary extends Component {
     public static boolean contains(Entity entity, Transform point) {
 
         // <HACK>
-        if (entity.hasComponent(Image.class)) {
-            Group<Entity> shapes = Image.getShapes(entity);
+        if (entity.hasComponent(Model.class)) {
+            Group<Entity> shapes = Model.getShapes(entity);
             for (int i = 0; i < shapes.size(); i++) {
-                if (/*shapes.get(i).getComponent(Model.class).shape.isBoundary // HACK
+                if (/*shapes.get(i).getComponent(Primitive.class).shape.isBoundary // HACK
                     &&*/ Geometry.contains(Boundary.get(shapes.get(i)), point)) { // HACK
                     return true;
                 }
@@ -63,9 +63,9 @@ public class Boundary extends Component {
         }
         return false;
 
-        // TODO: return Model.contains(entity.getComponent(Boundary.class).boundary, point);
+        // TODO: return Primitive.contains(entity.getComponent(Boundary.class).boundary, point);
 
-        // TODO?: return Model.contains(this.boundary, point);
+        // TODO?: return Primitive.contains(this.boundary, point);
     }
 
     // TODO: Compute bounding box for image when add/remove Shapes and store it here!
@@ -73,11 +73,11 @@ public class Boundary extends Component {
 
         List<Transform> shapeBoundaries = new ArrayList<>();
 
-//        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
-        Group<Entity> shapes = Image.getShapes(entity);
+//        List<Shape> shapes = entity.getComponent(Model.class).getModel().getShapes();
+        Group<Entity> shapes = Model.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
-//            if (shapes.get(i).getComponent(Model.class).shape.isBoundary) { // HACK
-            //shapeBoundaries.addAll(BoundarySystem.get(shapes.get(i).getComponent(Model.class).shape)); // HACK
+//            if (shapes.get(i).getComponent(Primitive.class).shape.isBoundary) { // HACK
+            //shapeBoundaries.addAll(BoundarySystem.get(shapes.get(i).getComponent(Primitive.class).shape)); // HACK
             shapeBoundaries.addAll(Boundary.get(shapes.get(i))); // HACK
 //            }
         }

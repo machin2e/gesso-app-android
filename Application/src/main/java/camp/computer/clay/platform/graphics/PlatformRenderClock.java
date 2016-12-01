@@ -7,7 +7,7 @@ import android.view.SurfaceHolder;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
@@ -29,14 +29,15 @@ public class PlatformRenderClock extends Thread {
 
     // <STATISTICS>
     private double currentFPS = 0;
-    public double currentFrameTime = 0;
+    public double frameTimeDelta = 0;
     public double currentSleepTime = 0;
     // </STATISTICS>
 
     private PlatformRenderSurface platformRenderSurface;
 
     private boolean isRunning = false;
-    public long tickCount;
+    public long frameCount = 0;
+    public long tickCount = 0; // TODO: Move tickCount into Engine
 
     PlatformRenderClock(PlatformRenderSurface platformRenderSurface) {
         super();
@@ -52,13 +53,22 @@ public class PlatformRenderClock extends Thread {
     @Override
     public void run() {
 
-        long framePeriod = 1000 / targetFPS; // Period in milliseconds
+        long targetFramePeriod = 1000 / targetFPS; // Period in milliseconds
         long frameStartTime = 0;
         long frameStopTime;
         long frameSleepTime;
         long sleepStartTime = 0;
 
+        // <REFACTOR>
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Palette palette = new Palette();
+        // </REFACTOR>
+
         while (isRunning) {
+
+            if (frameCount > 0) {
+                tickCount++;
+            }
 
             // We need to make sure that the surface is ready
             SurfaceHolder holder = platformRenderSurface.getSurfaceHolder();
@@ -69,23 +79,15 @@ public class PlatformRenderClock extends Thread {
             dt = Clock.getCurrentTime() - frameStartTime;
             frameStartTime = Clock.getCurrentTime();
 
-            // Advance the world state
-            tickCount++;
-
 //            platformRenderSurface.world.update();
 
             Canvas canvas = holder.lockCanvas();
 
-            // <REFACTOR>
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            Palette palette = new Palette();
-            palette.canvas = canvas;
-            palette.paint = paint;
-            // </REFACTOR>
-
             try {
                 if (canvas != null) {
                     synchronized (holder) {
+
+                        frameCount++;
 
                         // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK HIERARCHY!!!!!!!!!!!!! FUCK!!!!!!!!
 
@@ -108,12 +110,12 @@ public class PlatformRenderClock extends Thread {
                         canvas.drawColor(Color.WHITE);
                         // </CLEAR_CANVAS>
 
-                        Group<Entity> entities = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
+                        Group<Entity> entities = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponent(Model.class).sortByLayer();
 
                         // <UPDATE>
                         // TODO: Draw Renderables.
                         // TODO: This call is expensive. Make it way faster. Cache? Sublist?
-                        platformRenderSurface.drawRenderableEntities(entities, canvas, paint, palette);
+                        platformRenderSurface.drawRenderables(entities, canvas, paint, palette);
                         // </UPDATE>
 
                         if (World.ENABLE_GEOMETRY_ANNOTATIONS) {
@@ -143,11 +145,11 @@ public class PlatformRenderClock extends Thread {
             // Store actual frames per second
             frameStopTime = Clock.getCurrentTime();
             currentFPS = (1000.0f / (float) (frameStopTime - frameStartTime));
-            currentFrameTime = frameStopTime - frameStartTime;
+            frameTimeDelta = frameStopTime - frameStartTime;
 
             // Sleep the thread until the time remaining in the frame's allocated draw time expires.
             // This reduces energy consumption thereby increasing battery life.
-            frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
+            frameSleepTime = targetFramePeriod - (frameStopTime - frameStartTime);
             try {
                 sleepStartTime = Clock.getCurrentTime();
                 if (frameSleepTime > 0) {

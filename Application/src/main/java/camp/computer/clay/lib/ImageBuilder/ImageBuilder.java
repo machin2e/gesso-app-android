@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.entity.Entity;
@@ -146,7 +146,7 @@ public class ImageBuilder {
                 String label = shape.getString("label");
                 String type = shape.getString("type");
 
-                // Model
+                // Primitive
                 double x = position.getDouble("x") * scaleFactor;
                 double y = position.getDouble("y") * scaleFactor;
                 double rotation = shape.getDouble("rotation");
@@ -176,7 +176,7 @@ public class ImageBuilder {
 
                 if (type.equals("Point")) {
 
-                    // NOTE: Model N/A
+                    // NOTE: Primitive N/A
 
                     Point point = new Point();
                     point.setLabel(label);
@@ -289,7 +289,7 @@ public class ImageBuilder {
                 String label = shape.getString("label");
                 String type = shape.getString("type");
 
-                // Model
+                // Primitive
                 double x = position.getDouble("x") * scaleFactor;
                 double y = position.getDouble("y") * scaleFactor;
                 double rotation = shape.getDouble("rotation");
@@ -319,7 +319,7 @@ public class ImageBuilder {
 
                 if (type.equals("Point")) {
 
-                    // NOTE: Model N/A
+                    // NOTE: Primitive N/A
 
                     Point point = new Point();
                     point.setLabel(label);
@@ -333,7 +333,7 @@ public class ImageBuilder {
                     imageBuilder.addShape(point);
 
                     // <ENTITY>
-                    long eid = Image.addShape(entity, point);
+                    long eid = Model.addShape(entity, point);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
@@ -362,7 +362,7 @@ public class ImageBuilder {
                     imageBuilder.addShape(rectangle);
 
                     // <ENTITY>
-                    long eid = Image.addShape(entity, rectangle);
+                    long eid = Model.addShape(entity, rectangle);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
@@ -388,7 +388,7 @@ public class ImageBuilder {
                     imageBuilder.addShape(circle);
 
                     // <ENTITY>
-                    long eid = Image.addShape(entity, circle);
+                    long eid = Model.addShape(entity, circle);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK

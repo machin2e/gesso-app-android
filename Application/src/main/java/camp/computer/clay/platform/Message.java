@@ -64,7 +64,7 @@ public class Message {
         return this.source;
     }
 
-    // TODO: getImages().getAddress()
+    // TODO: getModels().getAddress()
     public String getTargetAddress() {
         return this.target;
     }

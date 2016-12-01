@@ -1,23 +1,23 @@
 package camp.computer.clay.engine.system;
 
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 
-public class ImageSystem extends System {
+public class ModelSystem extends System {
 
-    public ImageSystem(World world) {
+    public ModelSystem(World world) {
         super(world);
     }
 
     @Override
     public void update() {
 
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Image.class, Transform.class);
+        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, Transform.class);
 
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
@@ -27,23 +27,23 @@ public class ImageSystem extends System {
 //            if (entity.hasComponent(Extension.class)) {
 //                updateExtensionGeometry(entity);
 //            }
-            updateImage(entity);
+            updateModel(entity);
 
             // TODO: updateShape(entity) // FOR UPDATING LAYOUT CONSTRAINTS OF SHAPES
             // </HACK>
         }
 
-//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, RelativeLayoutConstraint.class, Transform.class);
+//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Primitive.class, RelativeLayoutConstraint.class, Transform.class);
 //
 //        for (int i = 0; i < shapeEntities.size(); i++) {
 //            Entity entity = shapeEntities.get(i);
-//            updateImage(entity);
+//            updateModel(entity);
 //        }
     }
 
-    // Previously: Image.update()
-    // Required Components: Image, Transform
-    private void updateImage(Entity entity) {
+    // Previously: Model.update()
+    // Required Components: Model, Transform
+    private void updateModel(Entity entity) {
 
         // Start by transforming base images. They will never have more than one level of constraints (?).
         Transform absoluteReferenceTransform = null;
@@ -70,7 +70,7 @@ public class ImageSystem extends System {
 //            }
         }
 
-//        if (entity.hasComponent(Model.class)) {
+//        if (entity.hasComponent(Primitive.class)) {
 //            if (absoluteReferenceTransform != null) {
 //                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
 //                updateShapeRelativeTransform(entity, absoluteReferenceTransform);
@@ -80,14 +80,14 @@ public class ImageSystem extends System {
         if (entity.hasComponent(Path.class)) {
 //            // <REFACTOR>
 //            // TODO: Fix this... understand it. This works when REMOVED.
-//            Group<Entity> shapes = Image.getShapes(entity);
+//            Group<Entity> shapes = Model.getShapes(entity);
 //            for (int i = 0; i < shapes.size(); i++) {
 //                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
 //                updateShapeRelativeTransform(shapes.get(i), shapes.get(i));
 //            }
 //            // </REFACTOR>
         } else {
-            Group<Entity> shapes = Image.getShapes(entity);
+            Group<Entity> shapes = Model.getShapes(entity);
             for (int i = 0; i < shapes.size(); i++) {
                 if (absoluteReferenceTransform != null) {
                     // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
@@ -101,11 +101,11 @@ public class ImageSystem extends System {
      * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
      * preparation for drawing and collision detection.
      * <p>
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code Model}. Translate
      * the center position of the {@code Shape}. Effectively, this updates the position of the
      * {@code Shape}.
      *
-     * @param referenceTransform Position of the containing {@code Image} relative to which the
+     * @param referenceTransform Position of the containing {@code Model} relative to which the
      *                           {@code Shape} will be drawn.
      */
     private void updateShapeRelativeTransform(Entity shape, Transform referenceTransform) {

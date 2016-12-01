@@ -1,11 +1,11 @@
 package camp.computer.clay.engine.system;
 
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -19,11 +19,11 @@ public class StyleSystem extends System {
         super(world);
     }
     // TODO: Consider renaming to AppearanceSystem.
-    // TODO: Use this system to change the Image's currently displayed "frame" or "suit"? Maybe ImageSystem is better for that. And update style here?
+    // TODO: Use this system to change the Model's currently displayed "frame" or "suit"? Maybe ModelSystem is better for that. And update style here?
 
     @Override
     public void update() {
-        Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Style.class, Transform.class, Image.class);
+        Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
 
         // Update Style
         for (int i = 0; i < entitiesWithTransform.size(); i++) {
@@ -45,14 +45,14 @@ public class StyleSystem extends System {
 
         // Get LED shapes
         // TODO: Optimize! Cache!
-        Group<Entity> lightShapes = Image.getShapes(host, "^LED (1[0-2]|[1-9])$");
+        Group<Entity> lightShapes = Model.getShapes(host, "^LED (1[0-2]|[1-9])$");
 
         Group<Entity> ports = Portable.getPorts(host);
 
         // Update color of LEDs to color of corresponding Port shape
         for (int i = 0; i < ports.size(); i++) {
             String portColor = camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i)));
-            lightShapes.get(i).getComponent(Model.class).shape.setColor(portColor);
+            lightShapes.get(i).getComponent(Primitive.class).shape.setColor(portColor);
         }
     }
 
@@ -63,7 +63,7 @@ public class StyleSystem extends System {
         for (int i = 0; i < ports.size(); i++) {
             Entity portEntity = ports.get(i);
 
-//            Shape portShape = extension.getComponent(Image.class).getShape(portEntity);
+//            Shape portShape = extension.getComponent(Model.class).getShape(portEntity);
 //
 //            // Update color of Port shape based on type
 //            if (portShape != null) {
