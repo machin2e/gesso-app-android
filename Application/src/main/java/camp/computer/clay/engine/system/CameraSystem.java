@@ -17,6 +17,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 import camp.computer.clay.util.Geometry;
 
 public class CameraSystem extends System {
@@ -37,7 +38,7 @@ public class CameraSystem extends System {
     private void updateCamera(Entity camera) {
 
         // Update focus
-        updateFocus(camera);
+        updateCameraFocus(camera);
 
         // <REFACTOR>
         // TODO: Move into PhysicsSystem (if possible!)
@@ -54,150 +55,7 @@ public class CameraSystem extends System {
         // </REFACTOR>
     }
 
-    // <REFACTOR/DELETE>
-    // TODO: Put into PlatformRenderSurface? Viewport? Elsewhere? Screen descriptor structure?
-    public void setWidth(Entity camera, double width) {
-        camera.getComponent(Camera.class).width = width;
-    }
-
-    public double getWidth(Entity camera) {
-        return camera.getComponent(Camera.class).width;
-    }
-
-    public void setHeight(Entity camera, double height) {
-        camera.getComponent(Camera.class).height = height;
-    }
-
-    public double getHeight(Entity camera) {
-        return camera.getComponent(Camera.class).height;
-    }
-    // </REFACTOR/DELETE>
-
-    private void setPosition(Entity camera, Transform position) {
-//        Log.v("CameraSystem", "setPosition");
-
-        // <HACK>
-        /*
-        // TODO: This sets position in a way that accounts for the offset resulting from the status bar height...
-        int navBarHeight = 0;
-        Resources resources = Application.getInstance().getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            navBarHeight = resources.getDimensionPixelSize(resourceId);
-        }
-        camera.getComponent(Physics.class).targetTransform.set(-position.x, -position.y + (navBarHeight / 2.0));
-        */
-        // <HACK>
-
-        camera.getComponent(Physics.class).targetTransform.set(-position.x * camera.getComponent(Physics.class).targetTransform.scale, -position.y * camera.getComponent(Physics.class).targetTransform.scale);
-//        camera.getComponent(Transform.class).set(-position.x, -position.y);
-    }
-
-//    private void adjustPosition(Entity camera) {
-//        Log.v("CameraSystem", "adjustPosition");
-//        Transform centerPosition = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getCenterPoint();
-//        setPosition(camera, centerPosition, Camera.DEFAULT_ADJUSTMENT_PERIOD);
-//    }
-
-    public void setOffset(Entity camera, double dx, double dy) {
-        camera.getComponent(Physics.class).targetTransform.offset(dx, dy);
-    }
-
-    public void setOffset(Entity camera, Transform point) {
-        setOffset(camera, point.x, point.y);
-    }
-
-    private void setScale(Entity camera, double scale) {
-
-        /*
-        // TODO: Implement Zoom Levels
-        if (Math.abs(scale - Camera.SCALE_LEVEL_1) < Math.abs(scale - Camera.SCALE_LEVEL_2)) {
-            camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_1;
-            camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_1;
-        } else {
-            camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_2;
-            camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_2;
-        }
-         */
-
-        camera.getComponent(Physics.class).targetTransform.scale = scale;
-    }
-
-    public double getScale(Entity camera) {
-        return camera.getComponent(Transform.class).scale;
-    }
-
-//    private void adjustScale(Entity camera, double duration) {
-//        // <REFACTOR>
-//        //Rectangle boundingBox = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getBoundingBox();
-//        Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
-//        // </REFACTOR>
-//        Log.v("BoundingBoxScale", "adjustScale: width: " + boundingBox.width + ", height: " + boundingBox.height);
-//        if (boundingBox.width > 0 && boundingBox.height > 0) {
-//            adjustScale(camera, boundingBox, duration);
-//        }
-//    }
-
-//    /**
-//     * Adjusts the {@code CameraEntity} to fit the bounding box {@code boundingBox}. This sets the
-//     * duration of the scale adjustment to the default value {@code DEFAULT_SCALE_PERIOD}.
-//     *
-//     * @param boundingBox The bounding box to fit into the display area.
-//     */
-//    private void adjustScale(Entity camera, Rectangle boundingBox) {
-//        adjustScale(camera, boundingBox, Camera.DEFAULT_SCALE_PERIOD);
-//    }
-
-    /**
-     * Adjusts the {@code CameraEntity} to fit the bounding box {@code boundingBox}.
-     *
-     * @param boundingBox The bounding box to fit into the display area.
-     * @param duration    The duration of the scale adjustment.
-     */
-    private void adjustScale(Entity camera, Rectangle boundingBox) {
-
-        /*
-        // Multiply the bounding box
-        double paddingMultiplier = 1.0; // 1.10;
-        boundingBox.setWidth(boundingBox.getWidth() * paddingMultiplier);
-        boundingBox.setHeight(boundingBox.getHeight() * paddingMultiplier);
-        */
-
-//        Log.v("HostExtensionShapes", "adjustScale(...):");
-//        Log.v("HostExtensionShapes", "\tBoundingBox.width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
-//        Log.v("HostExtensionShapes", "\tViewPort.width: " + getWidth(camera) + ", height: " + getHeight(camera));
-
-        double horizontalScale = getWidth(camera) / boundingBox.getWidth();
-        double verticalScale = getHeight(camera) / boundingBox.getHeight();
-
-//        Log.v("HostExtensionShapes", "\thorizontalScale: " + horizontalScale);
-//        Log.v("HostExtensionShapes", "\tverticalScale: " + verticalScale);
-
-        // <REFACTOR>
-        camera.getComponent(Camera.class).boundingBox = boundingBox;
-        // </REFACTOR>
-
-//        if (horizontalScale <= Camera.MAXIMUM_SCALE || horizontalScale <= Camera.MAXIMUM_SCALE) {
-        if (horizontalScale < verticalScale) {
-            setScale(camera, horizontalScale);
-        } else if (horizontalScale > horizontalScale) {
-            setScale(camera, verticalScale);
-        }
-//        } else {
-//            setScale(camera, Camera.MAXIMUM_SCALE, Camera.DEFAULT_SCALE_PERIOD);
-//        }
-    }
-
-    public void setFocus(Entity camera, Entity entity) {
-
-        Camera cameraComponent = camera.getComponent(Camera.class);
-
-        cameraComponent.focus = entity;
-        cameraComponent.mode = Camera.Mode.FOCUS;
-
-    }
-
-    private void updateFocus(Entity camera) {
+    private void updateCameraFocus(Entity camera) {
 
         Camera cameraComponent = camera.getComponent(Camera.class);
 
@@ -224,14 +82,12 @@ public class CameraSystem extends System {
                 // </MOVE_TO_EVENT_HANDLER>
 
                 // <REFACTOR>
-                camera.getComponent(Camera.class).boundary = null;
+                cameraComponent.boundary = null;
                 // </REFACTOR>
 
                 // Update scale and position
                 Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
-                adjustScale(camera, boundingBox);
-//            adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
-//            adjustPosition(camera);
+                setScale(camera, boundingBox);
                 setPosition(camera, boundingBox.getPosition());
 
 
@@ -302,7 +158,7 @@ public class CameraSystem extends System {
                 // </REFACTOR>
 
                 // Update scale and position
-                adjustScale(camera, boundingBox);
+                setScale(camera, boundingBox);
                 //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
                 setPosition(camera, boundingBox.getPosition());
 
@@ -352,12 +208,81 @@ public class CameraSystem extends System {
                 // </REFACTOR>
 
                 // Update scale and position
-                adjustScale(camera, boundingBox);
+                setScale(camera, boundingBox);
                 setPosition(camera, boundingBox.getPosition());
                 //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
                 //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
 
             }
         }
+    }
+
+    public void setFocus(Entity camera, Entity entity) {
+
+        Camera cameraComponent = camera.getComponent(Camera.class);
+
+        cameraComponent.focus = entity;
+        cameraComponent.mode = Camera.Mode.FOCUS;
+
+    }
+
+    private void setPosition(Entity camera, Transform position) {
+
+        // <HACK>
+        /*
+        // TODO: This sets position in a way that accounts for the offset resulting from the status bar height...
+        int navBarHeight = 0;
+        Resources resources = Application.getInstance().getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            navBarHeight = resources.getDimensionPixelSize(resourceId);
+        }
+        camera.getComponent(Physics.class).targetTransform.set(-position.x, -position.y + (navBarHeight / 2.0));
+        */
+        // <HACK>
+
+        camera.getComponent(Physics.class).targetTransform.set(
+                -position.x * camera.getComponent(Physics.class).targetTransform.scale,
+                -position.y * camera.getComponent(Physics.class).targetTransform.scale
+        );
+    }
+
+    public void setOffset(Entity camera, double dx, double dy) {
+        camera.getComponent(Physics.class).targetTransform.offset(dx, dy);
+    }
+
+    public void setOffset(Entity camera, Transform point) {
+        setOffset(camera, point.x, point.y);
+    }
+
+    /**
+     * Adjusts the {@code CameraEntity} to fit the bounding box {@code boundingBox}.
+     *
+     * @param boundingBox The bounding box to fit into the display area.
+     */
+    private void setScale(Entity camera, Rectangle boundingBox) {
+
+        // <REFACTOR>
+        // TODO: Move into Platform helper.
+        int displayWidth = DeviceDimensionsHelper.getDisplayWidth(Application.getContext());
+        int displayHeight = DeviceDimensionsHelper.getDisplayHeight(Application.getContext());
+        // </REFACTOR>
+
+        double horizontalScale = displayWidth / boundingBox.getWidth();
+        double verticalScale = displayHeight / boundingBox.getHeight();
+
+        // <REFACTOR>
+        camera.getComponent(Camera.class).boundingBox = boundingBox;
+        // </REFACTOR>
+
+//        if (horizontalScale <= Camera.MAXIMUM_SCALE || horizontalScale <= Camera.MAXIMUM_SCALE) {
+        if (horizontalScale < verticalScale) {
+            camera.getComponent(Physics.class).targetTransform.scale = horizontalScale;
+        } else if (horizontalScale > horizontalScale) {
+            camera.getComponent(Physics.class).targetTransform.scale = verticalScale;
+        }
+//        } else {
+//            setScale(camera, Camera.MAXIMUM_SCALE, Camera.DEFAULT_SCALE_PERIOD);
+//        }
     }
 }

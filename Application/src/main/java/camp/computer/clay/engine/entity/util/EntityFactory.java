@@ -1081,10 +1081,8 @@ public class EntityFactory {
 
         final Entity camera = new Entity();
 
-        // Add Path Component (for type identification)
-        camera.addComponent(new Camera());
-
-        // Add Transform Component
+        // Components
+        camera.addComponent(new Camera()); // Unique to Camera
         camera.addComponent(new Transform());
         camera.addComponent(new Physics());
 
@@ -1097,15 +1095,17 @@ public class EntityFactory {
                     return;
                 }
 
-                //            if (action.isDragging()) {
+                Camera cameraComponent = camera.getComponent(Camera.class);
+                Physics physicsComponent = camera.getComponent(Physics.class);
+
                 // TODO: Make sure there's no inconsistency "information access sequence" between this EventHandlerSystem, InputSystem, and PlatformRenderSurface.onTouch. Should only access info from previously dispatched? event
                 //world.getSystem(CameraSystem.class).setOffset(camera, event.xOffset, event.yOffset);
-                camera.getComponent(Camera.class).mode = Camera.Mode.FREE;
-                camera.getComponent(Physics.class).targetTransform.set(
-                        camera.getComponent(Physics.class).targetTransform.x + event.xOffset,
-                        camera.getComponent(Physics.class).targetTransform.y + event.yOffset
+                cameraComponent.mode = Camera.Mode.FREE;
+
+                physicsComponent.targetTransform.set(
+                        physicsComponent.targetTransform.x + event.xOffset,
+                        physicsComponent.targetTransform.y + event.yOffset
                 );
-                Log.v("CameraEvent", "offset.x: " + event.getOffset().y + ", y: " + event.getOffset().y);
             }
         });
 
@@ -1117,11 +1117,12 @@ public class EntityFactory {
                     return;
                 }
 
-                // TODO: 11/13/2016 Set Title
+                Camera cameraComponent = camera.getComponent(Camera.class);
 
                 // Camera
                 if (event.isTap()) {
-                    world.getSystem(CameraSystem.class).setFocus(camera, null);
+                    cameraComponent.focus = null;
+                    cameraComponent.mode = Camera.Mode.FOCUS;
                 }
             }
         });

@@ -37,7 +37,6 @@ import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.Geometry.Circle;
 import camp.computer.clay.lib.Geometry.Point;
@@ -300,9 +299,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         this.world = world;
 
         // Set camera viewport dimensions from the width and height of the device
-        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-        world.getSystem(CameraSystem.class).setWidth(camera, DeviceDimensionsHelper.getDisplayWidth(Application.getContext()));
-        world.getSystem(CameraSystem.class).setHeight(camera, DeviceDimensionsHelper.getDisplayHeight(Application.getContext()));
+//        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+//        world.getSystem(CameraSystem.class).setWidth(camera, DeviceDimensionsHelper.getDisplayWidth(Application.getContext()));
+//        world.getSystem(CameraSystem.class).setHeight(camera, DeviceDimensionsHelper.getDisplayHeight(Application.getContext()));
     }
     // </TODO: REMOVE_REFERENCE_TO_WORLD>
 

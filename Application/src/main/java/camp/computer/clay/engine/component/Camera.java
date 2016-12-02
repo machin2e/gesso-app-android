@@ -20,17 +20,6 @@ public class Camera extends Component {
     public Rectangle boundingBox = null;
     public List<Transform> boundary = null;
 
-    // <DELETE>
-    // Width of perspective --- actions (e.g., touches) are interpreted relative to this point
-    public double width;
-
-    // Height of perspective
-    public double height;
-    // </DELETE>
-
-
-    // What if you had to wrap it up before tomorrow? Wrap it up. Wrap it up. Apply your edge. Resist against hate and discontent. Attend to your ideals and self-awareness.
-
     public Camera() {
         super();
     }
