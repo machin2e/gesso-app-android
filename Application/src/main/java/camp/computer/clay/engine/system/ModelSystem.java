@@ -1,12 +1,12 @@
 package camp.computer.clay.engine.system;
 
-import camp.computer.clay.engine.component.Model;
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 
 public class ModelSystem extends System {
 

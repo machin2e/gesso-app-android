@@ -15,7 +15,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.Geometry;
 
@@ -31,52 +31,27 @@ public class CameraSystem extends System {
         Group<Entity> cameras = world.Manager.getEntities().filterWithComponent(Camera.class);
         for (int i = 0; i < cameras.size(); i++) {
             updateCamera(cameras.get(i));
-            updateFocus(cameras.get(i));
         }
     }
 
     private void updateCamera(Entity camera) {
 
-        Camera cameraComponent = camera.getComponent(Camera.class);
+        // Update focus
+        updateFocus(camera);
+
+        // <REFACTOR>
+        // TODO: Move into PhysicsSystem (if possible!)
         Transform transformComponent = camera.getComponent(Transform.class);
         Physics physicsComponent = camera.getComponent(Physics.class);
 
-//        // Position
-//        camera.getComponent(Transform.class).set(
-//                physicsComponent.targetTransform.x * transformComponent.scale,
-//                physicsComponent.targetTransform.y * transformComponent.scale
-//        );
+        double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt;
 
-//        transformComponent.scale = physicsComponent.targetTransform.scale;
+        // TODO: Replace use of targetTransform with animation based on facingDirection (i.e., vector; or normal vector?)
+        transformComponent.x += (physicsComponent.targetTransform.x - transformComponent.x) * physicsComponent.velocity.x * dt;
+        transformComponent.y += (physicsComponent.targetTransform.y - transformComponent.y) * physicsComponent.velocity.y * dt;
 
-//        transformComponent.set(
-//                camera.getComponent(Physics.class).targetTransform.x * transformComponent.scale,
-//                camera.getComponent(Physics.class).targetTransform.y * transformComponent.scale
-//        );
-
-        double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt; // 1.0;
-
-        double scaleVelocity = 0.0030;
-//        Log.v("dt", "dt: " + dt);
-        transformComponent.scale += (physicsComponent.targetTransform.scale - transformComponent.scale) * scaleVelocity * dt;
-
-        double panVelocity = 0.0030;
-        Transform source = camera.getComponent(Transform.class);
-        Transform target = camera.getComponent(Physics.class).targetTransform;
-        // This works...
-//        camera.getComponent(Transform.class).x += (target.x * transformComponent.scale - source.x) * panVelocity * dt;
-//        camera.getComponent(Transform.class).y += (target.y * transformComponent.scale - source.y) * panVelocity * dt;
-
-        transformComponent.x += (target.x - source.x) * panVelocity * dt;
-        transformComponent.y += (target.y - source.y) * panVelocity * dt;
-
-//        camera.getComponent(Transform.class).x += (target.x - source.x * transformComponent.scale) * panVelocity * dt;
-//        camera.getComponent(Transform.class).y += (target.y - source.y * transformComponent.scale) * panVelocity * dt;
-        // ..but not this... why?
-//        camera.getComponent(Transform.class).x += (target.x - source.x) * panVelocity * dt;
-//        camera.getComponent(Transform.class).y += (target.y - source.y) * panVelocity * dt;
-
-
+        transformComponent.scale += (physicsComponent.targetTransform.scale - transformComponent.scale) * physicsComponent.velocity.z * dt;
+        // </REFACTOR>
     }
 
     // <REFACTOR/DELETE>
@@ -98,8 +73,8 @@ public class CameraSystem extends System {
     }
     // </REFACTOR/DELETE>
 
-    private void setPosition(Entity camera, Transform position, double duration) {
-        Log.v("CameraSystem", "setPosition");
+    private void setPosition(Entity camera, Transform position) {
+//        Log.v("CameraSystem", "setPosition");
 
         // <HACK>
         /*
@@ -188,15 +163,15 @@ public class CameraSystem extends System {
         boundingBox.setHeight(boundingBox.getHeight() * paddingMultiplier);
         */
 
-        Log.v("HostExtensionShapes", "adjustScale(...):");
-        Log.v("HostExtensionShapes", "\tBoundingBox.width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
-        Log.v("HostExtensionShapes", "\tViewPort.width: " + getWidth(camera) + ", height: " + getHeight(camera));
+//        Log.v("HostExtensionShapes", "adjustScale(...):");
+//        Log.v("HostExtensionShapes", "\tBoundingBox.width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+//        Log.v("HostExtensionShapes", "\tViewPort.width: " + getWidth(camera) + ", height: " + getHeight(camera));
 
         double horizontalScale = getWidth(camera) / boundingBox.getWidth();
         double verticalScale = getHeight(camera) / boundingBox.getHeight();
 
-        Log.v("HostExtensionShapes", "\thorizontalScale: " + horizontalScale);
-        Log.v("HostExtensionShapes", "\tverticalScale: " + verticalScale);
+//        Log.v("HostExtensionShapes", "\thorizontalScale: " + horizontalScale);
+//        Log.v("HostExtensionShapes", "\tverticalScale: " + verticalScale);
 
         // <REFACTOR>
         camera.getComponent(Camera.class).boundingBox = boundingBox;
@@ -215,169 +190,174 @@ public class CameraSystem extends System {
 
     public void setFocus(Entity camera, Entity entity) {
 
-        camera.getComponent(Camera.class).previousFocus = camera.getComponent(Camera.class).focus;
-        camera.getComponent(Camera.class).focus = entity;
+        Camera cameraComponent = camera.getComponent(Camera.class);
+
+        cameraComponent.focus = entity;
+        cameraComponent.mode = Camera.Mode.FOCUS;
 
     }
 
     private void updateFocus(Entity camera) {
 
-//        if (camera.getComponent(Camera.class).focus == camera.getComponent(Camera.class).previousFocus) {
-//            return;
-//        }
+        Camera cameraComponent = camera.getComponent(Camera.class);
 
-        Entity entity = camera.getComponent(Camera.class).focus;
+        if (cameraComponent.mode == Camera.Mode.FREE) {
+
+        } else if (cameraComponent.mode == Camera.Mode.FOCUS) {
+
+            Entity entity = camera.getComponent(Camera.class).focus;
 
 //        if (entity == null) {
 //            return;
 //        }
 
-        if (entity == null) {
+            if (entity == null) {
 
-            Log.v("SetFocus", "setFocus(World)");
+//            Log.v("SetFocus", "setFocus(World)");
 
-            // <MOVE_TO_EVENT_HANDLER>
-            // Hide Portables' Ports.
-            world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+                // <MOVE_TO_EVENT_HANDLER>
+                // Hide Portables' Ports.
+                world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
 
-            // Update distance between Hosts and Extensions
-            world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
-            // </MOVE_TO_EVENT_HANDLER>
+                // Update distance between Hosts and Extensions
+                world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+                // </MOVE_TO_EVENT_HANDLER>
 
-            // <REFACTOR>
-            camera.getComponent(Camera.class).boundary = null;
-            // </REFACTOR>
+                // <REFACTOR>
+                camera.getComponent(Camera.class).boundary = null;
+                // </REFACTOR>
 
-            // Update scale and position
-            Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
-            adjustScale(camera, boundingBox);
+                // Update scale and position
+                Rectangle boundingBox = Geometry.getBoundingBox(world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
+                adjustScale(camera, boundingBox);
 //            adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
 //            adjustPosition(camera);
-            setPosition(camera, boundingBox.getPosition(), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+                setPosition(camera, boundingBox.getPosition());
 
 
-        } else if (entity.hasComponent(Host.class)) {
+            } else if (entity.hasComponent(Host.class)) {
 
-            Log.v("SetFocus", "setFocus(HostEntity)");
+//            Log.v("SetFocus", "setFocus(HostEntity)");
 
-            // <REFACTOR>
+                // <REFACTOR>
             /*
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class).remove(entity);
             otherPortables.setTransparency(0.1);
             */
 
-            // Get all Ports in all Path connected to any of the Host's Ports
-            Group<Entity> hostPathPorts = new Group<>();
-            Group<Entity> hostPorts = Portable.getPorts(entity);
-            for (int i = 0; i < hostPorts.size(); i++) {
-                Entity port = hostPorts.get(i);
+                // Get all Ports in all Path connected to any of the Host's Ports
+                Group<Entity> hostPathPorts = new Group<>();
+                Group<Entity> hostPorts = Portable.getPorts(entity);
+                for (int i = 0; i < hostPorts.size(); i++) {
+                    Entity port = hostPorts.get(i);
 
-                if (!hostPathPorts.contains(port)) {
-                    hostPathPorts.add(port);
+                    if (!hostPathPorts.contains(port)) {
+                        hostPathPorts.add(port);
+                    }
+
+                    Group<Entity> portPaths = Port.getPaths(port);
+                    for (int j = 0; j < portPaths.size(); j++) {
+                        Entity path = portPaths.get(j);
+                        if (!hostPathPorts.contains(Path.getSource(path))) {
+                            hostPathPorts.add(Path.getSource(path));
+                        }
+                        if (Path.getTarget(path) != null // HACK: for case when singleton Path has no Target Port
+                                && !hostPathPorts.contains(Path.getTarget(path))) {
+                            hostPathPorts.add(Path.getTarget(path));
+                        }
+                    }
                 }
 
-                Group<Entity> portPaths = Port.getPaths(port);
-                for (int j = 0; j < portPaths.size(); j++) {
-                    Entity path = portPaths.get(j);
-                    if (!hostPathPorts.contains(Path.getSource(path))) {
-                        hostPathPorts.add(Path.getSource(path));
-                    }
-                    if (Path.getTarget(path) != null // HACK: for case when singleton Path has no Target Port
-                            && !hostPathPorts.contains(Path.getTarget(path))) {
-                        hostPathPorts.add(Path.getTarget(path));
-                    }
-                }
-            }
+                // </REFACTOR>
 
-            // </REFACTOR>
+                Group<Entity> hostPathPortShapes = hostPathPorts.getModels().getShapes();
+//            Log.v("HostExtensionShapes", "Host:");
+//            Log.v("HostExtensionShapes", "\tx: " + entity.getComponent(Transform.class).x + ", y: " + entity.getComponent(Transform.class).y);
+//            for (int i = 0; i < hostPathPortShapes.size(); i++) {
+//                Log.v("HostExtensionShapes", "\tx: " + hostPathPortShapes.get(i).getComponent(Transform.class).x + ", y: " + hostPathPortShapes.get(i).getComponent(Transform.class).y);
+//            }
 
-            Group<Entity> hostPathPortShapes = hostPathPorts.getModels().getShapes();
-            Log.v("HostExtensionShapes", "Host:");
-            Log.v("HostExtensionShapes", "\tx: " + entity.getComponent(Transform.class).x + ", y: " + entity.getComponent(Transform.class).y);
-            for (int i = 0; i < hostPathPortShapes.size(); i++) {
-                Log.v("HostExtensionShapes", "\tx: " + hostPathPortShapes.get(i).getComponent(Transform.class).x + ", y: " + hostPathPortShapes.get(i).getComponent(Transform.class).y);
-            }
+                Group<Entity> extensionGeometry = Portable.getExtensions(entity).getModels().getShapes();
+//            Log.v("HostExtensionShapes", "Extension (shapeCount: " + Portable.getExtensions(entity).getModels().getShapes().size() + ")");
+//            for (int i = 0; i < extensionGeometry.size(); i++) {
+//                Log.v("HostExtensionShapes", "\tx: " + extensionGeometry.get(i).getComponent(Transform.class).x + ", y: " + extensionGeometry.get(i).getComponent(Transform.class).y);
+//            }
+                //Rectangle boundingBox = Primitive.getBoundingBox(hostPathPortShapes.getVertices());
+                hostPathPortShapes.addAll(extensionGeometry);
 
-            Group<Entity> extensionGeometry = Portable.getExtensions(entity).getModels().getShapes();
-            Log.v("HostExtensionShapes", "Extension (shapeCount: " + Portable.getExtensions(entity).getModels().getShapes().size() + ")");
-            for (int i = 0; i < extensionGeometry.size(); i++) {
-                Log.v("HostExtensionShapes", "\tx: " + extensionGeometry.get(i).getComponent(Transform.class).x + ", y: " + extensionGeometry.get(i).getComponent(Transform.class).y);
-            }
-            //Rectangle boundingBox = Primitive.getBoundingBox(hostPathPortShapes.getVertices());
-            hostPathPortShapes.addAll(extensionGeometry);
-
-            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getBoundaryVertices());
-            Log.v("HostExtensionShapes", "BoundingBox:");
-            Log.v("HostExtensionShapes", "\tx: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y);
+                Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getBoundaryVertices());
+//            Log.v("HostExtensionShapes", "BoundingBox:");
+//            Log.v("HostExtensionShapes", "\tx: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y);
 
 //            boundingBox.getPosition().x *= camera.getComponent(Transform.class).scale;
 //            boundingBox.getPosition().y *= camera.getComponent(Transform.class).scale;
 //
 //            Log.v("HostExtensionShapes", "\tx': " + boundingBox.getPosition().x + ", y': " + boundingBox.getPosition().y);
-            Log.v("HostExtensionShapes", "\twidth: " + boundingBox.getWidth() + ", y: " + boundingBox.getHeight());
+//            Log.v("HostExtensionShapes", "\twidth: " + boundingBox.getWidth() + ", y: " + boundingBox.getHeight());
+//
+//            Log.v("PortCount", "ports.size: " + hostPathPortShapes.size());
 
-            Log.v("PortCount", "ports.size: " + hostPathPortShapes.size());
+                // <REFACTOR>
+                camera.getComponent(Camera.class).boundary = hostPathPortShapes.getBoundaryVertices();
+                // </REFACTOR>
 
-            // <REFACTOR>
-            camera.getComponent(Camera.class).boundary = hostPathPortShapes.getBoundaryVertices();
-            // </REFACTOR>
+                // Update scale and position
+                adjustScale(camera, boundingBox);
+                //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+                setPosition(camera, boundingBox.getPosition());
 
-            // Update scale and position
-            adjustScale(camera, boundingBox);
-            //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
-            setPosition(camera, boundingBox.getPosition(), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+            } else if (entity.hasComponent(Extension.class)) {
 
-        } else if (entity.hasComponent(Extension.class)) {
+                Log.v("SetFocus", "setFocus(Extension)");
 
-            Log.v("SetFocus", "setFocus(Extension)");
-
-            // <REFACTOR>
+                // <REFACTOR>
             /*
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class).remove(entity);
             otherPortables.setTransparency(0.1);
             */
 
-            // Get Ports along every Path connected to the Ports on the selected Host
-            Group<Entity> extensionPathPorts = new Group<>();
-            Group<Entity> extensionPorts = Portable.getPorts(entity);
-            for (int i = 0; i < extensionPorts.size(); i++) {
-                Entity port = extensionPorts.get(i);
+                // Get Ports along every Path connected to the Ports on the selected Host
+                Group<Entity> extensionPathPorts = new Group<>();
+                Group<Entity> extensionPorts = Portable.getPorts(entity);
+                for (int i = 0; i < extensionPorts.size(); i++) {
+                    Entity port = extensionPorts.get(i);
 
-                if (!extensionPathPorts.contains(port)) {
-                    extensionPathPorts.add(port);
-                }
+                    if (!extensionPathPorts.contains(port)) {
+                        extensionPathPorts.add(port);
+                    }
 
-                Group<Entity> portPaths = Port.getPaths(port);
-                for (int j = 0; j < portPaths.size(); j++) {
-                    Entity path = portPaths.get(j);
-                    if (!extensionPathPorts.contains(Path.getSource(path))) {
-                        extensionPathPorts.add(Path.getSource(path));
-                    }
-                    if (!extensionPathPorts.contains(Path.getTarget(path))) {
-                        extensionPathPorts.add(Path.getTarget(path));
+                    Group<Entity> portPaths = Port.getPaths(port);
+                    for (int j = 0; j < portPaths.size(); j++) {
+                        Entity path = portPaths.get(j);
+                        if (!extensionPathPorts.contains(Path.getSource(path))) {
+                            extensionPathPorts.add(Path.getSource(path));
+                        }
+                        if (!extensionPathPorts.contains(Path.getTarget(path))) {
+                            extensionPathPorts.add(Path.getTarget(path));
+                        }
                     }
                 }
+                // </REFACTOR>
+
+                // Increase distance between Host and Extension
+                Entity host = Portable.getHosts(entity).get(0);
+                world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+
+                Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getShapes();
+                extensionPathPortShapes.addAll(Model.getShapes(entity)); // HACK: Add Extension shapes
+                Rectangle boundingBox = Geometry.getBoundingBox(extensionPathPortShapes.getBoundaryVertices());
+
+                // <REFACTOR>
+                camera.getComponent(Camera.class).boundary = extensionPathPortShapes.getBoundaryVertices();
+                // </REFACTOR>
+
+                // Update scale and position
+                adjustScale(camera, boundingBox);
+                setPosition(camera, boundingBox.getPosition());
+                //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+                //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+
             }
-            // </REFACTOR>
-
-            // Increase distance between Host and Extension
-            Entity host = Portable.getHosts(entity).get(0);
-            world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
-
-            Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getShapes();
-            extensionPathPortShapes.addAll(Model.getShapes(entity)); // HACK: Add Extension shapes
-            Rectangle boundingBox = Geometry.getBoundingBox(extensionPathPortShapes.getBoundaryVertices());
-
-            // <REFACTOR>
-            camera.getComponent(Camera.class).boundary = extensionPathPortShapes.getBoundaryVertices();
-            // </REFACTOR>
-
-            // Update scale and position
-            adjustScale(camera, boundingBox);
-            setPosition(camera, boundingBox.getPosition(), Camera.DEFAULT_ADJUSTMENT_PERIOD);
-            //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
-            //setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
-
         }
     }
 }

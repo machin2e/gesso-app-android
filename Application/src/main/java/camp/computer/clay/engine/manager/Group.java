@@ -12,15 +12,14 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Style;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.Geometry.Rectangle;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class Group<E> implements List<E> {
 
@@ -180,7 +179,8 @@ public class Group<E> implements List<E> {
             public Entity map(Entity entity, Double transparency) {
 //                if (entity instanceof HostEntity) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == HostEntity.getTypeUuid()
                 if (entity.getComponent(Model.class) != null) {
-                    entity.getComponent(Style.class).setTransparency(entity, transparency);
+                    // TODO: Set transparency
+                    // e.g., entity.getComponent(Style.class).setTransparency(entity, transparency);
                 }
                 return entity;
             }

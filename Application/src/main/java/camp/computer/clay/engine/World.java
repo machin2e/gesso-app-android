@@ -1,78 +1,45 @@
 package camp.computer.clay.engine;
 
-import android.graphics.Canvas;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Primitive;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
+import camp.computer.clay.engine.component.Player;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
-import camp.computer.clay.engine.manager.Event;
-import camp.computer.clay.engine.manager.EventHandler;
+import camp.computer.clay.engine.manager.EventManager;
 import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.System;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.lib.ImageBuilder.Text;
+import camp.computer.clay.lib.Geometry.Rectangle;
+import camp.computer.clay.lib.Geometry.Text;
 import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
-import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
-
-    // <EVENT_MANAGER>
-    private HashMap<Event.Type, ArrayList<EventHandler>> eventHandlers = new HashMap<>();
-
-    public boolean subscribe(Event.Type eventType, EventHandler<?> eventHandler) {
-        if (!eventHandlers.containsKey(eventType)) {
-            eventHandlers.put(eventType, new ArrayList());
-            eventHandlers.get(eventType).add(eventHandler);
-            return true;
-        } else if (eventHandlers.containsKey(eventType) && !eventHandlers.get(eventType).contains(eventHandler)) {
-            eventHandlers.get(eventType).add(eventHandler);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void notifySubscribers(Event event) {
-
-        // Get subscribers to Event
-        ArrayList<EventHandler> subscribedEventHandlers = eventHandlers.get(event.getType());
-        if (subscribedEventHandlers != null) {
-            for (int i = 0; i < subscribedEventHandlers.size(); i++) {
-                subscribedEventHandlers.get(i).execute(event);
-            }
-        }
-    }
-
-    // TODO: public boolean unsubscribe(...)
-
-    // </EVENT_MANAGER>
 
     public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 325;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
@@ -89,17 +56,44 @@ public class World {
 
     // <SETTINGS>
     public static boolean ENABLE_OVERLAY = true;
+
     public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
+    public static boolean ENABLE_ANNOTATION_ENTITY_TRANSFORM = false;
+
     public static boolean ENABLE_GEOMETRY_OVERLAY = true;
     // </SETTINGS>
+    
+    // <REFACTOR_INTO_ENGINE>
+    public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
+    public static float NOTIFICATION_FONT_SIZE = 45;
+    public static final long DEFAULT_NOTIFICATION_TIMEOUT = 1000;
+    public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
+    public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
 
-    // <TEMPORARY>
-    public Repository repository = new Repository();
-    // </TEMPORARY>
+    public static int OVERLAY_TOP_MARGIN = 25;
+    public static int OVERLAY_LEFT_MARGIN = 25;
+    public static int OVERLAY_LINE_SPACING = 10;
+    public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
+    public static float OVERLAY_FONT_SIZE = 25;
+    public static String OVERLAY_FONT_COLOR = "#ffff0000";
+
+    public static String GEOMETRY_ANNOTATION_FONT = "fonts/ProggySquare.ttf";
+    public static float GEOMETRY_ANNOTATION_FONT_SIZE = 35;
+    public static String GEOMETRY_ANNOTATION_FONT_COLOR = "#ffff0000";
+    public static int GEOMETRY_ANNOTATION_LINE_SPACING = 10;
+    // </REFACTOR_INTO_ENGINE>
 
     // <MANAGERS>
     public Manager Manager;
     // </MANAGERS>
+
+    // <EVENT_MANAGER>
+    public EventManager eventManager = new EventManager();
+    // </EVENT_MANAGER>
+
+    // <TEMPORARY>
+    public Repository repository;
+    // </TEMPORARY>
 
     public World() {
         super();
@@ -116,6 +110,7 @@ public class World {
         createPrototypeExtensionEntity();
 
         // <TEMPORARY>
+        repository = new Repository();
         repository.populateTestData();
         // </TEMPORARY>
     }
@@ -154,34 +149,23 @@ public class World {
     public void update() {
         long updateStartTime = Clock.getCurrentTime();
         for (int i = 0; i < systems.size(); i++) {
-            // <HACK>
-//            if (systems.get(i).getClass() == RenderSystem.class /*|| systems.get(i).getClass() == CameraSystem.class*/) {
-//                continue;
-//            }
-            // </HACK>
             systems.get(i).update();
         }
         updateTime = Clock.getCurrentTime() - updateStartTime;
-    }
-
-    public void draw(Canvas canvas) {
-        long renderStartTime = Clock.getCurrentTime();
-//        getSystem(CameraSystem.class).update();
-//        getSystem(RenderSystem.class).update();
-        renderTime = Clock.getCurrentTime() - renderStartTime;
     }
 
     public Entity createEntity(Class<?> entityType) {
 
         Entity entity = null;
 
-        if (entityType == Host.class) { // HACK (because Host is a Component)
+        // HACK (because Host is a Component)
+        if (entityType == Host.class) {
             entity = EntityFactory.createHostEntity(this);
-        } else if (entityType == Extension.class) { // HACK (because Extension is a Component)
+        } else if (entityType == Extension.class) {
             entity = EntityFactory.createExtensionEntity(this);
         } else if (entityType == Path.class) {
             entity = EntityFactory.createPathEntity(this);
-        } else if (entityType == Port.class) { // HACK (because Extension is a Component)
+        } else if (entityType == Port.class) {
             entity = EntityFactory.createPortEntity(this);
         } else if (entityType == Camera.class) {
             entity = EntityFactory.createCameraEntity(this);
@@ -191,6 +175,8 @@ public class World {
             entity = EntityFactory.createNotificationEntity(this);
         } else if (entityType == Primitive.class) {
             entity = EntityFactory.createPrimitiveEntity(this);
+        } else if (entityType == Workspace.class) {
+            entity = EntityFactory.createWorkspaceEntity(this);
         }
 
         // Add Entity to Manager

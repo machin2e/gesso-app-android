@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class Primitive extends Component {
 

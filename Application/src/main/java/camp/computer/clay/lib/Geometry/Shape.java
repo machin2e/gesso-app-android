@@ -1,4 +1,4 @@
-package camp.computer.clay.lib.ImageBuilder;
+package camp.computer.clay.lib.Geometry;
 
 import java.util.List;
 

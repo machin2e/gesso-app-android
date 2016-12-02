@@ -64,7 +64,7 @@ public class Event {
     });
     */
 
-    public static int MAXIMUM_POINT_COUNT = 1;
+    public static int MAXIMUM_POINT_COUNT = 5;
 
     public static int MAXIMUM_TAP_DURATION = 200;
 

@@ -115,10 +115,10 @@ public class Messenger {
         return incomingMessages.remove(0);
     }
 
-    // TODO: Unify queues and rename to "queueEvent()" or "updateImage()"
+    // TODO: Unify queues and rename to "queue()" or "updateImage()"
     public void processIncomingMessages() {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
-        // Dequeue and queueEvent the getNext message on the incoming message queue.
+        // Dequeue and queue the getNext message on the incoming message queue.
         if (hasIncomingMessages()) {
 //            Log.v("Clay_Time", "Processing incoming message");
             while (hasIncomingMessages()) {

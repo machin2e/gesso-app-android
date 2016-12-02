@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import camp.computer.clay.engine.World;
@@ -37,34 +39,30 @@ import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
-import camp.computer.clay.lib.ImageBuilder.Circle;
-import camp.computer.clay.lib.ImageBuilder.Point;
-import camp.computer.clay.lib.ImageBuilder.Polygon;
-import camp.computer.clay.lib.ImageBuilder.Polyline;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.lib.ImageBuilder.Segment;
-import camp.computer.clay.lib.ImageBuilder.Shape;
-import camp.computer.clay.lib.ImageBuilder.Text;
-import camp.computer.clay.lib.ImageBuilder.Triangle;
+import camp.computer.clay.lib.Geometry.Circle;
+import camp.computer.clay.lib.Geometry.Point;
+import camp.computer.clay.lib.Geometry.Polygon;
+import camp.computer.clay.lib.Geometry.Polyline;
+import camp.computer.clay.lib.Geometry.Rectangle;
+import camp.computer.clay.lib.Geometry.Segment;
+import camp.computer.clay.lib.Geometry.Shape;
+import camp.computer.clay.lib.Geometry.Text;
+import camp.computer.clay.lib.Geometry.Triangle;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
-    // World Rendering Context
-//    public Canvas canvas = null;
-//    public Matrix identityMatrix;
-
-    // World PlatformRenderClock
     private SurfaceHolder surfaceHolder;
 
     public PlatformRenderClock platformRenderClock;
 
-    // Coordinate System (Grid)
     public Transform originTransform = new Transform();
 
-    // World
+    // <REFACTOR>
+    // TODO: Remove world from platform layer.
     public World world;
+    // </REFACTOR>
 
     public PlatformRenderSurface(Context context) {
         super(context);
@@ -89,9 +87,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         Bitmap canvasBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
         canvas.setBitmap(canvasBitmap);
-
-        // Create Identity Matrix
-        // Matrix identityMatrix = new Matrix();
 
         // Center the world coordinate system
         originTransform.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
@@ -164,35 +159,46 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         return surfaceHolder;
     }
 
-    private Event previousEvent = null;
+    /*
+    // NOTES:
+    // - Motion events contain information about all of the pointers that are currently active
+    //   even if some of them have not moved since the getLastEvent event was delivered.
+    //
+    // - The index of pointers only ever changes by one as individual pointers go up and down,
+    //   except when the gesture is canceled.
+    //
+    // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
+    //   across all subsequent motion events in a gesture. Then for successive motion events,
+    //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
+    //   id in that motion event.
+    //
+    // DOCUMENTATION:
 
-    Entity camera = null;
-
-    // https://developer.android.com/training/gestures/scale.html
+    // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
+    // starts the gesture. The pointer data for this pointer is always at index 0 in
+    // the MotionEvent.
+    //
+    // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
+    // the getFirstEvent. The pointer data for this pointer is at the index returned by
+    // getActionIndex().
+    //
+    // ACTION_MOVE is sent when a change has happened during a press gesture for any
+    // pointer.
+    //
+    // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
+    //
+    // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
+    //
+    // REFERENCES:
+    // - https://developer.android.com/training/gestures/multi.html
+    // - https://developer.android.com/training/gestures/scale.html
+    */
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
         if (this.world == null) {
             return false;
         }
-
-        if (this.camera == null) {
-            this.camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-        }
-
-        Transform cameraTransform = camera.getComponent(Transform.class);
-        double cameraScale = world.getSystem(CameraSystem.class).getScale(camera);
-
-        // - Motion events contain information about all of the pointers that are currently active
-        //   even if some of them have not moved since the getLastEvent event was delivered.
-        //
-        // - The index of pointers only ever changes by one as individual pointers go up and down,
-        //   except when the gesture is canceled.
-        //
-        // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
-        //   across all subsequent motion events in a gesture. Then for successive motion events,
-        //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
-        //   id in that motion event.
 
         int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
         int pointerId = motionEvent.getPointerId(pointerIndex);
@@ -208,95 +214,44 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
-//                double unscaledSurfaceX = 0;
-//                double unscaledSurfaceY = 0;
-
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-
                     event.surfaceCoordinates[id].x = motionEvent.getX(i);
                     event.surfaceCoordinates[id].y = motionEvent.getY(i);
-
-//                    unscaledSurfaceX = (motionEvent.getX(i) - (originTransform.x + cameraTransform.x));
-//                    unscaledSurfaceY = (motionEvent.getY(i) - (originTransform.y + cameraTransform.y));
-
-                    // TODO: Update equations so cameraScale is always the correct scale, the current scale, and computed as needed.
-                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originTransform.x + cameraTransform.x)) / cameraScale;
-                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originTransform.y + cameraTransform.y)) / cameraScale;
-
                 }
-
-//                Log.v("PlatformRenderSurface", "x: " + motionEvent.getX() + ", y: " + motionEvent.getY());
-//                Log.v("PlatformRenderSurface", "x': " + unscaledSurfaceX + ", y': " + unscaledSurfaceY);
-//                Log.v("PlatformRenderSurface", "x'': " + event.pointerCoordinates[0].x + ", y'': " + event.pointerCoordinates[0].y);
-//                Log.v("PlatformRenderSurface", "---");
-
-                // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
-                // starts the gesture. The pointer data for this pointer is always at index 0 in
-                // the MotionEvent.
-                //
-                // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
-                // the getFirstEvent. The pointer data for this pointer is at the index returned by
-                // getActionIndex().
-                //
-                // ACTION_MOVE is sent when a change has happened during a press gesture for any
-                // pointer.
-                //
-                // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
-                //
-                // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
-                //
-                // REFERENCES:
-                // - https://developer.android.com/training/gestures/multi.html
 
                 // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-
-                    // Set previous Event
-                    previousEvent = event;
 
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
                     holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
-                    inputSystem.queueEvent(event);
+                    inputSystem.queue(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
 
-                    // Set previous Event
-                    event.setPreviousEvent(previousEvent);
-                    previousEvent = event;
-
                     event.setType(Event.Type.MOVE);
                     event.pointerIndex = pointerId;
 
-                    if (previousEvent.getDistance() > Event.MINIMUM_MOVE_DISTANCE) {
-                        holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
-                        inputSystem.queueEvent(event);
-                    }
+                    inputSystem.queue(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-
-                    // Set previous Event
-                    event.setPreviousEvent(previousEvent);
-                    previousEvent = event;
 
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
 
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
-                    inputSystem.queueEvent(event);
+                    inputSystem.queue(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
                     // TODO:
                 }
             }
@@ -311,6 +266,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         @Override
         public void run() {
 
+            /*
             if (previousEvent.getDistance() < Event.MINIMUM_MOVE_DISTANCE) {
                 InputSystem inputSystem = world.getSystem(InputSystem.class);
 
@@ -320,21 +276,22 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 event.setType(Event.Type.HOLD);
                 event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
 
-                // Set previous Event
-                if (previousEvent != null) {
-                    event.setPreviousEvent(previousEvent);
-                } else {
-                    event.setPreviousEvent(null);
-                }
-                previousEvent = event;
+//                // Set previous Event
+//                if (previousEvent != null) {
+//                    event.setPreviousEvent(previousEvent);
+//                } else {
+//                    event.setPreviousEvent(null);
+//                }
+//                previousEvent = event;
 
-                inputSystem.queueEvent(event);
+                inputSystem.queue(event);
 
                 Log.v("PlatformRenderSurface", "event.getDistance: " + event.getDistance());
             }
 
-//                }
-//            }
+                }
+            }
+            */
         }
     };
 
@@ -388,77 +345,53 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
-    // <REFACTOR_INTO_ENGINE>
-    public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
-    public static float NOTIFICATION_FONT_SIZE = 45;
-    public static final long DEFAULT_NOTIFICATION_TIMEOUT = 1000;
-    public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
-    public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
-
-    public static int OVERLAY_TOP_MARGIN = 25;
-    public static int OVERLAY_LEFT_MARGIN = 25;
-    public static int OVERLAY_LINE_SPACING = 10;
-    public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
-    public static float OVERLAY_FONT_SIZE = 25;
-    public static String OVERLAY_FONT_COLOR = "#ffff0000";
-
-    public static String GEOMETRY_ANNOTATION_FONT = "fonts/ProggySquare.ttf";
-    public static float GEOMETRY_ANNOTATION_FONT_SIZE = 35;
-    public static String GEOMETRY_ANNOTATION_FONT_COLOR = "#ffff0000";
-    public static int GEOMETRY_ANNOTATION_LINE_SPACING = 10;
-    // </REFACTOR_INTO_ENGINE>
-
-    private static Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), OVERLAY_FONT);
+    private static Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), World.OVERLAY_FONT);
     private static Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
 
-    private static Typeface geometryAnnotationTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), GEOMETRY_ANNOTATION_FONT);
+    private static Typeface geometryAnnotationTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), World.GEOMETRY_ANNOTATION_FONT);
     private static Typeface geometryAnnotationTypefaceBold = Typeface.create(geometryAnnotationTypeface, Typeface.NORMAL);
 
     double minFps = Double.MAX_VALUE;
     double maxFps = Double.MIN_VALUE;
 
+    private DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
     public void drawOverlay(Canvas canvas, Paint paint) {
 
         // Font
+        paint.setColor(Color.parseColor(World.OVERLAY_FONT_COLOR));
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(World.OVERLAY_FONT_SIZE);
         paint.setTypeface(overlayTypefaceBold);
 
-        int linePosition = 0;
+        float linePosition = 0;
+        String lineText = "";
+        Rect textBounds = new Rect();
 
         // <FRAME_COUNT>
         canvas.save();
-        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(OVERLAY_FONT_SIZE);
-
-        String framesText = "Frames: " + (int) platformRenderClock.frameCount;
-        Rect framesTextBounds = new Rect();
-        paint.getTextBounds(framesText, 0, framesText.length(), framesTextBounds);
-        linePosition += OVERLAY_TOP_MARGIN + framesTextBounds.height();
-        canvas.drawText(framesText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Frames: " + (int) platformRenderClock.frameCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_TOP_MARGIN + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </FRAME_COUNT>
 
         // <TICK_COUNT>
         canvas.save();
-        String tickCountText = "Ticks: " + (int) platformRenderClock.tickCount;
-        Rect tickCountTextBounds = new Rect();
-        paint.getTextBounds(tickCountText, 0, tickCountText.length(), tickCountTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + tickCountTextBounds.height();
-        canvas.drawText(tickCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Ticks: " + (int) platformRenderClock.tickCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </TICK_COUNT>
 
         // <FPS_LABEL>
         canvas.save();
-        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(OVERLAY_FONT_SIZE);
-
-        String fpsText = "FPS: " + (int) minFps + " " + (int) platformRenderClock.getFramesPerSecond() + " " + (int) maxFps;
-        Rect fpsTextBounds = new Rect();
-        paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + fpsTextBounds.height();
-        canvas.drawText(fpsText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "FPS: " + (int) minFps + " " + (int) platformRenderClock.getFramesPerSecond() + " " + (int) maxFps;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // <HACK>
@@ -473,51 +406,46 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <FRAME_TIME>
         canvas.save();
-        String frameTimeText = "Frame Time: " + (int) platformRenderClock.frameTimeDelta;
-        Rect frameTimeTextBounds = new Rect();
-        paint.getTextBounds(frameTimeText, 0, frameTimeText.length(), frameTimeTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + frameTimeTextBounds.height();
-        canvas.drawText(frameTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Frame Time: " + (int) platformRenderClock.frameTimeDelta;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </FRAME_TIME>
 
         // <FRAME_SLEEP_TIME>
         canvas.save();
-        String frameSleepTimeText = "Frame Sleep Time: " + (int) platformRenderClock.currentSleepTime;
-        Rect frameSleepTimeTextBounds = new Rect();
-        paint.getTextBounds(frameSleepTimeText, 0, frameSleepTimeText.length(), frameSleepTimeTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + frameSleepTimeTextBounds.height();
-        canvas.drawText(frameSleepTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Frame Sleep Time: " + (int) platformRenderClock.currentSleepTime;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </FRAME_SLEEP_TIME>
 
         // <UPDATE_TIME>
         canvas.save();
-        String updateTimeText = "Update Time: " + (int) world.updateTime;
-        Rect updateTimeTextBounds = new Rect();
-        paint.getTextBounds(updateTimeText, 0, updateTimeText.length(), updateTimeTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + updateTimeTextBounds.height();
-        canvas.drawText(updateTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Update Time: " + (int) world.updateTime;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </UPDATE_TIME>
 
         // <RENDER_TIME>
         canvas.save();
-        String renderTimeText = "Render Time: " + (int) world.renderTime;
-        Rect renderTimeTextBounds = new Rect();
-        paint.getTextBounds(renderTimeText, 0, renderTimeText.length(), renderTimeTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + renderTimeTextBounds.height();
-        canvas.drawText(renderTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Render Time: " + (int) world.renderTime;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </RENDER_TIME>
 
         // <RENDER_TIME>
         canvas.save();
-        String filterWithComponentCountText = "Filter Count: " + (int) world.lookupCount;
-        Rect filterWithComponentCountTextBounds = new Rect();
-        paint.getTextBounds(filterWithComponentCountText, 0, filterWithComponentCountText.length(), filterWithComponentCountTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + filterWithComponentCountTextBounds.height();
-        canvas.drawText(filterWithComponentCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Filter Count: " + (int) world.lookupCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         world.lookupCount = 0;
         // </RENDER_TIME>
@@ -532,87 +460,78 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         int cameraCount = world.Manager.getEntities().filterWithComponent(Camera.class).size();
 
         // Entities
-        String text = "Entities: " + entityCount;
-        Rect textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Entities: " + entityCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Hosts
         canvas.save();
-        text = "Hosts: " + hostCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Hosts: " + hostCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Ports
         canvas.save();
-        text = "Ports: " + portCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Ports: " + portCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Extensions
         canvas.save();
-        text = "Extensions: " + extensionCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Extensions: " + extensionCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Paths
         canvas.save();
-        text = "Paths: " + pathCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Paths: " + pathCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Cameras
         canvas.save();
-        text = "Cameras: " + cameraCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
-        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Cameras: " + cameraCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </ENTITY_STATISTICS>
 
         // <CAMERA_SCALE_MONITOR>
         canvas.save();
         Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0); // HACK
-        String cameraScaleText = "Camera Scale: " + camera.getComponent(Transform.class).scale;
-        Rect cameraScaleTextBounds = new Rect();
-        paint.getTextBounds(cameraScaleText, 0, cameraScaleText.length(), cameraScaleTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + cameraScaleTextBounds.height();
-        canvas.drawText(cameraScaleText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Camera Scale: " + decimalFormat.format(camera.getComponent(Transform.class).scale);
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_SCALE_MONITOR>
 
         // <CAMERA_POSITION_MONITOR>
         canvas.save();
-        String cameraPositionText = "Camera Position: " + camera.getComponent(Transform.class).x + ", " + camera.getComponent(Transform.class).y;
-        Rect cameraPositionTextBounds = new Rect();
-        paint.getTextBounds(cameraPositionText, 0, cameraPositionText.length(), cameraPositionTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + cameraPositionTextBounds.height();
-        canvas.drawText(cameraPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Camera Position: " + decimalFormat.format(camera.getComponent(Transform.class).x) + ", " + decimalFormat.format(camera.getComponent(Transform.class).y);
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_POSITION_MONITOR>
 
         // <CAMERA_TARGET_POSITION_MONITOR>
         canvas.save();
-        String cameraTargetPositionText = "Camera Target: " + camera.getComponent(Physics.class).targetTransform.x + ", " + camera.getComponent(Physics.class).targetTransform.y;
-        Rect cameraTargetPositionTextBounds = new Rect();
-        paint.getTextBounds(cameraTargetPositionText, 0, cameraTargetPositionText.length(), cameraTargetPositionTextBounds);
-        linePosition += OVERLAY_LINE_SPACING + cameraTargetPositionTextBounds.height();
-        canvas.drawText(cameraTargetPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        lineText = "Camera Target: " + decimalFormat.format(camera.getComponent(Physics.class).targetTransform.x) + ", " + decimalFormat.format(camera.getComponent(Physics.class).targetTransform.y);
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_TARGET_POSITION_MONITOR>
 
@@ -633,7 +552,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // TODO: Clean up: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
         // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
         Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
-        paint.setColor(Color.parseColor(GEOMETRY_ANNOTATION_FONT_COLOR));
+        paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
 
@@ -664,55 +583,57 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // </BOUNDARY>
 
         // <TRANSFORM_POSITION>
-        // Style
-        paint.setColor(Color.parseColor(GEOMETRY_ANNOTATION_FONT_COLOR));
-        paint.setStrokeWidth(1.0f);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(GEOMETRY_ANNOTATION_FONT_SIZE);
+        if (World.ENABLE_ANNOTATION_ENTITY_TRANSFORM) {
+            // Style
+            paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
+            paint.setStrokeWidth(1.0f);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextSize(World.GEOMETRY_ANNOTATION_FONT_SIZE);
 
-        // Font
-        paint.setTypeface(geometryAnnotationTypeface);
+            // Font
+            paint.setTypeface(geometryAnnotationTypeface);
 
-        float linePosition = 0f;
-        String lineText = "";
-        Rect textBounds = new Rect();
+            float linePosition = 0f;
+            String lineText = "";
+            Rect textBounds = new Rect();
 
-        for (int i = 0; i < entities.size(); i++) {
+            for (int i = 0; i < entities.size(); i++) {
 
-            Transform transformComponent = entities.get(i).getComponent(Transform.class);
+                Transform transformComponent = entities.get(i).getComponent(Transform.class);
 
-            linePosition = (float) transformComponent.y;
+                linePosition = (float) transformComponent.y;
 
-            canvas.save();
+                canvas.save();
 
-            // <X>
-            canvas.save();
-            lineText = "x: " + (float) transformComponent.x;
-            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
-            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
-            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
-            canvas.restore();
-            // </X>
+                // <X>
+                canvas.save();
+                lineText = "x: " + (float) transformComponent.x;
+                paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+                canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+                linePosition += textBounds.height() + World.GEOMETRY_ANNOTATION_LINE_SPACING;
+                canvas.restore();
+                // </X>
 
-            // <Y>
-            canvas.save();
-            lineText = "y: " + (float) transformComponent.y;
-            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
-            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
-            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
-            canvas.restore();
-            // </Y>
+                // <Y>
+                canvas.save();
+                lineText = "y: " + (float) transformComponent.y;
+                paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+                canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+                linePosition += textBounds.height() + World.GEOMETRY_ANNOTATION_LINE_SPACING;
+                canvas.restore();
+                // </Y>
 
-            // <ROTATION>
-            canvas.save();
-            lineText = "r: " + (float) transformComponent.rotation;
-            paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
-            canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
-            linePosition += textBounds.height() + GEOMETRY_ANNOTATION_LINE_SPACING;
-            canvas.restore();
-            // </ROTATION>
+                // <ROTATION>
+                canvas.save();
+                lineText = "r: " + (float) transformComponent.rotation;
+                paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+                canvas.drawText(lineText, (float) transformComponent.x, linePosition, paint);
+                linePosition += textBounds.height() + World.GEOMETRY_ANNOTATION_LINE_SPACING;
+                canvas.restore();
+                // </ROTATION>
 
-            canvas.restore();
+                canvas.restore();
+            }
         }
         // </TRANSFORM_POSITION>
 
@@ -768,10 +689,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <DISPLAY_SURFACE_AXES>
         canvas.save();
-        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
+        paint.setColor(Color.parseColor(World.OVERLAY_FONT_COLOR));
         paint.setStrokeWidth(1.0f);
         paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(OVERLAY_FONT_SIZE);
+        paint.setTextSize(World.OVERLAY_FONT_SIZE);
 
         // Horizontal Axis
         canvas.drawLine(
@@ -998,23 +919,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         canvas.translate((float) transform.x, (float) transform.y);
         canvas.rotate((float) transform.rotation);
 
-        canvas.drawRoundRect(
-                (float) (0 - (width / 2.0)),
-                (float) (0 - (height / 2.0)),
-                (float) (0 + (width / 2.0)),
-                (float) (0 + (height / 2.0)),
-                (float) cornerRadius,
-                (float) cornerRadius,
-                paint
-        );
-
-        // Draw Points in Shape
-        if (palette.outlineThickness > 0) {
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.parseColor(palette.outlineColor));
-            paint.setStrokeWidth((float) palette.outlineThickness);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             canvas.drawRoundRect(
                     (float) (0 - (width / 2.0)),
                     (float) (0 - (height / 2.0)),
@@ -1024,6 +929,26 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     (float) cornerRadius,
                     paint
             );
+        }
+
+        // Draw Points in Shape
+        if (palette.outlineThickness > 0) {
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.parseColor(palette.outlineColor));
+            paint.setStrokeWidth((float) palette.outlineThickness);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                canvas.drawRoundRect(
+                        (float) (0 - (width / 2.0)),
+                        (float) (0 - (height / 2.0)),
+                        (float) (0 + (width / 2.0)),
+                        (float) (0 + (height / 2.0)),
+                        (float) cornerRadius,
+                        (float) cornerRadius,
+                        paint
+                );
+            }
         }
 
         canvas.restore();

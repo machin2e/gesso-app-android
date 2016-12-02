@@ -5,7 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.util.Geometry;
 
 public class Boundary extends Component {

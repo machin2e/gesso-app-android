@@ -12,15 +12,17 @@ import java.util.UUID;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
+import camp.computer.clay.engine.system.AppearanceSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
-import camp.computer.clay.engine.system.ModelSystem;
+import camp.computer.clay.engine.system.EventSystem;
 import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.engine.system.StyleSystem;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.Cache;
@@ -65,13 +67,17 @@ public class Clay {
         // Create World
         world = new World();
         world.addSystem(new InputSystem(world));
+        world.addSystem(new EventSystem(world));
         world.addSystem(new ModelSystem(world));
-        world.addSystem(new StyleSystem(world));
+        world.addSystem(new AppearanceSystem(world));
         world.addSystem(new PhysicsSystem(world));
         world.addSystem(new PortableLayoutSystem(world));
         world.addSystem(new BoundarySystem(world));
         world.addSystem(new CameraSystem(world));
         world.addSystem(new RenderSystem(world));
+
+        // Create Workspace
+        world.createEntity(Workspace.class);
 
         // Create Camera
         world.createEntity(Camera.class);

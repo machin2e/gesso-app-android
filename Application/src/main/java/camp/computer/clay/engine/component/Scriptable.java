@@ -3,7 +3,7 @@ package camp.computer.clay.engine.component;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.Process;
 
-public class Processor extends Component {
+public class Scriptable extends Component {
 
     // TODO: 11/8/2016 Consider renaming to something like ControllerComponent
 
@@ -13,7 +13,7 @@ public class Processor extends Component {
 
 
     // <CONSTRUCTOR>
-    public Processor() {
+    public Scriptable() {
         // <REFACTOR>
         // TODO: Should a process be created by default? How to tell if a process should be stored in the database?
         process = new Process();
@@ -24,11 +24,11 @@ public class Processor extends Component {
 
     // <ABSTRACT_ENTITY_INTERFACE>
     public static void setProcess(Entity entity, Process process) {
-        entity.getComponent(Processor.class).process = process;
+        entity.getComponent(Scriptable.class).process = process;
     }
 
     public static Process getProcess(Entity entity) {
-        return entity.getComponent(Processor.class).process;
+        return entity.getComponent(Scriptable.class).process;
     }
     // </ABSTRACT_ENTITY_INTERFACE>
 }

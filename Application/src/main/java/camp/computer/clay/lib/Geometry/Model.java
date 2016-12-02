@@ -1,4 +1,4 @@
-package camp.computer.clay.lib.ImageBuilder;
+package camp.computer.clay.lib.Geometry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.entity.Entity;
@@ -40,9 +39,9 @@ import camp.computer.clay.platform.Application;
  * @author Computer Camp
  * @version 1.0.0-alpha
  */
-public class ImageBuilder {
+public class Model {
 
-    // TODO: Rename to BuildableImage? Collage? ImageBuilder?
+    // TODO: Rename to BuildableImage? Collage? Model?
 
     protected List<Shape> shapes = new ArrayList<>();
 
@@ -88,11 +87,11 @@ public class ImageBuilder {
 
     // <FILE_IO>
     // Opens image data from JSON file stored in custom format.
-    // TODO: 11/2/2016 Consider adding support for constructing ImageBuilder from SVG file.
-    public static ImageBuilder open(String filename) {
+    // TODO: 11/2/2016 Consider adding support for constructing Model from SVG file.
+    public static Model open(String filename) {
 
         // Create Empty image
-        ImageBuilder imageBuilder = new ImageBuilder();
+        Model model = new Model();
 
         // <PLATFORM_LAYER>
         InputStream inputStream = null;
@@ -187,7 +186,7 @@ public class ImageBuilder {
                     point.setOutlineThickness(outlineThickness);
 //                    point.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(point);
+                    model.addShape(point);
 
                 } else if (type.equals("Rectangle")) {
 
@@ -205,7 +204,7 @@ public class ImageBuilder {
                     rectangle.setOutlineThickness(outlineThickness);
 //                    rectangle.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(rectangle);
+                    model.addShape(rectangle);
 
                 } else if (type.equals("Circle")) {
 
@@ -220,7 +219,7 @@ public class ImageBuilder {
                     circle.setOutlineThickness(outlineThickness);
 //                    circle.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(circle);
+                    model.addShape(circle);
                 }
             }
 
@@ -229,13 +228,13 @@ public class ImageBuilder {
         }
         // </PLATFORM_LAYER>
 
-        return imageBuilder;
+        return model;
     }
 
-    public static ImageBuilder open2(String filename, Entity entity) {
+    public static Model open2(String filename, Entity entity) {
 
         // Create Empty image
-        ImageBuilder imageBuilder = new ImageBuilder();
+        Model model = new Model();
 
         // <PLATFORM_LAYER>
         InputStream inputStream = null;
@@ -330,10 +329,10 @@ public class ImageBuilder {
                     point.setOutlineThickness(outlineThickness);
 //                    point.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(point);
+                    model.addShape(point);
 
                     // <ENTITY>
-                    long eid = Model.addShape(entity, point);
+                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, point);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
@@ -359,10 +358,10 @@ public class ImageBuilder {
                     rectangle.setOutlineThickness(outlineThickness);
 //                    rectangle.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(rectangle);
+                    model.addShape(rectangle);
 
                     // <ENTITY>
-                    long eid = Model.addShape(entity, rectangle);
+                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, rectangle);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
@@ -385,10 +384,10 @@ public class ImageBuilder {
                     circle.setOutlineThickness(outlineThickness);
 //                    circle.isBoundary = isBoundary;
 
-                    imageBuilder.addShape(circle);
+                    model.addShape(circle);
 
                     // <ENTITY>
-                    long eid = Model.addShape(entity, circle);
+                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, circle);
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
@@ -405,7 +404,7 @@ public class ImageBuilder {
         }
         // </PLATFORM_LAYER>
 
-        return imageBuilder;
+        return model;
     }
     // </FILE_IO>
 }

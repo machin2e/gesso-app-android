@@ -10,17 +10,10 @@ import java.util.regex.Pattern;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class Model extends Component {
 
-    // <TODO>
-    // TODO: Delete this and create separate decoupled code to populate ImageComponent from Model file.
-//    public ImageBuilder image = null;
-    // </TODO>
-
-    //public Group<Primitive> shapes;
-    //public Group<Long> shapes;
     public List<Long> shapes;
 
     public Model() {
@@ -29,7 +22,6 @@ public class Model extends Component {
     }
 
     private void setup() {
-//        shapes = new Group<>();
         shapes = new ArrayList<>();
     }
 
@@ -38,14 +30,6 @@ public class Model extends Component {
 
     public int layerIndex = DEFAULT_LAYER_INDEX;
     // </LAYER>
-
-//    public void setImage(ImageBuilder imageBuilder) {
-//        this.image = imageBuilder;
-//    }
-//
-//    public ImageBuilder getModel() {
-//        return this.image;
-//    }
 
     public static long addShape(Entity entity, Shape shape) {
 
@@ -77,16 +61,16 @@ public class Model extends Component {
         return null;
     }
 
-    public static Entity getShape(Entity entity, Shape shape) {
-        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
-        for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shapeEntity = World.getWorld().Manager.get(shapeUuids.get(i));
-            if (shapeEntity.getComponent(Primitive.class).shape == shape) {
-                return shapeEntity;
-            }
-        }
-        return null;
-    }
+//    public static Entity getShape(Entity entity, Shape shape) {
+//        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
+//        for (int i = 0; i < shapeUuids.size(); i++) {
+//            Entity shapeEntity = World.getWorld().Manager.get(shapeUuids.get(i));
+//            if (shapeEntity.getComponent(Primitive.class).shape == shape) {
+//                return shapeEntity;
+//            }
+//        }
+//        return null;
+//    }
 
     public static Group<Entity> getShapes(Entity entity) {
         if (entity.getComponent(Model.class) == null) {
@@ -103,10 +87,6 @@ public class Model extends Component {
 
     public static Group<Entity> getShapes(Entity entity, String... labels) {
 
-//        if (image.getModel() == null) {
-//            image.setImage(new ImageBuilder());
-//        }
-//        List<Shape> shapes = image.getModel().getShapes();
         Group<Entity> shapes = Model.getShapes(entity);
 
         Group<Entity> matchingShapes = new Group<>();

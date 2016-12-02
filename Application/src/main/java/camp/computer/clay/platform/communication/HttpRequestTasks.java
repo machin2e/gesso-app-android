@@ -16,7 +16,7 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Processor;
+import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.Action;
 import camp.computer.clay.model.Process;
@@ -156,7 +156,7 @@ public class HttpRequestTasks {
 //                mapper.writeValue(dataOutputStream, content);
 
                 // <REFACTOR>
-                Process process = httpRequestTask.entity.getComponent(Processor.class).process;
+                Process process = httpRequestTask.entity.getComponent(Scriptable.class).process;
 
                 String processActionScripts = "{ \"type\": \"process\", \"actions\": [";
                 List<Action> actions = process.getActions();

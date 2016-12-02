@@ -17,6 +17,12 @@ public class Transform extends Component {
     public double y = 0;
 
     /**
+     * The z coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
+     * {@code null} then this is equivalent to an absolute position.
+     */
+    public double z = 0;
+
+    /**
      * Relative rotation of the coordinate with which endpoints referencing this one will be
      * rotated.
      */

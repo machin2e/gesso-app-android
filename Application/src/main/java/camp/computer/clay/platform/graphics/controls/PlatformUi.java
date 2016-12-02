@@ -38,17 +38,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.Processor;
+import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.model.Action;
 import camp.computer.clay.model.Script;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.communication.HttpRequestTasks;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 import camp.computer.clay.util.Random;
 
@@ -593,7 +591,7 @@ public class PlatformUi {
                                             Log.v("ListView", "selected: " + selectedAction.getTitle());
 
                                             // Add Action to Process
-                                            extension.getComponent(Processor.class).process.addAction(selectedAction);
+                                            extension.getComponent(Scriptable.class).process.addAction(selectedAction);
 
                                             // Replace with new View
 //                                    View actionView = createActionView_v1(selectedAction);
@@ -651,7 +649,7 @@ public class PlatformUi {
                         } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            List<Action> actions = extension.getComponent(Processor.class).process.getActions();
+                            List<Action> actions = extension.getComponent(Scriptable.class).process.getActions();
                             for (int i = 0; i < actions.size(); i++) {
                                 Log.v("ActionProcess", "" + i + ": " + actions.get(i).getTitle());
                             }
@@ -695,7 +693,7 @@ public class PlatformUi {
 
 
                 // <POPULATE_DATA>
-                List<Action> actions = extension.getComponent(Processor.class).process.getActions();
+                List<Action> actions = extension.getComponent(Scriptable.class).process.getActions();
                 for (int i = 0; i < actions.size(); i++) {
                     Log.v("ActionProcess", "" + i + ": " + actions.get(i).getTitle());
                     View actionView = createNewActionView_v5(actions.get(i));
@@ -2018,7 +2016,7 @@ public class PlatformUi {
                 linearLayout.addView(textView);
 
                 // EditText: Script Editor
-                Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), PlatformRenderSurface.NOTIFICATION_FONT);
+                Typeface typeface = Typeface.createFromAsset(Application.getInstance().getAssets(), World.NOTIFICATION_FONT);
                 // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
 
                 EditText scriptEditorView = new EditText(context);

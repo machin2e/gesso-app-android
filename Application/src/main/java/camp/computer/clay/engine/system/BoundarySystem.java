@@ -9,7 +9,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class BoundarySystem extends System {
 
