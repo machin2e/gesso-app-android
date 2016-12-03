@@ -10,19 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Workspace;
-import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
-import camp.computer.clay.engine.system.AppearanceSystem;
-import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.engine.system.CameraSystem;
-import camp.computer.clay.engine.system.EventSystem;
-import camp.computer.clay.engine.system.InputSystem;
-import camp.computer.clay.engine.system.ModelSystem;
-import camp.computer.clay.engine.system.PhysicsSystem;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.Cache;
@@ -32,7 +20,6 @@ import camp.computer.clay.platform.PhoneHost;
 import camp.computer.clay.platform.PlatformInterface;
 import camp.computer.clay.platform.communication.InternetInterface;
 import camp.computer.clay.platform.communication.MessengerInterface;
-import camp.computer.clay.util.Random;
 
 public class Clay {
 
@@ -64,39 +51,39 @@ public class Clay {
 
         this.internet = new Internet(this); // Start the networking systems
 
-        // Create World
-        world = new World();
-        world.addSystem(new InputSystem(world));
-        world.addSystem(new EventSystem(world));
-        world.addSystem(new ModelSystem(world));
-        world.addSystem(new AppearanceSystem(world));
-        world.addSystem(new PhysicsSystem(world));
-        world.addSystem(new PortableLayoutSystem(world));
-        world.addSystem(new BoundarySystem(world));
-        world.addSystem(new CameraSystem(world));
-        world.addSystem(new RenderSystem(world));
-
-        // Create Workspace
-        world.createEntity(Workspace.class);
-
-        // Create Camera
-        world.createEntity(Camera.class);
-
-        Application.getInstance().getPlatformRenderSurface().setWorld(world);
-
-        // <TEST>
-        int minHostCount = 5;
-        int maxHostCount = 6;
-        int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
-        for (int i = 0; i < hostCount; i++) {
-            world.createEntity(Host.class);
-        }
-        // </TEST>
-
-        // <HACK>
-        // TODO: Place in a LayoutSystem
-        world.getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
-        // </HACK>
+//        // Create World
+//        world = new World();
+//        world.addSystem(new InputSystem(world));
+//        world.addSystem(new EventSystem(world));
+//        world.addSystem(new ModelSystem(world));
+//        world.addSystem(new AppearanceSystem(world));
+//        world.addSystem(new PhysicsSystem(world));
+//        world.addSystem(new PortableLayoutSystem(world));
+//        world.addSystem(new BoundarySystem(world));
+//        world.addSystem(new CameraSystem(world));
+//        world.addSystem(new RenderSystem(world));
+//
+//        // Create Workspace
+//        world.createEntity(Workspace.class);
+//
+//        // Create Camera
+//        world.createEntity(Camera.class);
+//
+//        Application.getInstance().getPlatformRenderSurface().setWorld(world);
+//
+//        // <TEST>
+//        int minHostCount = 5;
+//        int maxHostCount = 6;
+//        int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
+//        for (int i = 0; i < hostCount; i++) {
+//            world.createEntity(Host.class);
+//        }
+//        // </TEST>
+//
+//        // <HACK>
+//        // TODO: Place in a LayoutSystem
+//        world.getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
+//        // </HACK>
     }
 
     // TODO: Convert to Event Handler

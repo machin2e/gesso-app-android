@@ -28,8 +28,8 @@ import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
+import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.EventManager;
-import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Text;
@@ -37,7 +37,7 @@ import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
-import camp.computer.clay.util.time.Clock;
+import camp.computer.clay.util.time.OLD_Clock;
 
 public class World {
 
@@ -62,7 +62,7 @@ public class World {
 
     public static boolean ENABLE_GEOMETRY_OVERLAY = true;
     // </SETTINGS>
-    
+
     // <REFACTOR_INTO_ENGINE>
     public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
     public static float NOTIFICATION_FONT_SIZE = 45;
@@ -83,20 +83,28 @@ public class World {
     public static int GEOMETRY_ANNOTATION_LINE_SPACING = 10;
     // </REFACTOR_INTO_ENGINE>
 
+    public long tickCount = 0;
+    public long previousTickTime = -1;
+    public long tickFrequency = Clock.NANOS_PER_SECOND / 30;
+
     // <MANAGERS>
-    public Manager Manager;
+    public EventManager events;
+
+    public EntityManager entities;
     // </MANAGERS>
 
-    // <EVENT_MANAGER>
-    public EventManager eventManager = new EventManager();
-    // </EVENT_MANAGER>
+    private List<System> systems = new ArrayList<>();
 
     // <TEMPORARY>
     public Repository repository;
     // </TEMPORARY>
 
-    public World() {
+    public Engine engine;
+
+    public World(Engine engine) {
         super();
+
+        this.engine = engine;
         setup();
     }
 
@@ -105,7 +113,9 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-        Manager = new Manager();
+        events = new EventManager();
+
+        entities = new EntityManager();
 
         createPrototypeExtensionEntity();
 
@@ -122,8 +132,6 @@ public class World {
         return World.world;
     }
     // </TODO: DELETE>
-
-    private List<System> systems = new ArrayList<>();
 
     public void addSystem(System system) {
         if (!systems.contains(system)) {
@@ -146,12 +154,13 @@ public class World {
 
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
-    public void update() {
-        long updateStartTime = Clock.getCurrentTime();
+    public void update(long dt) {
+
+        long updateStartTime = OLD_Clock.getCurrentTime();
         for (int i = 0; i < systems.size(); i++) {
-            systems.get(i).update();
+            systems.get(i).update(dt);
         }
-        updateTime = Clock.getCurrentTime() - updateStartTime;
+        updateTime = OLD_Clock.getCurrentTime() - updateStartTime;
     }
 
     public Entity createEntity(Class<?> entityType) {
@@ -179,8 +188,8 @@ public class World {
             entity = EntityFactory.createWorkspaceEntity(this);
         }
 
-        // Add Entity to Manager
-        Manager.add(entity);
+        // Add Entity to entities
+        entities.add(entity);
 
         return entity;
     }
@@ -237,7 +246,7 @@ public class World {
 
         // <HACK>
         // TODO: Add to common createEntity method.
-        Manager.add(prototypeExtension);
+        entities.add(prototypeExtension);
         // <HACK>
 
         return prototypeExtension;

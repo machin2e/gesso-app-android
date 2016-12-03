@@ -4,16 +4,16 @@ import java.util.HashMap;
 
 import camp.computer.clay.engine.entity.Entity;
 
-public class Manager {
+public class EntityManager {
 
+    public static long INVALID_UUID = -1L;
     public static long count = 0L;
     public long uuid = 0L;
-    public static long INVALID_UUID = -1L;
 
-    // NOTE: This should be the only language reference to each Entity.
+    // NOTE: This should be the only language reference to each Entity object.
     private HashMap<Long, Entity> entities;
 
-    public Manager() {
+    public EntityManager() {
         setup();
     }
 
@@ -21,16 +21,15 @@ public class Manager {
         entities = new HashMap<>();
     }
 
-    synchronized public Group<Entity> getEntities() {
+    synchronized public long add(Entity entity) {
+        entities.put(entity.uuid, entity);
+        return entity.uuid;
+    }
+
+    synchronized public Group<Entity> get() {
         Group<Entity> entityGroup = new Group<>();
         entityGroup.addAll(entities.values());
         return entityGroup;
-    }
-
-    synchronized public long add(Entity entity) {
-//        entity.uuid = count++;
-        entities.put(entity.uuid, entity);
-        return entity.uuid;
     }
 
     synchronized public Entity get(long uuid) {

@@ -1,13 +1,13 @@
 package camp.computer.clay.engine.entity;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.manager.Manager;
+import camp.computer.clay.engine.manager.EntityManager;
+import camp.computer.clay.engine.manager.Group;
 
 public final class Entity {
 
     // <HACK>
-    public long uuid = Manager.count++; // Manager.INVALID_UUID;
+    public long uuid = EntityManager.count++; // entities.INVALID_UUID;
     // </HACK>
 
     public long getUuid() {
@@ -17,7 +17,7 @@ public final class Entity {
     public boolean isActive = true;
 
     // TODO?: Move into World. Allows World-specific Entities.
-//    public static Group<Entity> Manager = new Group<>();
+//    public static Group<Entity> entities = new Group<>();
 
     private Group<Component> components = null;
 

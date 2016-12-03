@@ -22,8 +22,8 @@ public class AppearanceSystem extends System {
     }
 
     @Override
-    public void update() {
-        Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
+    public void update(long dt) {
+        Group<Entity> entitiesWithTransform = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
 
         // Update Style
         for (int i = 0; i < entitiesWithTransform.size(); i++) {

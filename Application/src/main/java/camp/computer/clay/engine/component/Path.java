@@ -1,9 +1,9 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Manager;
+import camp.computer.clay.engine.manager.EntityManager;
+import camp.computer.clay.engine.manager.Group;
 
 public class Path extends Component {
 
@@ -71,9 +71,9 @@ public class Path extends Component {
 
     public Direction direction = Direction.NONE;
 
-    public long sourcePortUuid = Manager.INVALID_UUID;
+    public long sourcePortUuid = EntityManager.INVALID_UUID;
 
-    public long targetPortUuid = Manager.INVALID_UUID;
+    public long targetPortUuid = EntityManager.INVALID_UUID;
     // </COMPONENT_DATA>
 
 
@@ -168,7 +168,7 @@ public class Path extends Component {
 
     public static Entity getSource(Entity path) {
         long sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
-        return World.getWorld().Manager.getEntities().get(sourcePortUuid);
+        return World.getWorld().entities.get(sourcePortUuid);
     }
 
     public static void setTarget(Entity path, Entity target) {
@@ -190,7 +190,7 @@ public class Path extends Component {
 
     public static Entity getTarget(Entity path) {
         long targetPortUuid = path.getComponent(Path.class).targetPortUuid;
-        return World.getWorld().Manager.getEntities().get(targetPortUuid);
+        return World.getWorld().entities.get().get(targetPortUuid);
     }
 
     public static Group<Entity> getPorts(Entity path) {

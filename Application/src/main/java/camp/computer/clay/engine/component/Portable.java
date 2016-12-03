@@ -70,7 +70,7 @@ public class Portable extends Component {
     // Expects Extension
     // Requires components: Portable, Extension
     public static Group<Entity> getHosts(Entity portable) {
-        List<Entity> hosts = World.getWorld().Manager.getEntities().filterWithComponent(Host.class);
+        List<Entity> hosts = World.getWorld().entities.get().filterWithComponent(Host.class);
 
         Group<Entity> portableHosts = new Group<>();
         for (int i = 0; i < hosts.size(); i++) {

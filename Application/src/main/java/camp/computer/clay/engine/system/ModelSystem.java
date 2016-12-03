@@ -15,9 +15,9 @@ public class ModelSystem extends System {
     }
 
     @Override
-    public void update() {
+    public void update(long dt) {
 
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, Transform.class);
+        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
 
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
@@ -33,7 +33,7 @@ public class ModelSystem extends System {
             // </HACK>
         }
 
-//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Primitive.class, RelativeLayoutConstraint.class, Transform.class);
+//        Group<Entity> shapeEntities = world.entities.get().filterActive(true).filterWithComponents(Primitive.class, RelativeLayoutConstraint.class, Transform.class);
 //
 //        for (int i = 0; i < shapeEntities.size(); i++) {
 //            Entity entity = shapeEntities.get(i);

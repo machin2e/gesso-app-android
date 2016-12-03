@@ -5,18 +5,15 @@ import java.util.List;
 
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.util.Geometry;
 
 public class Boundary extends Component {
 
     public List<Transform> boundary = new ArrayList<>();
 
-    public static class util {
-        public static void set(Entity entity, List<Transform> vertices) {
-            entity.getComponent(Boundary.class).boundary.clear();
-            entity.getComponent(Boundary.class).boundary.addAll(vertices);
-        }
+    public static void set(Entity entity, List<Transform> vertices) {
+        entity.getComponent(Boundary.class).boundary.clear();
+        entity.getComponent(Boundary.class).boundary.addAll(vertices);
     }
 
     public static List<Transform> get(Entity entity) {
@@ -26,15 +23,6 @@ public class Boundary extends Component {
         }
         return null;
     }
-
-
-//    public static List<Transform> get(Entity entity) {
-//        if (entity.hasComponent(Boundary.class)
-//                && Boundary.get(entity).size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!
-//            return Boundary.get(entity);
-//        }
-//        return null;
-//    }
 
     /**
      * Returns {@code true} if any of the {@code Shape}s in the {@code Model} contain the
@@ -66,22 +54,5 @@ public class Boundary extends Component {
         // TODO: return Primitive.contains(entity.getComponent(Boundary.class).boundary, point);
 
         // TODO?: return Primitive.contains(this.boundary, point);
-    }
-
-    // TODO: Compute bounding box for image when add/remove Shapes and store it here!
-    public static Rectangle getBoundingBox(Entity entity) {
-
-        List<Transform> shapeBoundaries = new ArrayList<>();
-
-//        List<Shape> shapes = entity.getComponent(Model.class).getModel().getShapes();
-        Group<Entity> shapes = Model.getShapes(entity);
-        for (int i = 0; i < shapes.size(); i++) {
-//            if (shapes.get(i).getComponent(Primitive.class).shape.isBoundary) { // HACK
-            //shapeBoundaries.addAll(BoundarySystem.get(shapes.get(i).getComponent(Primitive.class).shape)); // HACK
-            shapeBoundaries.addAll(Boundary.get(shapes.get(i))); // HACK
-//            }
-        }
-
-        return Geometry.getBoundingBox(shapeBoundaries);
     }
 }

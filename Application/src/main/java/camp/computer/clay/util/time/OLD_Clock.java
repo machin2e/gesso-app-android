@@ -1,18 +1,14 @@
 package camp.computer.clay.util.time;
 
-import android.util.Log;
-
-import java.util.*;
-
 /**
  * References:
  * - <a href="https://developer.android.com/reference/android/os/SystemClock.html">Android SystemClock Documentation</a>
  */
-public class Clock { // extends Thread {
+public class OLD_Clock { // extends Thread {
 
     public static final double MILLISECONDS_PER_SECOND = 1000.0f;
 
-    public Clock() {
+    public OLD_Clock() {
         setup();
     }
 
@@ -24,7 +20,7 @@ public class Clock { // extends Thread {
         // - android.os.SystemClock.elapsedRealtime();
     }
 
-//    private long timeFrequency = 0L; // What is this? The count delay of the "high performance counter"
+    //    private long timeFrequency = 0L; // What is this? The count delay of the "high performance counter"
     private long frameTime = 0L; // Timestamp at which the current frame was started (last call to reset())
     private double previousFrameDuration = 0.0D;
 //    private long frameDuration = 0L; // deltaLastFrame
@@ -58,7 +54,7 @@ public class Clock { // extends Thread {
         this.previousFrameDuration = frameDuration;
     }
 
-    // Call this from the Time/Clock Thread
+    // Call this from the Time/OLD_Clock Thread
     private void tick() {
         // TODO: Call "updateImage" method for (subscribing?) Entities in Simulation
     }
@@ -70,7 +66,7 @@ public class Clock { // extends Thread {
     /**
      * Returns the units of time since the last frame. Used to updateImage the simulation state
      * independent of drawing to the frame.
-     *
+     * <p>
      * This allows the simulation to run independently. It helps address issues that can arise
      * in animation when the simulation state changes depend on the frame rate.
      *

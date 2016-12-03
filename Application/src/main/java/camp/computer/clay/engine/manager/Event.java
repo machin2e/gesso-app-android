@@ -3,7 +3,7 @@ package camp.computer.clay.engine.manager;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Geometry;
-import camp.computer.clay.util.time.Clock;
+import camp.computer.clay.util.time.OLD_Clock;
 
 public class Event {
 
@@ -11,7 +11,6 @@ public class Event {
     // TODO: Calculate acceleration of current event relative to previous.
 
     public enum Type {
-        NONE,
         SELECT,
         HOLD,
         MOVE,
@@ -97,7 +96,7 @@ public class Event {
     public int pointerIndex = -1;
 
     public Event() {
-        this.timestamp = Clock.getCurrentTime(); // TODO: Get from the World clock!
+        this.timestamp = OLD_Clock.getCurrentTime(); // TODO: Get from the World clock!
         setup();
     }
 

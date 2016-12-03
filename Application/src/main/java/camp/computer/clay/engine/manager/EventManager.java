@@ -7,6 +7,10 @@ public class EventManager {
 
     private HashMap<Event.Type, ArrayList<EventHandler>> eventHandlers = new HashMap<>();
 
+    public void schedule(Event event) {
+        // TODO: Add to scheduled events so it can be fired at the appropriate time.
+    }
+
     public boolean subscribe(Event.Type eventType, EventHandler<?> eventHandler) {
         if (!eventHandlers.containsKey(eventType)) {
             eventHandlers.put(eventType, new ArrayList());

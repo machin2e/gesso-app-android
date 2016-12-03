@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import camp.computer.clay.Clay;
+import camp.computer.clay.engine.Engine;
+import camp.computer.clay.engine.Platform;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Physics;
@@ -261,6 +263,10 @@ public class Application extends FragmentActivity implements PlatformInterface {
         platformUi.openMainMenu();
         // </SHOW_MAIN_MENU>
         */
+
+        // <TIMER_THREAD>
+        final Engine engine = new Engine(new Platform());
+        // </TIMER_THREAD>
     }
 
     @Override
@@ -358,7 +364,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
             case KeyEvent.KEYCODE_1: {
                 // Monitor
-                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale -= 0.10;
                 }
@@ -367,7 +373,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
             case KeyEvent.KEYCODE_2: {
                 // Monitor
-                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale = 1.0;
                 }
@@ -376,7 +382,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
             case KeyEvent.KEYCODE_3: {
                 // Monitor
-                Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale += 0.10;
                 }

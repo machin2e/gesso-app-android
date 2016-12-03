@@ -55,7 +55,7 @@ public class PhoneHost {
     }
 
 //    public long getTimeSinceLastMessage () {
-////        Log.v ("Clay_Time", "Clock since getLastEvent message: " + this.timeOfLastContact);
+////        Log.v ("Clay_Time", "OLD_Clock since getLastEvent message: " + this.timeOfLastContact);
 //        Date currentTime = Calendar.getInstance().getTime ();
 //
 //        if (timeOfLastContact != null) {

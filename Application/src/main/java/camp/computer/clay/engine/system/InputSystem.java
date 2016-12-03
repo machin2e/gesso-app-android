@@ -26,10 +26,10 @@ public class InputSystem extends System {
 
     private Event previousEvent = null;
 
-    public void update() {
+    public void update(long dt) {
 
         if (camera == null) {
-            camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+            camera = world.entities.get().filterWithComponent(Camera.class).get(0);
         }
 
         if (camera != null) {
@@ -49,6 +49,7 @@ public class InputSystem extends System {
 
     private Event process(Event event) {
 
+        // Set world position
         for (int i = 0; i < Event.MAXIMUM_POINT_COUNT; i++) {
             // TODO: Update equations so cameraScale is always the correct scale, the current scale, and computed as needed.
             Transform origin = Application.getInstance().platformRenderSurface.originTransform;
@@ -106,14 +107,14 @@ public class InputSystem extends System {
             }
         }
 
-        processAndDispatchEvent(event);
+        setTargets(event);
 
         return event;
     }
 
     public Entity previousPrimaryTarget = null;
 
-    private void processAndDispatchEvent(Event event) {
+    private void setTargets(Event event) {
 
         Entity primaryTarget = null;
 
@@ -123,32 +124,26 @@ public class InputSystem extends System {
             event.setSecondaryTarget(event.getFirstEvent().getSecondaryTarget());
         } else {
 
-            // Annotate the Event
-            Group<Entity> primaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
-            Group<Entity> secondaryTargets = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
+            // Assign target Entities
+            Group<Entity> primaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
+            Group<Entity> secondaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
 
-            if (primaryTargets.size() > 0) {
-                primaryTarget = primaryTargets.get(primaryTargets.size() - 1); // Get primary target from the top layer (will be last in the list of targets)
+            if (primaryBoundaries.size() > 0) {
+                primaryTarget = primaryBoundaries.get(primaryBoundaries.size() - 1); // Get primary target from the top layer (will be last in the list of targets)
             } else {
-                Group<Entity> cameras = world.Manager.getEntities().filterWithComponent(Camera.class);
+                Group<Entity> cameras = world.entities.get().filterWithComponent(Camera.class);
                 primaryTarget = cameras.get(0);
             }
             event.setTarget(primaryTarget);
 
             if (primaryTarget.hasComponent(Model.class)) { // Needed because entities like Camera without Model component are also processed here.
-                for (int i = 0; i < secondaryTargets.size(); i++) {
-                    if (Model.getShapes(primaryTarget).contains(secondaryTargets.get(i))) {
-                        event.setSecondaryTarget(secondaryTargets.get(i));
+                for (int i = 0; i < secondaryBoundaries.size(); i++) {
+                    if (Model.getShapes(primaryTarget).contains(secondaryBoundaries.get(i))) {
+                        event.setSecondaryTarget(secondaryBoundaries.get(i));
                     }
                 }
             }
         }
-
-//        // Dispatch the Event to subscribers
-//        Entity eventTarget = event.getTarget();
-//        if (eventTarget != null) {
-//            world.eventManager.notifySubscribers(event);
-//        }
 
         // Handle special bookkeeping storing previous target Entity
         if (event.getType() == Event.Type.UNSELECT) {

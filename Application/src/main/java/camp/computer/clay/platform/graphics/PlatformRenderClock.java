@@ -11,7 +11,7 @@ import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.util.time.Clock;
+import camp.computer.clay.util.time.OLD_Clock;
 
 /**
  * PlatformRenderClock is a background thread that periodically updates the world state
@@ -48,7 +48,7 @@ public class PlatformRenderClock extends Thread {
         this.isRunning = isRunning;
     }
 
-    public double dt = Clock.getCurrentTime();
+    public double dt = OLD_Clock.getCurrentTime();
 
     @Override
     public void run() {
@@ -76,8 +76,8 @@ public class PlatformRenderClock extends Thread {
                 continue;
             }
 
-            dt = Clock.getCurrentTime() - frameStartTime;
-            frameStartTime = Clock.getCurrentTime();
+            dt = OLD_Clock.getCurrentTime() - frameStartTime;
+            frameStartTime = OLD_Clock.getCurrentTime();
 
 //            platformRenderSurface.world.update();
 
@@ -91,12 +91,12 @@ public class PlatformRenderClock extends Thread {
 
                         // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK HIERARCHY!!!!!!!!!!!!! FUCK!!!!!!!!
 
-                        platformRenderSurface.world.update();
+//                        platformRenderSurface.world.update();
 
                         canvas.save();
 
                         // <CAMERA_VIEWPORT>
-                        Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+                        Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
                         Transform cameraTransform = camera.getComponent(Transform.class);
                         canvas.translate(
                                 (float) (platformRenderSurface.originTransform.x + cameraTransform.x) /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
@@ -110,7 +110,7 @@ public class PlatformRenderClock extends Thread {
                         canvas.drawColor(Color.WHITE);
                         // </CLEAR_CANVAS>
 
-                        Group<Entity> entities = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponent(Model.class).sortByLayer();
+                        Group<Entity> entities = World.getWorld().entities.get().filterActive(true).filterWithComponent(Model.class).sortByLayer();
 
                         // <UPDATE>
                         // TODO: Draw Renderables.
@@ -143,7 +143,7 @@ public class PlatformRenderClock extends Thread {
             }
 
             // Store actual frames per second
-            frameStopTime = Clock.getCurrentTime();
+            frameStopTime = OLD_Clock.getCurrentTime();
             currentFPS = (1000.0f / (float) (frameStopTime - frameStartTime));
             frameTimeDelta = frameStopTime - frameStartTime;
 
@@ -151,7 +151,7 @@ public class PlatformRenderClock extends Thread {
             // This reduces energy consumption thereby increasing battery life.
             frameSleepTime = targetFramePeriod - (frameStopTime - frameStartTime);
             try {
-                sleepStartTime = Clock.getCurrentTime();
+                sleepStartTime = OLD_Clock.getCurrentTime();
                 if (frameSleepTime > 0) {
                     Thread.sleep(frameSleepTime);
                 } else {
@@ -160,7 +160,7 @@ public class PlatformRenderClock extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            currentSleepTime = Clock.getCurrentTime() - sleepStartTime;
+            currentSleepTime = OLD_Clock.getCurrentTime() - sleepStartTime;
         }
     }
 

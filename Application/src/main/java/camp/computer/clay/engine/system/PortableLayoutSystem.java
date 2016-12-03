@@ -34,11 +34,11 @@ public class PortableLayoutSystem extends System {
     }
 
     @Override
-    public void update() {
+    public void update(long dt) {
         updatePathPortConfiguration();
         updatePortConfiguration();
 
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Model.class, Transform.class);
+        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.hasComponent(Extension.class)) {
@@ -138,7 +138,7 @@ public class PortableLayoutSystem extends System {
     // Update Port configurations based on contained Paths
     private void updatePathPortConfiguration() {
 
-        Group<Entity> paths = world.Manager.getEntities().filterActive(true).filterWithComponent(Path.class);
+        Group<Entity> paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 
@@ -196,8 +196,8 @@ public class PortableLayoutSystem extends System {
     private void updatePortConfiguration() {
 
         // Clear Ports that are not contained in any Path
-        Group<Entity> ports = world.Manager.getEntities().filterWithComponent(Port.class);
-        Group<Entity> paths = world.Manager.getEntities().filterWithComponent(Path.class);
+        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
+        Group<Entity> paths = world.entities.get().filterWithComponent(Path.class);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             boolean isPortInPath = false;
@@ -216,7 +216,7 @@ public class PortableLayoutSystem extends System {
     }
 
     public void setPortableSeparation(double distance) {
-        Group<Entity> extensions = world.Manager.getEntities().filterWithComponent(Extension.class);
+        Group<Entity> extensions = world.entities.get().filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
             if (Portable.getHosts(extension).size() > 0) {
@@ -542,7 +542,7 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout(LayoutStrategy layoutStrategy) {
 
-        Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
+        Group<Entity> hosts = world.entities.get().filterWithComponent(Host.class);
 
         layoutStrategy.execute(hosts);
     }
@@ -620,7 +620,7 @@ public class PortableLayoutSystem extends System {
                 // Add header contact shape
                 Point headerContactShape = new Point();
                 long eid = Model.addShape(extension, headerContactShape);
-                Entity headerContactGeometry = world.Manager.get(eid); // HACK
+                Entity headerContactGeometry = world.entities.get(eid); // HACK
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
                 //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
 

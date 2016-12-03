@@ -20,5 +20,5 @@ public abstract class System {
         return this.world;
     }
 
-    public abstract void update();
+    public abstract void update(long dt);
 }

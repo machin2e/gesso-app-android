@@ -335,7 +335,7 @@ public class Model {
                     long eid = camp.computer.clay.engine.component.Model.addShape(entity, point);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
+                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
@@ -364,7 +364,7 @@ public class Model {
                     long eid = camp.computer.clay.engine.component.Model.addShape(entity, rectangle);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
+                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
@@ -390,7 +390,7 @@ public class Model {
                     long eid = camp.computer.clay.engine.component.Model.addShape(entity, circle);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().Manager.get(eid); // HACK
+                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);

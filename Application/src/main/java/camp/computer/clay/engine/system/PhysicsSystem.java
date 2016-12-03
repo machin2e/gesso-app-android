@@ -14,9 +14,9 @@ public class PhysicsSystem extends System {
     }
 
     @Override
-    public void update() {
+    public void update(long dt) {
         // <HACK>
-        Group<Entity> entities = world.Manager.getEntities().filterWithComponents(Host.class, Transform.class, Physics.class);
+        Group<Entity> entities = world.entities.get().filterWithComponents(Host.class, Transform.class, Physics.class);
         // </HACK>
 
         for (int i = 0; i < entities.size(); i++) {
@@ -34,7 +34,7 @@ public class PhysicsSystem extends System {
         }
 
         // <HACK>
-//        entities = world.Manager.getEntities().filterWithComponents(Camera.class);
+//        entities = world.entities.get().filterWithComponents(Camera.class);
         // </HACK>
 
 //        for (int i = 0; i < entities.size(); i++) {

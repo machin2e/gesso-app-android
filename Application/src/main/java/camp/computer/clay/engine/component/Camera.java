@@ -14,7 +14,7 @@ public class Camera extends Component {
 
     public static double MAXIMUM_SCALE = 1.5;
 
-    public Mode mode = Mode.FOCUS;
+    public Mode mode = Mode.FREE;
     public Entity focus = null;
 
     public Rectangle boundingBox = null;

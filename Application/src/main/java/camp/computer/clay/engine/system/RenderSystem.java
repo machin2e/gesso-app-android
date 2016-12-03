@@ -9,7 +9,7 @@ public class RenderSystem extends System {
     }
 
     @Override
-    public void update() {
+    public void update(long dt) {
         // TODO: Create Renderable components parsable by platform renderer.
     }
 }

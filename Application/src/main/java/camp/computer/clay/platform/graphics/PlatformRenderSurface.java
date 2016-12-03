@@ -259,6 +259,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         return true;
     }
 
+    // <PLATFORM_SCHEDULED_EVENT>
     private Handler holdEventTimerHandler = new Handler();
 
     private Runnable holdEventTimerRunnable = new Runnable() {
@@ -293,15 +294,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             */
         }
     };
+    // </PLATFORM_SCHEDULED_EVENT>
 
     // <TODO: REMOVE_REFERENCE_TO_WORLD>
     public void setWorld(World world) {
         this.world = world;
-
-        // Set camera viewport dimensions from the width and height of the device
-//        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-//        world.getSystem(CameraSystem.class).setWidth(camera, DeviceDimensionsHelper.getDisplayWidth(Application.getContext()));
-//        world.getSystem(CameraSystem.class).setHeight(camera, DeviceDimensionsHelper.getDisplayHeight(Application.getContext()));
     }
     // </TODO: REMOVE_REFERENCE_TO_WORLD>
 
@@ -357,6 +354,23 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     public void drawOverlay(Canvas canvas, Paint paint) {
 
+        // <REFACTOR>
+        // TODO: Move to Engine/World
+        long engineTickCount = world.engine.tickCount;
+        int entityCount = world.entities.get().size();
+        int hostCount = world.entities.get().filterWithComponent(Host.class).size();
+        int portCount = world.entities.get().filterWithComponent(Port.class).size();
+        int extensionCount = world.entities.get().filterWithComponent(Extension.class).size();
+        int pathCount = world.entities.get().filterWithComponent(Path.class).size();
+        int cameraCount = world.entities.get().filterWithComponent(Camera.class).size();
+
+        int worldUpdateTime = (int) world.updateTime;
+        int worldRenderTime = (int) world.renderTime;
+        int worldLookupCount = (int) world.lookupCount;
+        world.lookupCount = 0;
+        Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0); // HACK
+        // </REFACTOR>
+
         // Font
         paint.setColor(Color.parseColor(World.OVERLAY_FONT_COLOR));
         paint.setStyle(Paint.Style.FILL);
@@ -367,23 +381,23 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         String lineText = "";
         Rect textBounds = new Rect();
 
+        // <TICK_COUNT>
+        canvas.save();
+        lineText = "Ticks: " + (int) engineTickCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_TOP_MARGIN;
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </TICK_COUNT>
+
         // <FRAME_COUNT>
         canvas.save();
         lineText = "Frames: " + (int) platformRenderClock.frameCount;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
-        linePosition += World.OVERLAY_TOP_MARGIN + textBounds.height();
-        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
-        canvas.restore();
-        // </FRAME_COUNT>
-
-        // <TICK_COUNT>
-        canvas.save();
-        lineText = "Ticks: " + (int) platformRenderClock.tickCount;
-        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
-        // </TICK_COUNT>
+        // </FRAME_COUNT>
 
         // <FPS_LABEL>
         canvas.save();
@@ -423,7 +437,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <UPDATE_TIME>
         canvas.save();
-        lineText = "Update Time: " + (int) world.updateTime;
+        lineText = "Update Time: " + (int) worldUpdateTime;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
@@ -432,7 +446,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <RENDER_TIME>
         canvas.save();
-        lineText = "Render Time: " + (int) world.renderTime;
+        lineText = "Render Time: " + worldRenderTime;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
@@ -441,24 +455,16 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <RENDER_TIME>
         canvas.save();
-        lineText = "Filter Count: " + (int) world.lookupCount;
+        lineText = "Filter Count: " + worldLookupCount;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
-        world.lookupCount = 0;
         // </RENDER_TIME>
 
         // <ENTITY_STATISTICS>
-        canvas.save();
-        int entityCount = world.Manager.getEntities().size();
-        int hostCount = world.Manager.getEntities().filterWithComponent(Host.class).size();
-        int portCount = world.Manager.getEntities().filterWithComponent(Port.class).size();
-        int extensionCount = world.Manager.getEntities().filterWithComponent(Extension.class).size();
-        int pathCount = world.Manager.getEntities().filterWithComponent(Path.class).size();
-        int cameraCount = world.Manager.getEntities().filterWithComponent(Camera.class).size();
-
         // Entities
+        canvas.save();
         lineText = "Entities: " + entityCount;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
@@ -508,7 +514,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <CAMERA_SCALE_MONITOR>
         canvas.save();
-        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0); // HACK
         lineText = "Camera Scale: " + decimalFormat.format(camera.getComponent(Transform.class).scale);
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
@@ -548,9 +553,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
 
         // <BOUNDARY>
-        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
-        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
-        Group<Entity> entities2 = World.getWorld().Manager.getEntities().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
+        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
+        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
+        Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
         paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
@@ -640,7 +645,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
 
-        Entity camera = World.getWorld().Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
         if (camera != null) {
             Rectangle boundingBox = camera.getComponent(Camera.class).boundingBox;
 
@@ -774,7 +779,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 
-            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
+//            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
 //            segment.setOutlineThickness(World.PATH_EDITVIEW_THICKNESS);
 //            segment.setOutlineColor(sourcePortShape.getColor());
             palette.outlineColor = sourcePortShape.getColor();
@@ -842,17 +847,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawShape(Entity shape, Canvas canvas, Paint paint, Palette palette) {
 
         // <HACK>
-//        shape.getComponent(Primitive.class).shape.setPosition(
-//        );
-//                shape.getComponent(Transform.class)
-//        shape.getComponent(Primitive.class).shape.setRotation(
-//                shape.getComponent(Transform.class).getRotation()
-//        );
-
         Shape shapeMesh = shape.getComponent(Primitive.class).shape;
 
         // Palette
-//        Palette palette = new Palette();
         palette.color = shapeMesh.getColor();
         palette.outlineColor = shapeMesh.getOutlineColor();
         palette.outlineThickness = shapeMesh.outlineThickness;

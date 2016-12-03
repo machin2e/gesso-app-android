@@ -15,7 +15,7 @@ public class EventSystem extends System {
         super(world);
     }
 
-    public void update() {
+    public void update(long dt) {
         while (eventQueue.size() > 0) {
             dispatch(dequeue());
         }
@@ -37,7 +37,7 @@ public class EventSystem extends System {
     private void dispatch(Event event) {
         Entity eventTarget = event.getTarget();
         if (eventTarget != null) {
-            world.eventManager.notifySubscribers(event);
+            world.events.notifySubscribers(event);
         }
     }
 }

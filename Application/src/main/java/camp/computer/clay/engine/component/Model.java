@@ -53,7 +53,7 @@ public class Model extends Component {
     public static Entity getShape(Entity entity, String label) {
         List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
         for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getWorld().Manager.get(shapeUuids.get(i));
+            Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
             if (Label.getLabel(shape).equals(label)) {
                 return shape;
             }
@@ -64,7 +64,7 @@ public class Model extends Component {
 //    public static Entity getShape(Entity entity, Shape shape) {
 //        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
 //        for (int i = 0; i < shapeUuids.size(); i++) {
-//            Entity shapeEntity = World.getWorld().Manager.get(shapeUuids.get(i));
+//            Entity shapeEntity = World.getWorld().entities.get(shapeUuids.get(i));
 //            if (shapeEntity.getComponent(Primitive.class).shape == shape) {
 //                return shapeEntity;
 //            }
@@ -79,7 +79,7 @@ public class Model extends Component {
         List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getWorld().Manager.get(shapeUuids.get(i));
+            Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
             shapes.add(shape);
         }
         return shapes;
