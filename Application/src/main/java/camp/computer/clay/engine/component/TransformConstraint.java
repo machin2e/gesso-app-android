@@ -3,7 +3,7 @@ package camp.computer.clay.engine.component;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 
-public class RelativeLayoutConstraint extends Component {
+public class TransformConstraint extends Component {
 
     // TODO: Rename to TransformConstraint?
     // TODO: Don't implement as Component? Create separate system and totally decouple constraints?
@@ -17,7 +17,7 @@ public class RelativeLayoutConstraint extends Component {
 
     public Transform relativeTransform;
 
-    public RelativeLayoutConstraint() {
+    public TransformConstraint() {
         setup();
     }
 

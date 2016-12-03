@@ -513,10 +513,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
     */
     // </PLATFORM_THREAD_ADAPTER>
 
-    public PlatformRenderSurface getPlatformRenderSurface() {
-        return this.platformRenderSurface;
-    }
-
     // <TODO: DELETE>
     @Override
     public void setClay(Clay clay) {

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.Application;
 
@@ -336,8 +336,8 @@ public class Model {
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
                     // </HACK>
                     // </ENTITY>
@@ -365,8 +365,8 @@ public class Model {
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
                     // </HACK>
                     // </ENTITY>
@@ -391,8 +391,8 @@ public class Model {
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, y);
-                    shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
+                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
                     // </HACK>
                     // </ENTITY>

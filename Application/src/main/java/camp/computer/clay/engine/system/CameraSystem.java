@@ -22,37 +22,39 @@ import camp.computer.clay.util.Geometry;
 
 public class CameraSystem extends System {
 
-    Group<Entity> cameras; // = world.entities.get().filterWithComponent(Camera.class);
+    Group<Entity> cameraEntities;
     Group<Entity> pathAndPortEntities;
     Group<Entity> hostAndExtensionEntities;
 
     public CameraSystem(World world) {
         super(world);
+        setup();
+    }
 
-        cameras = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+    private void setup() {
+        cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
         pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
         hostAndExtensionEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
     }
 
     @Override
     public void update(long dt) {
-
-        for (int i = 0; i < cameras.size(); i++) {
-            updateCamera(cameras.get(i));
+        for (int i = 0; i < cameraEntities.size(); i++) {
+            updateCamera(cameraEntities.get(i));
         }
     }
 
     private void updateCamera(Entity camera) {
 
         // Update focus
-        updateCameraFocus(camera);
+        computeCameraFocus(camera);
 
         // <REFACTOR>
         // TODO: Move into PhysicsSystem (if possible!)
         Transform transformComponent = camera.getComponent(Transform.class);
         Physics physicsComponent = camera.getComponent(Physics.class);
 
-        double dt = Application.getInstance().platformRenderSurface.platformRenderClock.dt;
+        double dt = world.engine.platform.getRenderSurface().platformRenderClock.dt; // REFACTOR
 
         // TODO: Replace use of targetTransform with animation based on facingDirection (i.e., vector; or normal vector?)
         transformComponent.x += (physicsComponent.targetTransform.x - transformComponent.x) * physicsComponent.velocity.x * dt;
@@ -62,7 +64,7 @@ public class CameraSystem extends System {
         // </REFACTOR>
     }
 
-    private void updateCameraFocus(Entity camera) {
+    private void computeCameraFocus(Entity camera) {
 
         Camera cameraComponent = camera.getComponent(Camera.class);
 
@@ -78,7 +80,7 @@ public class CameraSystem extends System {
 
                 // <MOVE_TO_EVENT_HANDLER>
                 // Hide Portables' Ports.
-                //world.entities.get().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+                //world.entitiesWithBoundary.get().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
                 pathAndPortEntities.setVisibility(Visible.INVISIBLE);
 
                 // Update distance between Hosts and Extensions
@@ -90,7 +92,7 @@ public class CameraSystem extends System {
                 // </REFACTOR>
 
                 // Update scale and position
-                //Rectangle boundingBox = Geometry.getBoundingBox(world.entities.get().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
+                //Rectangle boundingBox = Geometry.getBoundingBox(world.entitiesWithBoundary.get().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
                 Rectangle boundingBox = Geometry.getBoundingBox(hostAndExtensionEntities.getModels().getShapes().getBoundaryVertices());
                 setScale(camera, boundingBox);
                 setPosition(camera, boundingBox.getPosition());

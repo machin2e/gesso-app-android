@@ -13,7 +13,6 @@ import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.Random;
 
 public class Engine {
@@ -59,7 +58,9 @@ public class Engine {
         // Create Camera
         world.createEntity(Camera.class);
 
-        Application.getInstance().getPlatformRenderSurface().setWorld(world);
+        // <REFACTOR>
+        platform.getRenderSurface().setWorld(world);
+        // </REFACTOR>
 
         // <VIRTUAL_HOSTS>
         int minHostCount = 5;

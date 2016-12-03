@@ -19,7 +19,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
@@ -99,28 +99,28 @@ public class EntityFactory {
         // Add relative layout constraints
         for (int i = 0; i < Portable.getPorts(host).size(); i++) {
             Entity port = Portable.getPort(host, i);
-            port.addComponent(new RelativeLayoutConstraint());
-            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(host);
+            port.addComponent(new TransformConstraint());
+            port.getComponent(TransformConstraint.class).setReferenceEntity(host);
         }
 
 
         // Relative Position Port Images
-        Portable.getPort(host, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-19.0, 40.0);
-        Portable.getPort(host, 1).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 40.0);
-        Portable.getPort(host, 2).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(19.0, 40.0);
-        Portable.getPort(host, 3).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, 19.0);
-        Portable.getPort(host, 4).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, 0.0);
-        Portable.getPort(host, 5).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, -19.0);
-        Portable.getPort(host, 6).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(19.0, -40.0);
-        Portable.getPort(host, 7).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, -40.0);
-        Portable.getPort(host, 8).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-19.0, -40.0);
-        Portable.getPort(host, 9).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, -19.0);
-        Portable.getPort(host, 10).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, 0.0);
-        Portable.getPort(host, 11).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, 19.0);
+        Portable.getPort(host, 0).getComponent(TransformConstraint.class).relativeTransform.set(-19.0, 40.0);
+        Portable.getPort(host, 1).getComponent(TransformConstraint.class).relativeTransform.set(0, 40.0);
+        Portable.getPort(host, 2).getComponent(TransformConstraint.class).relativeTransform.set(19.0, 40.0);
+        Portable.getPort(host, 3).getComponent(TransformConstraint.class).relativeTransform.set(40.0, 19.0);
+        Portable.getPort(host, 4).getComponent(TransformConstraint.class).relativeTransform.set(40.0, 0.0);
+        Portable.getPort(host, 5).getComponent(TransformConstraint.class).relativeTransform.set(40.0, -19.0);
+        Portable.getPort(host, 6).getComponent(TransformConstraint.class).relativeTransform.set(19.0, -40.0);
+        Portable.getPort(host, 7).getComponent(TransformConstraint.class).relativeTransform.set(0, -40.0);
+        Portable.getPort(host, 8).getComponent(TransformConstraint.class).relativeTransform.set(-19.0, -40.0);
+        Portable.getPort(host, 9).getComponent(TransformConstraint.class).relativeTransform.set(-40.0, -19.0);
+        Portable.getPort(host, 10).getComponent(TransformConstraint.class).relativeTransform.set(-40.0, 0.0);
+        Portable.getPort(host, 11).getComponent(TransformConstraint.class).relativeTransform.set(-40.0, 19.0);
         for (int i = 0; i < Portable.getPorts(host).size(); i++) {
-            Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(
-                    Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.x * 6.0,
-                    Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.y * 6.0
+            Portable.getPort(host, i).getComponent(TransformConstraint.class).relativeTransform.set(
+                    Portable.getPort(host, i).getComponent(TransformConstraint.class).relativeTransform.x * 6.0,
+                    Portable.getPort(host, i).getComponent(TransformConstraint.class).relativeTransform.y * 6.0
             );
         }
         // Add pin contact points to PortableComponent
@@ -313,10 +313,10 @@ public class EntityFactory {
         // Add relative layout constraints
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             Entity port = Portable.getPort(extension, i);
-            port.addComponent(new RelativeLayoutConstraint());
-            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+            port.addComponent(new TransformConstraint());
+            port.getComponent(TransformConstraint.class).setReferenceEntity(extension);
         }
-//        Portable.getPort(extension, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 20.0 * 6.0);
+//        Portable.getPort(extension, 0).getComponent(TransformConstraint.class).relativeTransform.set(0, 20.0 * 6.0);
 
 //        // <LOAD_GEOMETRY_FROM_FILE>
 //        Model imageBuilder = new Model();
@@ -384,7 +384,7 @@ public class EntityFactory {
 //        imageBuilder.addShape(rectangle);
         shapeUuid = camp.computer.clay.engine.component.Model.addShape(extension, rectangle);
         shape = world.entities.get(shapeUuid);
-        shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
+        shape.getComponent(TransformConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
         Label.setLabel(shape, "Header");
 
 //        extension.getComponent(Model.class).setImage(imageBuilder);
@@ -526,7 +526,7 @@ public class EntityFactory {
         pathShapeUuid = camp.computer.clay.engine.component.Model.addShape(path, circle);
 //        Entity shapeEntity = world.entities.get(pathShapeUuid);
         // <HACK>
-//        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set();
+//        shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set();
         // </HACK>
 
         // <HACK>
@@ -645,9 +645,9 @@ public class EntityFactory {
                                 Entity newPort = world.createEntity(Port.class);
 
                                 // <HACK>
-                                newPort.addComponent(new RelativeLayoutConstraint());
-                                newPort.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
-//                            newPort.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 25.0 * 6.0);
+                                newPort.addComponent(new TransformConstraint());
+                                newPort.getComponent(TransformConstraint.class).setReferenceEntity(extension);
+//                            newPort.getComponent(TransformConstraint.class).relativeTransform.set(0, 25.0 * 6.0);
                                 // </HACK>
 
                                 int newPortIndex = nearbyExtensionPorts.size();
@@ -1144,8 +1144,8 @@ public class EntityFactory {
         shape.addComponent(new Boundary());
         shape.addComponent(new Visibility());
 
-        shape.addComponent(new RelativeLayoutConstraint());
-        //shape.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+        shape.addComponent(new TransformConstraint());
+        //shape.getComponent(TransformConstraint.class).setReferenceEntity(extension);
 
         return shape;
     }

@@ -34,15 +34,15 @@ public class Model extends Component {
     public static long addShape(Entity entity, Shape shape) {
 
         // Create Shape entity and assign shape to it
-        Entity shapeEntity = World.getWorld().createEntity(Primitive.class);
-        shapeEntity.getComponent(Primitive.class).shape = shape;
+        Entity primitiveEntity = World.getWorld().createEntity(Primitive.class);
+        primitiveEntity.getComponent(Primitive.class).shape = shape;
 
-        shapeEntity.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(entity);
+        primitiveEntity.getComponent(TransformConstraint.class).setReferenceEntity(entity);
 
         // Add Shape entity to Model component
-        entity.getComponent(Model.class).shapes.add(shapeEntity.getUuid());
+        entity.getComponent(Model.class).shapes.add(primitiveEntity.getUuid());
 
-        return shapeEntity.getUuid();
+        return primitiveEntity.getUuid();
     }
 
     public static Entity getShape(Entity entity, String label) {

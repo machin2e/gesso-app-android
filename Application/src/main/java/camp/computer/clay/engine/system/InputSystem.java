@@ -12,30 +12,27 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.platform.Application;
 
 public class InputSystem extends System {
 
     private List<Event> eventQueue = new ArrayList<>();
 
+    Group<Entity> cameraEntities;
+
     public InputSystem(World world) {
         super(world);
+        setup();
     }
 
-    Entity camera = null;
+    private void setup() {
+        cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+    }
 
     private Event previousEvent = null;
 
     public void update(long dt) {
-
-        if (camera == null) {
-            camera = world.entities.get().filterWithComponent(Camera.class).get(0);
-        }
-
-        if (camera != null) {
-            while (eventQueue.size() > 0) {
-                world.getSystem(EventSystem.class).queue(process(dequeue()));
-            }
+        while (eventQueue.size() > 0) {
+            world.getSystem(EventSystem.class).queue(process(dequeue()));
         }
     }
 
@@ -52,9 +49,9 @@ public class InputSystem extends System {
         // Set world position
         for (int i = 0; i < Event.MAXIMUM_POINT_COUNT; i++) {
             // TODO: Update equations so cameraScale is always the correct scale, the current scale, and computed as needed.
-            Transform origin = Application.getInstance().platformRenderSurface.originTransform;
-            event.pointerCoordinates[i].x = (event.surfaceCoordinates[i].x - (origin.x + camera.getComponent(Transform.class).x)) / camera.getComponent(Transform.class).scale;
-            event.pointerCoordinates[i].y = (event.surfaceCoordinates[i].y - (origin.y + camera.getComponent(Transform.class).y)) / camera.getComponent(Transform.class).scale;
+            Transform origin = world.engine.platform.getRenderSurface().originTransform; // REFACTOR
+            event.pointerCoordinates[i].x = (event.surfaceCoordinates[i].x - (origin.x + cameraEntities.get(0).getComponent(Transform.class).x)) / cameraEntities.get(0).getComponent(Transform.class).scale;
+            event.pointerCoordinates[i].y = (event.surfaceCoordinates[i].y - (origin.y + cameraEntities.get(0).getComponent(Transform.class).y)) / cameraEntities.get(0).getComponent(Transform.class).scale;
         }
 
         switch (event.getType()) {
@@ -125,8 +122,10 @@ public class InputSystem extends System {
         } else {
 
             // Assign target Entities
+            // <REFACTOR>
             Group<Entity> primaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
             Group<Entity> secondaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
+            // </REFACTOR>
 
             if (primaryBoundaries.size() > 0) {
                 primaryTarget = primaryBoundaries.get(primaryBoundaries.size() - 1); // Get primary target from the top layer (will be last in the list of targets)
@@ -136,7 +135,7 @@ public class InputSystem extends System {
             }
             event.setTarget(primaryTarget);
 
-            if (primaryTarget.hasComponent(Model.class)) { // Needed because entities like Camera without Model component are also processed here.
+            if (primaryTarget.hasComponent(Model.class)) { // Needed because entitiesWithBoundary like Camera without Model component are also processed here.
                 for (int i = 0; i < secondaryBoundaries.size(); i++) {
                     if (Model.getShapes(primaryTarget).contains(secondaryBoundaries.get(i))) {
                         event.setSecondaryTarget(secondaryBoundaries.get(i));

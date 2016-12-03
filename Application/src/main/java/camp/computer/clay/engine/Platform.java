@@ -1,5 +1,8 @@
 package camp.computer.clay.engine;
 
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+
 public class Platform {
 
     private Clock clock;
@@ -15,5 +18,9 @@ public class Platform {
 
     public Clock getClock() {
         return clock;
+    }
+
+    public PlatformRenderSurface getRenderSurface() {
+        return Application.getInstance().platformRenderSurface;
     }
 }

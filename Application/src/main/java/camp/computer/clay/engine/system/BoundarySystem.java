@@ -14,25 +14,24 @@ import camp.computer.clay.util.Geometry;
 
 public class BoundarySystem extends System {
 
-    Group<Entity> entities;
+    Group<Entity> entitiesWithBoundary;
 
     public BoundarySystem(World world) {
         super(world);
 
-//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Primitive.class, Boundary.class);
-        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
+        entitiesWithBoundary = world.entities.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
     }
 
     @Override
     public void update(long dt) {
 
-        // Update Boundaries
-        for (int i = 0; i < entities.size(); i++) {
-            updateBoundary(entities.get(i));
+        // Updates Boundary components
+        for (int i = 0; i < entitiesWithBoundary.size(); i++) {
+            computeBoundary(entitiesWithBoundary.get(i));
         }
     }
 
-    private void updateBoundary(Entity entity) {
+    private void computeBoundary(Entity entity) {
         // TODO: Cache the boundary and only update when it has been invalidated!
 
         Shape shape = entity.getComponent(Primitive.class).shape;

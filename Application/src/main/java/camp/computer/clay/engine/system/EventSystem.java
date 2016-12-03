@@ -25,6 +25,11 @@ public class EventSystem extends System {
         eventQueue.add(event);
     }
 
+    /**
+     * Dequeues element
+     *
+     * @return
+     */
     private Event dequeue() {
         return eventQueue.remove(0);
     }

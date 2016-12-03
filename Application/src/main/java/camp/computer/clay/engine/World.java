@@ -19,7 +19,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
@@ -268,8 +268,8 @@ public class World {
             }
 
             // <HACK>
-            port.addComponent(new RelativeLayoutConstraint());
-            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+            port.addComponent(new TransformConstraint());
+            port.getComponent(TransformConstraint.class).setReferenceEntity(extension);
             // </HACK>
 
             Port.setIndex(port, i);

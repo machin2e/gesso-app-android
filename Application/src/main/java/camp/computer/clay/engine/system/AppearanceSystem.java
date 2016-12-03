@@ -26,7 +26,8 @@ public class AppearanceSystem extends System {
 
     private void setup() {
         // Setup subscriptions for needed Entity groups.
-        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, Model.class);
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class);
+        // TODO: (if needed) entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, Model.class);
     }
 
     /**

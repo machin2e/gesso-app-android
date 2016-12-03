@@ -11,5 +11,6 @@ public class RenderSystem extends System {
     @Override
     public void update(long dt) {
         // TODO: Create Renderable components parsable by platform renderer.
+        // TODO: Push Renderables to platform renderer in a synchronized call.
     }
 }

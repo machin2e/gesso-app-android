@@ -14,8 +14,8 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
 import camp.computer.clay.engine.component.util.Visible;
@@ -29,24 +29,24 @@ import camp.computer.clay.util.Geometry;
 
 public class PortableLayoutSystem extends System {
 
-    Group<Entity> entities, ports, paths, hosts, extensions;
+    Group<Entity> entities, hosts, extensions, ports, paths;
 
     public PortableLayoutSystem(World world) {
         super(world);
 
         entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
-        // TODO: Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
+        // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
 
-        //paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
+        //paths = world.entitiesWithBoundary.get().filterActive(true).filterWithComponent(Path.class);
         paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
 
-        //Group<Entity> hosts = world.entities.get().filterWithComponent(Host.class);
+        //Group<Entity> hosts = world.entitiesWithBoundary.get().filterWithComponent(Host.class);
         hosts = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
 
-        //extensions = world.entities.get().filterWithComponent(Extension.class);
+        //extensions = world.entitiesWithBoundary.get().filterWithComponent(Extension.class);
         extensions = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
 
-//        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
+//        Group<Entity> ports = world.entitiesWithBoundary.get().filterWithComponent(Port.class);
         ports = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
     }
 
@@ -55,7 +55,6 @@ public class PortableLayoutSystem extends System {
         updatePathPortConfiguration();
         updatePortConfiguration();
 
-//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.hasComponent(Extension.class)) {
@@ -137,8 +136,7 @@ public class PortableLayoutSystem extends System {
 
             int hostPortIndex = Port.getIndex(hostPort);
             int extensionPortIndex = Port.getIndex(extensionPort);
-//                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getPosition();
-//                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getPosition();
+
             Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
             Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
 
@@ -155,7 +153,6 @@ public class PortableLayoutSystem extends System {
     // Update Port configurations based on contained Paths
     private void updatePathPortConfiguration() {
 
-//        Group<Entity> paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 
@@ -213,8 +210,6 @@ public class PortableLayoutSystem extends System {
     private void updatePortConfiguration() {
 
         // Clear Ports that are not contained in any Path
-//        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
-//        Group<Entity> paths = world.entities.get().filterWithComponent(Path.class);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             boolean isPortInPath = false;
@@ -233,7 +228,6 @@ public class PortableLayoutSystem extends System {
     }
 
     public void setPortableSeparation(double distance) {
-//        Group<Entity> extensions = world.entities.get().filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
             if (Portable.getHosts(extension).size() > 0) {
@@ -589,8 +583,8 @@ public class PortableLayoutSystem extends System {
         Group<Entity> ports = Portable.getPorts(extension);
         double halfTotalPortsWidth = (((ports.size() - 1) * World.EXTENSION_PORT_SEPARATION_DISTANCE) / 2.0);
         for (int i = 0; i < ports.size(); i++) {
-            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
-            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
+            ports.get(i).getComponent(TransformConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
+            ports.get(i).getComponent(TransformConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
         }
     }
 
@@ -628,7 +622,7 @@ public class PortableLayoutSystem extends System {
                 //extension.getComponent(Portable.class).headerContactGeometries.get(i).getImagePosition().x = x;
                 Entity headerContactGeometry = extension.getComponent(Portable.class).headerContactGeometries.get(i);
 //                headerContactGeometry.getComponent(Transform.class).x = x;
-                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
             } else {
                 // <ENTITY>
                 // <HACK>
@@ -636,15 +630,15 @@ public class PortableLayoutSystem extends System {
                 Point headerContactShape = new Point();
                 long eid = Model.addShape(extension, headerContactShape);
                 Entity headerContactGeometry = world.entities.get(eid); // HACK
-//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
+//                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
+                //shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
 
                 // <REFACTOR_TO_REDUCE_REDUNDANCY>
 //                Model.addShape(extension, headerContactShape);
                 extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
-//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                //headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 0);
+//                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
+                //headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
+                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(0, 0);
                 // </REFACTOR_TO_REDUCE_REDUNDANCY>
 
             }
