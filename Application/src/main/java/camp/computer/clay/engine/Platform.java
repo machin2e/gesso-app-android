@@ -1,7 +1,7 @@
 package camp.computer.clay.engine;
 
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+import camp.computer.clay.platform.graphics.RenderSurface;
 
 public class Platform {
 
@@ -20,7 +20,7 @@ public class Platform {
         return clock;
     }
 
-    public PlatformRenderSurface getRenderSurface() {
-        return Application.getInstance().platformRenderSurface;
+    public RenderSurface getRenderSurface() {
+        return Application.getInstance().renderSurface;
     }
 }

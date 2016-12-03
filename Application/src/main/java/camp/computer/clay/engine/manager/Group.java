@@ -379,16 +379,16 @@ public class Group<E> implements List<E> {
     }
 
     // Assumes Group<Model>
-    public Group<Entity> getShapes() {
-        Group<Entity> shapes = new Group<>();
+    public Group<Entity> getPrimitives() {
+        Group<Entity> primitives = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Model model = (Model) elements.get(i);
-            Group<Entity> shapeEntities = Model.getShapes(model.getEntity());
-            for (int j = 0; j < shapeEntities.size(); j++) {
-                shapes.add(shapeEntities.get(j));
+            Group<Entity> modelPrimitives = Model.getPrimitives(model.getEntity());
+            for (int j = 0; j < modelPrimitives.size(); j++) {
+                primitives.add(modelPrimitives.get(j));
             }
         }
-        return shapes;
+        return primitives;
     }
     // <REFACTOR>
 

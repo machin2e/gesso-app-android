@@ -9,6 +9,7 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
@@ -137,8 +138,8 @@ public class PortableLayoutSystem extends System {
             int hostPortIndex = Port.getIndex(hostPort);
             int extensionPortIndex = Port.getIndex(extensionPort);
 
-            Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
-            Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
+            Transform hostContactTransform = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$").get(hostPortIndex).getComponent(Transform.class); // host.getComponent(Portable.class).headerContactPrimitives.get(hostPortIndex).getComponent(Transform.class);
+            Transform extensionContactTransform = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$").get(extensionPortIndex).getComponent(Transform.class); // extension.getComponent(Portable.class).headerContactPrimitives.get(extensionPortIndex).getComponent(Transform.class);
 
             Entity shapeEntity = Model.getShape(path, "Path");
             Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
@@ -566,7 +567,7 @@ public class PortableLayoutSystem extends System {
      */
     public void updateExtensionGeometry(Entity extension) {
 
-        // TODO: Clean up/delete images/shapes for any removed ports...
+        // TODO: Clean up/delete images/primitives for any removed ports...
 
         updateExtensionPortButtonPositions(extension);
         updateExtensionHeaderDimensions(extension);
@@ -616,31 +617,20 @@ public class PortableLayoutSystem extends System {
         // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
 
         // Update Contact Positions for Header
+        Group<Entity> extensionHeaderContactPrimitives = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < extension.getComponent(Portable.class).headerContactGeometries.size()) {
-                //extension.getComponent(Portable.class).headerContactGeometries.get(i).getImagePosition().x = x;
-                Entity headerContactGeometry = extension.getComponent(Portable.class).headerContactGeometries.get(i);
-//                headerContactGeometry.getComponent(Transform.class).x = x;
+            if (i < extensionHeaderContactPrimitives.size()) {
+                Entity headerContactGeometry = extensionHeaderContactPrimitives.get(i);
                 headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
             } else {
                 // <ENTITY>
                 // <HACK>
                 // Add header contact shape
                 Point headerContactShape = new Point();
-                long eid = Model.addShape(extension, headerContactShape);
-                Entity headerContactGeometry = world.entities.get(eid); // HACK
-//                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
-                //shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
-
-                // <REFACTOR_TO_REDUCE_REDUNDANCY>
-//                Model.addShape(extension, headerContactShape);
-                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
-//                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
-                //headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
-                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(0, 0);
-                // </REFACTOR_TO_REDUCE_REDUNDANCY>
-
+//                headerContactShape.setLabel("Pin " + (i + 1));
+                Entity headerContactGeometry = Model.addShape(extension, headerContactShape);
+                headerContactGeometry.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
             }
         }
     }

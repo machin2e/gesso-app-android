@@ -58,7 +58,6 @@ public class InputSystem extends System {
             case SELECT: {
                 // Set previous Event
                 previousEvent = event;
-
                 break;
             }
 
@@ -137,7 +136,7 @@ public class InputSystem extends System {
 
             if (primaryTarget.hasComponent(Model.class)) { // Needed because entitiesWithBoundary like Camera without Model component are also processed here.
                 for (int i = 0; i < secondaryBoundaries.size(); i++) {
-                    if (Model.getShapes(primaryTarget).contains(secondaryBoundaries.get(i))) {
+                    if (Model.getPrimitives(primaryTarget).contains(secondaryBoundaries.get(i))) {
                         event.setSecondaryTarget(secondaryBoundaries.get(i));
                     }
                 }

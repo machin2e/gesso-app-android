@@ -19,10 +19,10 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
-import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
@@ -206,8 +206,8 @@ public class World {
         notification.getComponent(Transform.class).rotation = 0;
         // </HACK>
 
-//        Text text2 = (Text) notification.getComponent(Model.class).getModel().getShapes().get(0);
-        Text text2 = (Text) Model.getShapes(notification).get(0).getComponent(Primitive.class).shape;
+//        Text text2 = (Text) notification.getComponent(Model.class).getModel().getPrimitives().get(0);
+        Text text2 = (Text) Model.getPrimitives(notification).get(0).getComponent(Primitive.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 

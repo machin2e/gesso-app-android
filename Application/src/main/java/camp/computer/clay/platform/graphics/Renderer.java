@@ -14,11 +14,11 @@ import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.util.time.OLD_Clock;
 
 /**
- * PlatformRenderClock is a background thread that periodically updates the world state
+ * Renderer is a background thread that periodically updates the world state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * world's state then re-rendering it.
  */
-public class PlatformRenderClock extends Thread {
+public class Renderer extends Thread {
 
     // <SETTINGS>
     public static int DEFAULT_TARGET_FPS = 30;
@@ -33,7 +33,7 @@ public class PlatformRenderClock extends Thread {
     public double currentSleepTime = 0;
     // </STATISTICS>
 
-    private PlatformRenderSurface platformRenderSurface;
+    private RenderSurface renderSurface;
 
     private boolean isRunning = false;
     public long frameCount = 0;
@@ -42,10 +42,11 @@ public class PlatformRenderClock extends Thread {
     public double dt = OLD_Clock.getCurrentTime();
 
     Group<Entity> entities;
+    Group<Entity> cameraEntities;
 
-    PlatformRenderClock(PlatformRenderSurface platformRenderSurface) {
+    Renderer(RenderSurface renderSurface) {
         super();
-        this.platformRenderSurface = platformRenderSurface;
+        this.renderSurface = renderSurface;
     }
 
     public void setRunning(boolean isRunning) {
@@ -59,6 +60,7 @@ public class PlatformRenderClock extends Thread {
         if (entities == null && World.getWorld() != null) {
             // TODO: Group<Entity> entities = World.getWorld().entities.get().filterActive(true).filterWithComponent(Model.class).sortByLayer();
             entities = World.getWorld().entities.subscribe(Group.Filters.filterWithComponents, Model.class);
+            cameraEntities = World.getWorld().entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
         }
 
         if (entities == null) {
@@ -84,7 +86,7 @@ public class PlatformRenderClock extends Thread {
             }
 
             // We need to make sure that the surface is ready
-            SurfaceHolder holder = platformRenderSurface.getSurfaceHolder();
+            SurfaceHolder holder = renderSurface.getSurfaceHolder();
             if (!holder.getSurface().isValid()) {
                 continue;
             }
@@ -109,11 +111,10 @@ public class PlatformRenderClock extends Thread {
                         canvas.save();
 
                         // <CAMERA_VIEWPORT>
-                        Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
-                        Transform cameraTransform = camera.getComponent(Transform.class);
+                        Transform cameraTransform = cameraEntities.get(0).getComponent(Transform.class);
                         canvas.translate(
-                                (float) (platformRenderSurface.originTransform.x + cameraTransform.x) /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
-                                (float) (platformRenderSurface.originTransform.y + cameraTransform.y) /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
+                                (float) (renderSurface.originTransform.x + cameraTransform.x) /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
+                                (float) (renderSurface.originTransform.y + cameraTransform.y) /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
                         );
 
                         canvas.scale((float) cameraTransform.scale, (float) cameraTransform.scale);
@@ -126,22 +127,22 @@ public class PlatformRenderClock extends Thread {
                         // <UPDATE>
                         // TODO: Draw Renderables.
                         // TODO: This call is expensive. Make it way faster. Cache? Sublist?
-                        platformRenderSurface.drawRenderables(entities, canvas, paint, palette);
+                        renderSurface.drawRenderables(entities.sortByLayer(), canvas, paint, palette);
                         // </UPDATE>
 
                         if (World.ENABLE_GEOMETRY_ANNOTATIONS) {
-                            platformRenderSurface.drawGeometryAnnotations(entities, canvas, paint);
+                            renderSurface.drawGeometryAnnotations(entities, canvas, paint);
                         }
 
                         canvas.restore();
 
                         // <OVERLAY>
                         if (World.ENABLE_OVERLAY) {
-                            platformRenderSurface.drawOverlay(canvas, paint);
+                            renderSurface.drawOverlay(canvas, paint);
                         }
 
                         if (World.ENABLE_GEOMETRY_OVERLAY) {
-                            platformRenderSurface.drawGeometryOverlay(canvas, paint);
+                            renderSurface.drawGeometryOverlay(canvas, paint);
                         }
                         // </OVERLAY>
 

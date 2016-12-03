@@ -19,11 +19,11 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
-import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
@@ -86,12 +86,12 @@ public class EntityFactory {
         Model model = Model.open2("Host.json", host);
 
         // <GEOMETRY_LOADER>
-//        for (int i = 0; i < model.getShapes().size(); i++) {
-//            long eid = Model.addShape(host, model.getShapes().get(i));
+//        for (int i = 0; i < model.getPrimitives().size(); i++) {
+//            long eid = Model.addShape(host, model.getPrimitives().get(i));
 //            // <HACK>
 //            // Set Label
 //            Entity shape = world.entities.get(eid);
-//            Label.setLabel(shape, model.getShapes().get(i).getLabel());
+//            Label.setLabel(shape, model.getPrimitives().get(i).getLabel());
 //            // </HACK>
 //        }
         // </GEOMETRY_LOADER>
@@ -124,16 +124,13 @@ public class EntityFactory {
             );
         }
         // Add pin contact points to PortableComponent
-        // <HACK>
-        Group<Entity> pinContactPoints = host.getComponent(camp.computer.clay.engine.component.Model.class).getShapes(host);
-        for (int i = 0; i < pinContactPoints.size(); i++) {
-            Entity pinContactPoint = pinContactPoints.get(i);
-            if (Label.getLabel(pinContactPoint).startsWith("Pin")) {
-                //Point contactPointShape = (Point) pinContactPoint.getComponent(Primitive.class).shape;
-                host.getComponent(Portable.class).headerContactGeometries.add(pinContactPoint);
-            }
-        }
-        // </HACK>
+//        // <HACK>
+//        Group<Entity> pinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
+////        Group<Entity> pinContactPoints = host.getComponent(camp.computer.clay.engine.component.Model.class).getPrimitives(host);
+//        for (int i = 0; i < pinContactPoints.size(); i++) {
+//            host.getComponent(Portable.class).headerContactPrimitives.add(pinContactPoints.get(i));
+//        }
+//        // </HACK>
 
         // <EVENT_HANDLERS>
         world.events.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
@@ -307,6 +304,7 @@ public class EntityFactory {
 
             Entity port = world.createEntity(Port.class);
 
+//            Label.setLabel(port, "Port " + (j + 1));
             Port.setIndex(port, j);
             Portable.addPort(extension, port);
         }
@@ -368,8 +366,7 @@ public class EntityFactory {
 //        extension.getComponent(Model.class).addShape(rectangle);
 //        rectangle.isBoundary = true;
 //        imageBuilder.addShape(rectangle);
-        shapeUuid = camp.computer.clay.engine.component.Model.addShape(extension, rectangle);
-        shape = world.entities.get(shapeUuid);
+        shape = camp.computer.clay.engine.component.Model.addShape(extension, rectangle);
         Label.setLabel(shape, "Board");
 
 
@@ -382,8 +379,7 @@ public class EntityFactory {
         rectangle.setOutlineThickness(0);
 //        extension.getComponent(Model.class).addShape(rectangle);
 //        imageBuilder.addShape(rectangle);
-        shapeUuid = camp.computer.clay.engine.component.Model.addShape(extension, rectangle);
-        shape = world.entities.get(shapeUuid);
+        shape = camp.computer.clay.engine.component.Model.addShape(extension, rectangle);
         shape.getComponent(TransformConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
         Label.setLabel(shape, "Header");
 
@@ -508,11 +504,10 @@ public class EntityFactory {
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
 //        imageBuilder.addShape(segment);
-        long pathShapeUuid = camp.computer.clay.engine.component.Model.addShape(path, segment);
+        Entity pathShapeEntity = camp.computer.clay.engine.component.Model.addShape(path, segment);
 
         // <HACK>
         // Set Label
-        Entity pathShapeEntity = world.entities.get(pathShapeUuid);
         pathShapeEntity.getComponent(Label.class).label = "Path";
         // </HACK>
 
@@ -523,7 +518,7 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        pathShapeUuid = camp.computer.clay.engine.component.Model.addShape(path, circle);
+        pathShapeEntity = camp.computer.clay.engine.component.Model.addShape(path, circle);
 //        Entity shapeEntity = world.entities.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set();
@@ -531,7 +526,6 @@ public class EntityFactory {
 
         // <HACK>
         // Set Label
-        pathShapeEntity = world.entities.get(pathShapeUuid);
         pathShapeEntity.getComponent(Label.class).label = "Source Port";
         // </HACK>
 
@@ -542,11 +536,10 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        pathShapeUuid = camp.computer.clay.engine.component.Model.addShape(path, circle);
+        pathShapeEntity = camp.computer.clay.engine.component.Model.addShape(path, circle);
 
         // <HACK>
         // Set Label
-        pathShapeEntity = world.entities.get(pathShapeUuid);
         pathShapeEntity.getComponent(Label.class).label = "Target Port";
         // </HACK>
 
@@ -1024,11 +1017,10 @@ public class EntityFactory {
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
-        long portShapeUuid = camp.computer.clay.engine.component.Model.addShape(port, circle);
+        Entity portShape = camp.computer.clay.engine.component.Model.addShape(port, circle);
 
         // <HACK>
         // Set Label
-        Entity portShape = world.entities.get(portShapeUuid);
         portShape.getComponent(Label.class).label = "Port";
         // </HACK>
 

@@ -14,7 +14,7 @@ import camp.computer.clay.lib.Geometry.Shape;
 
 public class Model extends Component {
 
-    public List<Long> shapes;
+    public List<Long> primitives;
 
     public Model() {
         super();
@@ -22,7 +22,7 @@ public class Model extends Component {
     }
 
     private void setup() {
-        shapes = new ArrayList<>();
+        primitives = new ArrayList<>();
     }
 
     // <LAYER>
@@ -31,7 +31,7 @@ public class Model extends Component {
     public int layerIndex = DEFAULT_LAYER_INDEX;
     // </LAYER>
 
-    public static long addShape(Entity entity, Shape shape) {
+    public static Entity addShape(Entity entity, Shape shape) {
 
         // Create Shape entity and assign shape to it
         Entity primitiveEntity = World.getWorld().createEntity(Primitive.class);
@@ -40,13 +40,13 @@ public class Model extends Component {
         primitiveEntity.getComponent(TransformConstraint.class).setReferenceEntity(entity);
 
         // Add Shape entity to Model component
-        entity.getComponent(Model.class).shapes.add(primitiveEntity.getUuid());
+        entity.getComponent(Model.class).primitives.add(primitiveEntity.getUuid());
 
-        return primitiveEntity.getUuid();
+        return primitiveEntity;
     }
 
     public static Entity getShape(Entity entity, String label) {
-        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
+        List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
         for (int i = 0; i < shapeUuids.size(); i++) {
             Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
             if (Label.getLabel(shape).equals(label)) {
@@ -56,11 +56,11 @@ public class Model extends Component {
         return null;
     }
 
-    public static Group<Entity> getShapes(Entity entity) {
+    public static Group<Entity> getPrimitives(Entity entity) {
         if (entity.getComponent(Model.class) == null) {
             Log.v("Gotcha", "Gotcha");
         }
-        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
+        List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < shapeUuids.size(); i++) {
             Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
@@ -69,8 +69,8 @@ public class Model extends Component {
         return shapes;
     }
 
-    public static Group<Entity> getShapes(Entity entity, String... labels) {
-        Group<Entity> shapes = Model.getShapes(entity);
+    public static Group<Entity> getPrimitives(Entity entity, String... labels) {
+        Group<Entity> shapes = Model.getPrimitives(entity);
         Group<Entity> matchingShapes = new Group<>();
 
         for (int i = 0; i < shapes.size(); i++) {

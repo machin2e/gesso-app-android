@@ -10,9 +10,12 @@ public class Timer {
     public void update(long time) {
         for (int i = 0; i < schedules.size(); i++) {
             Schedule schedule = schedules.get(i);
-            if (time - schedule.previousTickTime >= schedule.tickFrequency) {
-                schedule.previousTickTime = time;
-                schedule.execute(time - schedule.previousTickTime);
+            long dt = time - schedule.previousTickTime;
+            if (dt >= schedule.tickFrequency) {
+                synchronized (this) {
+                    schedule.previousTickTime = time;
+                    schedule.execute((dt / Clock.NANOS_PER_MILLISECOND));
+                }
             }
         }
     }

@@ -30,9 +30,9 @@ public class Boundary extends Component {
 
         // <HACK>
         if (entity.hasComponent(Model.class)) {
-            Group<Entity> shapes = Model.getShapes(entity);
+            Group<Entity> shapes = Model.getPrimitives(entity);
             for (int i = 0; i < shapes.size(); i++) {
-                if (/*shapes.get(i).getComponent(Primitive.class).shape.isBoundary // HACK
+                if (/*primitives.get(i).getComponent(Primitive.class).shape.isBoundary // HACK
                     &&*/ Geometry.contains(Boundary.get(shapes.get(i)), point)) { // HACK
                     return true;
                 }

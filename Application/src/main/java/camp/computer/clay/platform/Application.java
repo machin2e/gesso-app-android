@@ -25,7 +25,7 @@ import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UdpServer;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+import camp.computer.clay.platform.graphics.RenderSurface;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
 import camp.computer.clay.platform.scripting.JavaScriptEngine;
 import camp.computer.clay.platform.sound.SpeechSynthesisEngine;
@@ -64,7 +64,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     private PlatformUi platformUi;
 
-    public PlatformRenderSurface platformRenderSurface;
+    public RenderSurface renderSurface;
 
     private SpeechSynthesisEngine speechSynthesisEngine;
 
@@ -181,7 +181,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         */
 
         // Create Platform Rendering Surface and add it to the application view.
-        platformRenderSurface = new PlatformRenderSurface(getContext());
+        renderSurface = new RenderSurface(getContext());
         FrameLayout frameLayout = (FrameLayout) Application.getInstance().findViewById(applicationViewId);
         frameLayout.setPadding(0, 0, 0, 0);
         FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
@@ -191,9 +191,9 @@ public class Application extends FragmentActivity implements PlatformInterface {
 //                FrameLayout.LayoutParams.MATCH_PARENT
         );
         frameLayoutParams.setMargins(0, 0, 0, 0);
-        frameLayout.addView(platformRenderSurface, frameLayoutParams);
+        frameLayout.addView(renderSurface, frameLayoutParams);
 
-        platformRenderSurface.onResume();
+        renderSurface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -279,7 +279,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         super.onPause();
 
         // Rendering Surface
-        platformRenderSurface.onPause();
+        renderSurface.onPause();
     }
 
     @Override
@@ -295,7 +295,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         }
 
         // Rendering Surface
-        platformRenderSurface.onResume();
+        renderSurface.onResume();
     }
 
     @Override

@@ -54,9 +54,9 @@ public class AppearanceSystem extends System {
 
         // TODO: Optimize regex calls to use ids/hashes! Cache!
 
-        // Get LED shapes
+        // Get LED primitives
         Group<Entity> ports = Portable.getPorts(host);
-        Group<Entity> lightShapes = Model.getShapes(host, "^LED (1[0-2]|[1-9])$");
+        Group<Entity> lightShapes = Model.getPrimitives(host, "^LED (1[0-2]|[1-9])$");
 
         // Update color of LEDs to color of corresponding Port shape
         for (int i = 0; i < ports.size(); i++) {

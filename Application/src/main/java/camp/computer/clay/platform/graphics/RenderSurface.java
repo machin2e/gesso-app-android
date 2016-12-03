@@ -29,7 +29,6 @@ import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
@@ -50,11 +49,11 @@ import camp.computer.clay.lib.Geometry.Triangle;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 
-public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
+public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
     private SurfaceHolder surfaceHolder;
 
-    public PlatformRenderClock platformRenderClock;
+    public Renderer renderer;
 
     public Transform originTransform = new Transform();
 
@@ -63,7 +62,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public World world;
     // </REFACTOR>
 
-    public PlatformRenderSurface(Context context) {
+    public RenderSurface(Context context) {
         super(context);
         setFocusable(true);
 
@@ -71,11 +70,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         setLayoutParams(layoutParams);
     }
 
-    public PlatformRenderSurface(Context context, AttributeSet attrs) {
+    public RenderSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PlatformRenderSurface(Context context, AttributeSet attrs, int defStyle) {
+    public RenderSurface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -105,10 +104,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         /*
         // Kill the background Thread
         boolean retry = true;
-        // platformRenderClock.setRunning (false);
+        // renderer.setRunning (false);
         while (retry) {
             try {
-                platformRenderClock.join ();
+                renderer.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();
@@ -123,9 +122,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        platformRenderClock = new PlatformRenderClock(this);
-        platformRenderClock.setRunning(true);
-        platformRenderClock.start();
+        renderer = new Renderer(this);
+        renderer.setRunning(true);
+        renderer.start();
 
         // Start communications
         // getClay().getCommunication().startDatagramServer();
@@ -142,11 +141,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Kill the background Thread
         boolean retry = true;
-        platformRenderClock.setRunning(false);
+        renderer.setRunning(false);
 
         while (retry) {
             try {
-                platformRenderClock.join();
+                renderer.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -328,7 +327,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    Group<Entity> shapes = Model.getShapes(entity);
+                    Group<Entity> shapes = Model.getPrimitives(entity);
                     canvas.save();
                     for (int j = 0; j < shapes.size(); j++) {
                         drawShape(shapes.get(j), canvas, paint, palette);
@@ -416,7 +415,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <FRAME_COUNT>
         canvas.save();
-        lineText = "Frames: " + (int) platformRenderClock.frameCount;
+        lineText = "Frames: " + (int) renderer.frameCount;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
@@ -425,14 +424,14 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <FPS_LABEL>
         canvas.save();
-        lineText = "FPS: " + (int) minFps + " " + (int) platformRenderClock.getFramesPerSecond() + " " + (int) maxFps;
+        lineText = "FPS: " + (int) minFps + " " + (int) renderer.getFramesPerSecond() + " " + (int) maxFps;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // <HACK>
-        double fps = platformRenderClock.getFramesPerSecond();
+        double fps = renderer.getFramesPerSecond();
         if (fps < minFps) {
             minFps = fps;
         } else if (fps > maxFps) {
@@ -443,7 +442,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <FRAME_TIME>
         canvas.save();
-        lineText = "Frame Time: " + (int) platformRenderClock.frameTimeDelta;
+        lineText = "Frame Time: " + (int) renderer.frameTimeDelta;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
@@ -452,7 +451,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // <FRAME_SLEEP_TIME>
         canvas.save();
-        lineText = "Frame Sleep Time: " + (int) platformRenderClock.currentSleepTime;
+        lineText = "Frame Sleep Time: " + (int) renderer.currentSleepTime;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
@@ -590,9 +589,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
 
         // <BOUNDARY>
-        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
-        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
-        //Group<Entity> boundaryEntities = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
+        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
+        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
+        //Group<Entity> boundaryEntities = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getPrimitives();
         paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
@@ -789,7 +788,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.outlineColor = pathColor;
             // </REFACTOR>
 
-            // Draw shapes in Path
+            // Draw primitives in Path
             drawShape(Model.getShape(path, "Path"), canvas, paint, palette); // drawSegment(segment, palette);
             drawShape(sourcePortPathShape, canvas, paint, palette); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
 
@@ -824,7 +823,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.outlineColor = sourcePortShape.getColor();
             palette.outlineThickness = World.PATH_EDITVIEW_THICKNESS;
 
-            // Draw shapes in Path
+            // Draw primitives in Path
             drawSegment(Model.getShape(path, "Source Port").getComponent(Transform.class), Model.getShape(path, "Target Port").getComponent(Transform.class), canvas, paint, palette);
             drawShape(Model.getShape(path, "Source Port"), canvas, paint, palette);
             drawShape(Model.getShape(path, "Target Port"), canvas, paint, palette);
@@ -860,8 +859,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             Entity host = hostPort.getParent();
             Entity extension = extensionPort.getParent();
 
-            if (host.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(hostPort)
-                    && extension.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(extensionPort)) {
+            Group<Entity> pinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
+            Group<Entity> extensionPinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+
+            if (pinContactPoints.size() > Port.getIndex(hostPort)
+                    && extensionPinContactPoints.size() > Port.getIndex(extensionPort)) {
 
                 // Draw connection between Ports
                 // <REFACTOR>
@@ -885,38 +887,38 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
     // </REFACTOR>
 
-    public void drawShape(Entity shape, Canvas canvas, Paint paint, Palette palette) {
+    public void drawShape(Entity primitive, Canvas canvas, Paint paint, Palette palette) {
 
         // <HACK>
-        Shape shapeMesh = shape.getComponent(Primitive.class).shape;
+        Shape shape = primitive.getComponent(Primitive.class).shape;
 
         // Palette
-        palette.color = shapeMesh.getColor();
-        palette.outlineColor = shapeMesh.getOutlineColor();
-        palette.outlineThickness = shapeMesh.outlineThickness;
+        palette.color = shape.getColor();
+        palette.outlineColor = shape.getOutlineColor();
+        palette.outlineThickness = shape.outlineThickness;
 
         // TODO: drawShape(shape, palette);
-        if (shapeMesh.getClass() == Point.class) {
+        if (shape.getClass() == Point.class) {
             // TODO:
-        } else if (shapeMesh.getClass() == Segment.class) {
-            Segment segment = (Segment) shapeMesh;
+        } else if (shape.getClass() == Segment.class) {
+            Segment segment = (Segment) shape;
             drawSegment(segment.getSource(), segment.getTarget(), canvas, paint, palette);
-        } else if (shapeMesh.getClass() == Polyline.class) {
+        } else if (shape.getClass() == Polyline.class) {
             // TODO: drawPolyline((Polyline) shape, palette);
-        } else if (shapeMesh.getClass() == Triangle.class) {
+        } else if (shape.getClass() == Triangle.class) {
             // TODO: drawTriangle((Triangle) shape);
-        } else if (shapeMesh.getClass() == Rectangle.class) {
-            Rectangle rectangle = (Rectangle) shapeMesh;
-            drawRectangle(shape.getComponent(Transform.class), rectangle.width, rectangle.height, rectangle.cornerRadius, canvas, paint, palette);
-        } else if (shapeMesh.getClass() == Polygon.class) {
-            Polygon polygon = (Polygon) shapeMesh;
+        } else if (shape.getClass() == Rectangle.class) {
+            Rectangle rectangle = (Rectangle) shape;
+            drawRectangle(primitive.getComponent(Transform.class), rectangle.width, rectangle.height, rectangle.cornerRadius, canvas, paint, palette);
+        } else if (shape.getClass() == Polygon.class) {
+            Polygon polygon = (Polygon) shape;
             drawPolygon(polygon.getVertices(), canvas, paint, palette);
-        } else if (shapeMesh.getClass() == Circle.class) {
-            Circle circle = (Circle) shapeMesh;
-            drawCircle(shape.getComponent(Transform.class), circle.radius, canvas, paint, palette);
-        } else if (shapeMesh.getClass() == Text.class) {
-            Text text = (Text) shapeMesh;
-            drawText(shape.getComponent(Transform.class), text.getText(), text.size, canvas, paint, palette);
+        } else if (shape.getClass() == Circle.class) {
+            Circle circle = (Circle) shape;
+            drawCircle(primitive.getComponent(Transform.class), circle.radius, canvas, paint, palette);
+        } else if (shape.getClass() == Text.class) {
+            Text text = (Text) shape;
+            drawText(primitive.getComponent(Transform.class), text.getText(), text.size, canvas, paint, palette);
         }
         // </HACK>
     }

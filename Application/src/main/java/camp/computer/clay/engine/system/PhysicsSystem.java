@@ -9,7 +9,7 @@ import camp.computer.clay.engine.manager.Group;
 
 public class PhysicsSystem extends System {
 
-    private Group<Entity> entities;
+    Group<Entity> entities;
 
     public PhysicsSystem(World world) {
         super(world);
@@ -23,10 +23,21 @@ public class PhysicsSystem extends System {
     @Override
     public void update(long dt) {
         for (int i = 0; i < entities.size(); i++) {
+
+            /*
             // TODO: Update this to use time-based velocity and acceleration!
             entities.get(i).getComponent(Transform.class).set(
                     entities.get(i).getComponent(Physics.class).targetTransform
             );
+            */
+
+            Transform transformComponent = entities.get(i).getComponent(Transform.class);
+            Physics physicsComponent = entities.get(i).getComponent(Physics.class);
+
+            transformComponent.x += (physicsComponent.targetTransform.x - transformComponent.x) * physicsComponent.velocity.x * dt;
+            transformComponent.y += (physicsComponent.targetTransform.y - transformComponent.y) * physicsComponent.velocity.y * dt;
+
+            transformComponent.rotation += (physicsComponent.targetTransform.rotation - transformComponent.rotation) * physicsComponent.velocity.y * dt;
         }
     }
 }

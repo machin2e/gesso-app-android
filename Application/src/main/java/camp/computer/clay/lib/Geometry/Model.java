@@ -22,7 +22,7 @@ import camp.computer.clay.platform.Application;
  * <p>
  * Notes:
  * - This is a <em>descriptive</em> image format. That is, it just stores the structure of an image.
- * - The API provides functionality for accessing features of the image, such as the shapes
+ * - The API provides functionality for accessing features of the image, such as the primitives
  * defining the image, functionality for manipulating the image, and functionality for saving a
  * revision of the image.
  * - API also provides functions for serialization and deserialization, and for reading and writing
@@ -127,7 +127,7 @@ public class Model {
             JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
             String hostTitle = hostObject.getString("title"); // Handle to Host's title
 
-            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
+            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of primitives
 
             // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
             double scaleFactor = 6.0;
@@ -270,7 +270,7 @@ public class Model {
             JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
             String hostTitle = hostObject.getString("title"); // Handle to Host's title
 
-            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
+            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of primitives
 
             // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
             double scaleFactor = 6.0;
@@ -332,10 +332,9 @@ public class Model {
                     model.addShape(point);
 
                     // <ENTITY>
-                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, point);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
+                    Entity shapeEntity = camp.computer.clay.engine.component.Model.addShape(entity, point); // HACK
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
@@ -361,10 +360,9 @@ public class Model {
                     model.addShape(rectangle);
 
                     // <ENTITY>
-                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, rectangle);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
+                    Entity shapeEntity = camp.computer.clay.engine.component.Model.addShape(entity, rectangle); // HACK
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);
@@ -387,10 +385,9 @@ public class Model {
                     model.addShape(circle);
 
                     // <ENTITY>
-                    long eid = camp.computer.clay.engine.component.Model.addShape(entity, circle);
                     // <HACK>
                     // Set Label
-                    Entity shapeEntity = World.getWorld().entities.get(eid); // HACK
+                    Entity shapeEntity = camp.computer.clay.engine.component.Model.addShape(entity, circle); // HACK
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
                     shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
                     Label.setLabel(shapeEntity, label);

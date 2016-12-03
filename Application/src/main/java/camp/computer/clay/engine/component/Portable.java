@@ -1,6 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.World;
@@ -15,7 +14,7 @@ public class Portable extends Component {
 
     // <DELETE>
     // TODO: Look up in the Model geometry?
-    public List<Entity> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
+//    public List<Entity> headerContactPrimitives = new ArrayList<>(); // TODO: replace with List<Entity> for primitives
     // </DELETE>
     // </COMPONENT_DATA>
 

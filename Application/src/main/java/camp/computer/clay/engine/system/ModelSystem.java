@@ -56,7 +56,7 @@ public class ModelSystem extends System {
         if (entity.hasComponent(Path.class)) {
             // TODO: Refactor so a special case isn't needed for Path.
         } else {
-            Group<Entity> shapes = Model.getShapes(entity);
+            Group<Entity> shapes = Model.getPrimitives(entity);
             for (int i = 0; i < shapes.size(); i++) {
                 if (absoluteReferenceTransform != null) {
                     // TODO: if (shape.hasComponent(TransformConstraint.class)) {
