@@ -352,23 +352,42 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     private DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
+    Group<Entity> entities;
+    Group<Entity> hostEntities;
+    Group<Entity> portEntities;
+    Group<Entity> extensionEntities;
+    Group<Entity> pathEntities;
+    Group<Entity> cameraEntities;
+
+    boolean isValid = false;
+
     public void drawOverlay(Canvas canvas, Paint paint) {
+
+        if (!isValid) {
+            entities = world.entities.subscribe(null, null);
+            hostEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
+            portEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
+            extensionEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
+            pathEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
+            cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+            isValid = true;
+        }
 
         // <REFACTOR>
         // TODO: Move to Engine/World
         long engineTickCount = world.engine.tickCount;
-        int entityCount = world.entities.get().size();
-        int hostCount = world.entities.get().filterWithComponent(Host.class).size();
-        int portCount = world.entities.get().filterWithComponent(Port.class).size();
-        int extensionCount = world.entities.get().filterWithComponent(Extension.class).size();
-        int pathCount = world.entities.get().filterWithComponent(Path.class).size();
-        int cameraCount = world.entities.get().filterWithComponent(Camera.class).size();
+        int entityCount = entities.size();
+        int hostCount = hostEntities.size();
+        int portCount = portEntities.size();
+        int extensionCount = extensionEntities.size();
+        int pathCount = pathEntities.size();
+        int cameraCount = cameraEntities.size();
 
         int worldUpdateTime = (int) world.updateTime;
         int worldRenderTime = (int) world.renderTime;
         int worldLookupCount = (int) world.lookupCount;
         world.lookupCount = 0;
-        Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0); // HACK
+        Entity camera = cameraEntities.get(0); // HACK
         // </REFACTOR>
 
         // Font
