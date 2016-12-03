@@ -26,7 +26,7 @@ public class EventManager {
 
     // TODO: public boolean unsubscribe(...)
 
-    public void notifySubscribers(Event event) {
+    public void dispatch(Event event) { // previously notifySubscribers
 
         // Get subscribers to Event
         ArrayList<EventHandler> subscribedEventHandlers = eventHandlers.get(event.getType());

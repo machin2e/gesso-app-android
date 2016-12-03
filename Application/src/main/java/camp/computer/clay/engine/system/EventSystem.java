@@ -37,7 +37,7 @@ public class EventSystem extends System {
     private void dispatch(Event event) {
         Entity eventTarget = event.getTarget();
         if (eventTarget != null) {
-            world.events.notifySubscribers(event);
+            world.events.dispatch(event);
         }
     }
 }

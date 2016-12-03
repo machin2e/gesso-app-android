@@ -59,6 +59,10 @@ public class Group<E> implements List<E> {
 //        remove(elementIndex);
 //        return this;
 //    }
+
+    public Group<E> subgroup() {
+        return null;
+    }
     // </GROUP>
 
 
@@ -109,6 +113,39 @@ public class Group<E> implements List<E> {
                 } else {
                     return false;
                 }
+            }
+        };
+
+        /**
+         * Returns {@code true} if the {@code Entity} contains <em>any</em> of {@code Component}s
+         * in {@code componentTypes}.
+         */
+        public static Filter filterWithComponent = new Filter<Entity, Class<? extends Component>[]>() {
+            @Override
+            public boolean filter(Entity entity, Class<? extends Component>[] componentTypes) {
+                for (int j = 0; j < componentTypes.length; j++) {
+//                    Class<? extends Component> type = componentTypes[j];
+                    if (entity.hasComponent(componentTypes[j])) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        /**
+         * Returns {@code true} if the {@code Entity} contains <em>all</em> of {@code Component}s
+         * in {@code componentTypes}.
+         */
+        public static Filter filterWithComponents = new Filter<Entity, Class<? extends Component>[]>() {
+            @Override
+            public boolean filter(Entity entity, Class<? extends Component>[] componentTypes) {
+                for (int j = 0; j < componentTypes.length; j++) {
+                    if (entity.hasComponents(componentTypes)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         };
 
@@ -226,31 +263,36 @@ public class Group<E> implements List<E> {
     // Expects Group<Entity>
     public Group<Entity> filterWithComponent(Class<? extends Component>... componentTypes) {
 
-        Group<Entity> group = new Group<>();
+//        Group<Entity> group = new Group<>();
+//
+//        for (int i = 0; i < this.elements.size(); i++) {
+//            for (int j = 0; j < componentTypes.length; j++) {
+//                Class<? extends Component> type = componentTypes[j];
+//                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+//                if (entity.hasComponent(type)) {
+//                    group.add(entity);
+//                }
+//            }
+//        }
+//
+//        return group;
 
-        for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < componentTypes.length; j++) {
-                Class<? extends Component> type = componentTypes[j];
-                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-                if (entity.hasComponent(type)) {
-                    group.add(entity);
-                }
-            }
-        }
+        return filter(Filters.filterWithComponent, componentTypes);
 
-        return group;
     }
 
     // Expects Group<Entity>
     public Group<Entity> filterWithComponents(Class<? extends Component>... componentTypes) {
-        Group<Entity> group = new Group<>();
-        for (int i = 0; i < this.elements.size(); i++) {
-            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-            if (entity.hasComponents(componentTypes)) {
-                group.add(entity);
-            }
-        }
-        return group;
+//        Group<Entity> group = new Group<>();
+//        for (int i = 0; i < this.elements.size(); i++) {
+//            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+//            if (entity.hasComponents(componentTypes)) {
+//                group.add(entity);
+//            }
+//        }
+//        return group;
+
+        return filter(Filters.filterWithComponents, componentTypes);
     }
 
     // Exepcts Group<Entity>
