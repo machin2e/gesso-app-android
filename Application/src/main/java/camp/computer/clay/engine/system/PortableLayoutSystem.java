@@ -29,8 +29,22 @@ import camp.computer.clay.util.Geometry;
 
 public class PortableLayoutSystem extends System {
 
+    Group<Entity> entities, ports, paths, extensions;
+
     public PortableLayoutSystem(World world) {
         super(world);
+
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
+        // TODO: Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
+
+        paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
+        //paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
+
+        extensions = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
+        //extensions = world.entities.get().filterWithComponent(Extension.class);
+
+//        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
+        ports = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
     }
 
     @Override
@@ -38,7 +52,7 @@ public class PortableLayoutSystem extends System {
         updatePathPortConfiguration();
         updatePortConfiguration();
 
-        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
+//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.hasComponent(Extension.class)) {
@@ -138,7 +152,7 @@ public class PortableLayoutSystem extends System {
     // Update Port configurations based on contained Paths
     private void updatePathPortConfiguration() {
 
-        Group<Entity> paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
+//        Group<Entity> paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 
@@ -196,8 +210,8 @@ public class PortableLayoutSystem extends System {
     private void updatePortConfiguration() {
 
         // Clear Ports that are not contained in any Path
-        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
-        Group<Entity> paths = world.entities.get().filterWithComponent(Path.class);
+//        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
+//        Group<Entity> paths = world.entities.get().filterWithComponent(Path.class);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             boolean isPortInPath = false;
@@ -216,7 +230,7 @@ public class PortableLayoutSystem extends System {
     }
 
     public void setPortableSeparation(double distance) {
-        Group<Entity> extensions = world.entities.get().filterWithComponent(Extension.class);
+//        Group<Entity> extensions = world.entities.get().filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
             if (Portable.getHosts(extension).size() > 0) {

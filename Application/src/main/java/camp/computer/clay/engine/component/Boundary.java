@@ -11,11 +11,6 @@ public class Boundary extends Component {
 
     public List<Transform> boundary = new ArrayList<>();
 
-    public static void set(Entity entity, List<Transform> vertices) {
-        entity.getComponent(Boundary.class).boundary.clear();
-        entity.getComponent(Boundary.class).boundary.addAll(vertices);
-    }
-
     public static List<Transform> get(Entity entity) {
         if (entity.hasComponent(Boundary.class)
                 && entity.getComponent(Boundary.class).boundary.size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!

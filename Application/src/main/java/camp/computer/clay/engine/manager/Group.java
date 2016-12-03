@@ -30,6 +30,10 @@ public class Group<E> implements List<E> {
     // <GROUP>
     private List<E> elements = new ArrayList<>();
 
+    // Used by subscribe to filter elements that will be added to it.
+    public Filter filter = null;
+    public Object data = null;
+
     public Group() {
     }
 
@@ -60,9 +64,25 @@ public class Group<E> implements List<E> {
 //        return this;
 //    }
 
-    public Group<E> subgroup() {
-        return null;
-    }
+//    private List<Group> subscribers = new ArrayList<>();
+//
+//    /**
+//     * Creates subscribe that is automatically updated using the specified {@code filter} when
+//     * elements are added or removed from the parent {@code Group}.
+//     *
+//     * @param filter
+//     * @return
+//     */
+//    public <D> Group<E> subscribe(Filter filter, D... data) {
+//        Group<E> subgroup = filter(filter, data);
+//        subgroup.filter = filter;
+//        subgroup.data = data;
+//
+//        subscribers.add(subgroup);
+//        return subgroup;
+//    }
+//
+//    // TODO: unsubscribe(...)
     // </GROUP>
 
 
@@ -124,7 +144,6 @@ public class Group<E> implements List<E> {
             @Override
             public boolean filter(Entity entity, Class<? extends Component>[] componentTypes) {
                 for (int j = 0; j < componentTypes.length; j++) {
-//                    Class<? extends Component> type = componentTypes[j];
                     if (entity.hasComponent(componentTypes[j])) {
                         return true;
                     }
@@ -549,7 +568,18 @@ public class Group<E> implements List<E> {
      */
     @Override
     public boolean add(E object) {
-        this.elements.add(object);
+//        Log.v("SUBGROUP_ADD", "Adding to Group");
+//        result.add(elements.get(i));
+        if (this.filter == null || this.filter.filter(object, this.data) == true) {
+            this.elements.add(object);
+        }
+
+//        // Update subscribers
+//        for (int i = 0; i < subscribers.size(); i++) {
+//            Log.v("SUBGROUP_ADD", "Adding to subscriber...");
+//            subscribers.get(i).add(object);
+//        }
+
         return true;
     }
 

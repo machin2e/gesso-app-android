@@ -10,14 +10,18 @@ import camp.computer.clay.engine.manager.Group;
 
 public class ModelSystem extends System {
 
+    Group<Entity> entities;
+
     public ModelSystem(World world) {
         super(world);
+
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
     }
 
     @Override
     public void update(long dt) {
 
-        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
+//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
 
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);

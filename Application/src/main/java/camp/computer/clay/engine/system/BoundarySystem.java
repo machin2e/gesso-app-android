@@ -14,15 +14,19 @@ import camp.computer.clay.util.Geometry;
 
 public class BoundarySystem extends System {
 
+    Group<Entity> entities;
+
     public BoundarySystem(World world) {
         super(world);
+
+//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Primitive.class, Boundary.class);
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
     }
 
     @Override
     public void update(long dt) {
 
         // Update Boundaries
-        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Primitive.class, Boundary.class);
         for (int i = 0; i < entities.size(); i++) {
             updateBoundary(entities.get(i));
         }
@@ -44,7 +48,10 @@ public class BoundarySystem extends System {
                 Geometry.translatePoint(boundary.get(i), entity.getComponent(Transform.class).x, entity.getComponent(Transform.class).y); // Translate Shape
             }
 
-            Boundary.set(entity, boundary);
+            // Set the Boundary
+//            entity.getComponent(Boundary.class).boundary.clear();
+//            entity.getComponent(Boundary.class).boundary.addAll(vertices);
+            entity.getComponent(Boundary.class).boundary = vertices;
         }
     }
 }

@@ -1,6 +1,10 @@
 package camp.computer.clay.engine.manager;
 
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import camp.computer.clay.engine.entity.Entity;
 
@@ -23,6 +27,13 @@ public class EntityManager {
 
     synchronized public long add(Entity entity) {
         entities.put(entity.uuid, entity);
+
+        // Update subscribers
+        for (int i = 0; i < subscribers.size(); i++) {
+            Log.v("SUBGROUP_ADD", "Adding to subscriber...");
+            subscribers.get(i).add(entity);
+        }
+
         return entity.uuid;
     }
 
@@ -40,5 +51,51 @@ public class EntityManager {
     synchronized public void remove(Entity entity) {
         // TODO: 11/18/2016 Queue the removal operation and perform it at after the current render update completes.
         entities.remove(entity.uuid);
+
+        // Update subscribers
+        for (int i = 0; i < subscribers.size(); i++) {
+            Log.v("SUBGROUP_ADD", "Adding to subscriber...");
+            subscribers.get(i).remove(entity);
+        }
     }
+
+
+    private List<Group> subscribers = new ArrayList<>();
+
+    /**
+     * Creates subscribe that is automatically updated using the specified {@code filter} when
+     * elements are added or removed from the parent {@code Group}.
+     *
+     * @param filter
+     * @return
+     */
+    public <D> Group<Entity> subscribe(Group.Filter filter, D... data) {
+        Group<Entity> subgroup = new Group<>();
+        subgroup.filter = filter;
+        subgroup.data = data;
+
+        List<Entity> elements = new ArrayList<>(entities.values());
+        for (int i = 0; i < elements.size(); i++) {
+            if (filter == null || filter.filter(elements.get(i), data) == true) {
+                subgroup.add(elements.get(i));
+            }
+        }
+
+        subscribers.add(subgroup);
+
+        return subgroup;
+    }
+
+    // TODO: unsubscribe(...)
+
+//    public <D> Group filter(Group.Filter filter, D data) {
+//        Group<Entity> result = new Group<>();
+//        entities.
+//        for (int i = 0; i < entities.size(); i++) {
+//            if (filter.filter(entities.get(i), data) == true) {
+//                result.add(elements.get(i));
+//            }
+//        }
+//        return result;
+//    }
 }

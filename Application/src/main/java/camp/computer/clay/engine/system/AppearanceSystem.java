@@ -17,17 +17,22 @@ public class AppearanceSystem extends System {
 
     // TODO: Use this system to change the Model's currently displayed "frame" or "suit"? Maybe ModelSystem is better for that. And update style here?
 
+    Group<Entity> entities;
+
     public AppearanceSystem(World world) {
         super(world);
+
+        //Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, Model.class);
     }
 
     @Override
     public void update(long dt) {
-        Group<Entity> entitiesWithTransform = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
+//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
 
         // Update Style
-        for (int i = 0; i < entitiesWithTransform.size(); i++) {
-            Entity entity = entitiesWithTransform.get(i);
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
 
             // Update Style
             if (entity.hasComponent(Extension.class)) {

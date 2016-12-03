@@ -9,14 +9,19 @@ import camp.computer.clay.engine.manager.Group;
 
 public class PhysicsSystem extends System {
 
+    Group<Entity> entities;
+
     public PhysicsSystem(World world) {
         super(world);
+
+        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class);
+//        Group<Entity> entities = world.entities.get().filterWithComponents(Host.class, Transform.class, Physics.class);
     }
 
     @Override
     public void update(long dt) {
         // <HACK>
-        Group<Entity> entities = world.entities.get().filterWithComponents(Host.class, Transform.class, Physics.class);
+//        Group<Entity> entities = world.entities.get().filterWithComponents(Host.class, Transform.class, Physics.class);
         // </HACK>
 
         for (int i = 0; i < entities.size(); i++) {

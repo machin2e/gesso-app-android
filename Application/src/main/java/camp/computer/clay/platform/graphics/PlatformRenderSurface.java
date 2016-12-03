@@ -756,6 +756,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(Model.getShape(path, "Path"), canvas, paint, palette); // drawSegment(segment, palette);
             drawShape(sourcePortPathShape, canvas, paint, palette); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
 
+            /*
             // <DRAW_BOUNDARY>
             // Draw Boundary
             paint.setStrokeWidth(3.0f);
@@ -763,6 +764,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             paint.setColor(Color.CYAN);
             drawPolygon(Boundary.get(sourcePortPathShape), canvas, paint, palette);
             // </DRAW_BOUNDARY>
+            */
 
         } else {
 
@@ -790,6 +792,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(Model.getShape(path, "Source Port"), canvas, paint, palette);
             drawShape(Model.getShape(path, "Target Port"), canvas, paint, palette);
 
+            /*
             // <DRAW_BOUNDARY>
             paint.setStrokeWidth(3.0f);
             paint.setStyle(Paint.Style.STROKE);
@@ -797,6 +800,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawPolygon(Boundary.get(Model.getShape(path, "Source Port")), canvas, paint, palette);
             drawPolygon(Boundary.get(Model.getShape(path, "Target Port")), canvas, paint, palette);
             // </DRAW_BOUNDARY>
+            */
 
         }
     }
