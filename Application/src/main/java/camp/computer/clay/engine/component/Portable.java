@@ -3,9 +3,9 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 
 public class Portable extends Component {
 

@@ -359,17 +359,22 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     Group<Entity> pathEntities;
     Group<Entity> cameraEntities;
 
+    Group<Entity> boundaryEntities;
+
     boolean isValid = false;
 
     public void drawOverlay(Canvas canvas, Paint paint) {
 
         if (!isValid) {
-            entities = world.entities.subscribe(null, null);
+            this.entities = world.entities.subscribe(null, null);
             hostEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
             portEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
             extensionEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
             pathEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
             cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+
+            boundaryEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
+
             isValid = true;
         }
 
@@ -571,16 +576,29 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
 
+        if (!isValid) {
+            this.entities = world.entities.subscribe(null, null);
+            hostEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
+            portEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
+            extensionEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
+            pathEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
+            cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+
+            boundaryEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
+
+            isValid = true;
+        }
+
         // <BOUNDARY>
         // TODO: Clean up: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
         // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getShapes();
-        Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
+        //Group<Entity> boundaryEntities = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getShapes();
         paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
 
-        for (int i = 0; i < entities2.size(); i++) {
-            Boundary boundaryComponent = entities2.get(i).getComponent(Boundary.class);
+        for (int i = 0; i < boundaryEntities.size(); i++) {
+            Boundary boundaryComponent = boundaryEntities.get(i).getComponent(Boundary.class);
 
             // Outline
             if (boundaryComponent != null) {
@@ -664,7 +682,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);
 
-        Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+        Entity camera = cameraEntities.get(0);
         if (camera != null) {
             Rectangle boundingBox = camera.getComponent(Camera.class).boundingBox;
 

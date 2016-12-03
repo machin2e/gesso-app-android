@@ -29,7 +29,7 @@ import camp.computer.clay.util.Geometry;
 
 public class PortableLayoutSystem extends System {
 
-    Group<Entity> entities, ports, paths, extensions;
+    Group<Entity> entities, ports, paths, hosts, extensions;
 
     public PortableLayoutSystem(World world) {
         super(world);
@@ -37,11 +37,14 @@ public class PortableLayoutSystem extends System {
         entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
         // TODO: Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
 
-        paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
         //paths = world.entities.get().filterActive(true).filterWithComponent(Path.class);
+        paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
 
-        extensions = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
+        //Group<Entity> hosts = world.entities.get().filterWithComponent(Host.class);
+        hosts = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
+
         //extensions = world.entities.get().filterWithComponent(Extension.class);
+        extensions = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
 
 //        Group<Entity> ports = world.entities.get().filterWithComponent(Port.class);
         ports = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
@@ -555,8 +558,6 @@ public class PortableLayoutSystem extends System {
      * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
      */
     public void adjustLayout(LayoutStrategy layoutStrategy) {
-
-        Group<Entity> hosts = world.entities.get().filterWithComponent(Host.class);
 
         layoutStrategy.execute(hosts);
     }

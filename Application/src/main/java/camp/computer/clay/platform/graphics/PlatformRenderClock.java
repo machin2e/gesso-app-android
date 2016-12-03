@@ -39,6 +39,10 @@ public class PlatformRenderClock extends Thread {
     public long frameCount = 0;
     public long tickCount = 0; // TODO: Move tickCount into Engine
 
+    public double dt = OLD_Clock.getCurrentTime();
+
+    Group<Entity> entities;
+
     PlatformRenderClock(PlatformRenderSurface platformRenderSurface) {
         super();
         this.platformRenderSurface = platformRenderSurface;
@@ -48,10 +52,19 @@ public class PlatformRenderClock extends Thread {
         this.isRunning = isRunning;
     }
 
-    public double dt = OLD_Clock.getCurrentTime();
-
     @Override
     public void run() {
+
+        // <REFACTOR>
+        if (entities == null && World.getWorld() != null) {
+            // TODO: Group<Entity> entities = World.getWorld().entities.get().filterActive(true).filterWithComponent(Model.class).sortByLayer();
+            entities = World.getWorld().entities.subscribe(Group.Filters.filterWithComponents, Model.class);
+        }
+
+        if (entities == null) {
+            return;
+        }
+        // </REFACTOR>
 
         long targetFramePeriod = 1000 / targetFPS; // Period in milliseconds
         long frameStartTime = 0;
@@ -109,8 +122,6 @@ public class PlatformRenderClock extends Thread {
                         // <CLEAR_CANVAS>
                         canvas.drawColor(Color.WHITE);
                         // </CLEAR_CANVAS>
-
-                        Group<Entity> entities = World.getWorld().entities.get().filterActive(true).filterWithComponent(Model.class).sortByLayer();
 
                         // <UPDATE>
                         // TODO: Draw Renderables.

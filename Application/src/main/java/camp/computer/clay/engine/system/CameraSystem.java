@@ -22,14 +22,21 @@ import camp.computer.clay.util.Geometry;
 
 public class CameraSystem extends System {
 
+    Group<Entity> cameras; // = world.entities.get().filterWithComponent(Camera.class);
+    Group<Entity> pathAndPortEntities;
+    Group<Entity> hostAndExtensionEntities;
+
     public CameraSystem(World world) {
         super(world);
+
+        cameras = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+        hostAndExtensionEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
     }
 
     @Override
     public void update(long dt) {
 
-        Group<Entity> cameras = world.entities.get().filterWithComponent(Camera.class);
         for (int i = 0; i < cameras.size(); i++) {
             updateCamera(cameras.get(i));
         }
@@ -71,7 +78,8 @@ public class CameraSystem extends System {
 
                 // <MOVE_TO_EVENT_HANDLER>
                 // Hide Portables' Ports.
-                world.entities.get().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+                //world.entities.get().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
 
                 // Update distance between Hosts and Extensions
                 world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
@@ -82,7 +90,8 @@ public class CameraSystem extends System {
                 // </REFACTOR>
 
                 // Update scale and position
-                Rectangle boundingBox = Geometry.getBoundingBox(world.entities.get().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
+                //Rectangle boundingBox = Geometry.getBoundingBox(world.entities.get().filterWithComponent(Host.class, Extension.class).getModels().getShapes().getBoundaryVertices());
+                Rectangle boundingBox = Geometry.getBoundingBox(hostAndExtensionEntities.getModels().getShapes().getBoundaryVertices());
                 setScale(camera, boundingBox);
                 setPosition(camera, boundingBox.getPosition());
 

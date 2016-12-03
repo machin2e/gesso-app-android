@@ -39,11 +39,6 @@ public class Model extends Component {
 
         shapeEntity.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(entity);
 
-//        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(shape.getPosition());
-//        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.setRotation(shape.getRotation());
-
-//        shapeEntity.getComponent(Transform.class).rotation = shape.getRotation();
-
         // Add Shape entity to Model component
         entity.getComponent(Model.class).shapes.add(shapeEntity.getUuid());
 
@@ -61,17 +56,6 @@ public class Model extends Component {
         return null;
     }
 
-//    public static Entity getShape(Entity entity, Shape shape) {
-//        List<Long> shapeUuids = entity.getComponent(Model.class).shapes;
-//        for (int i = 0; i < shapeUuids.size(); i++) {
-//            Entity shapeEntity = World.getWorld().entities.get(shapeUuids.get(i));
-//            if (shapeEntity.getComponent(Primitive.class).shape == shape) {
-//                return shapeEntity;
-//            }
-//        }
-//        return null;
-//    }
-
     public static Group<Entity> getShapes(Entity entity) {
         if (entity.getComponent(Model.class) == null) {
             Log.v("Gotcha", "Gotcha");
@@ -86,9 +70,7 @@ public class Model extends Component {
     }
 
     public static Group<Entity> getShapes(Entity entity, String... labels) {
-
         Group<Entity> shapes = Model.getShapes(entity);
-
         Group<Entity> matchingShapes = new Group<>();
 
         for (int i = 0; i < shapes.size(); i++) {

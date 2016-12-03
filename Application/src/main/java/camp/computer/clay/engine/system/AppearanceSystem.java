@@ -21,32 +21,35 @@ public class AppearanceSystem extends System {
 
     public AppearanceSystem(World world) {
         super(world);
+        setup();
+    }
 
-        //Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
+    private void setup() {
+        // Setup subscriptions for needed Entity groups.
         entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, Model.class);
     }
 
+    /**
+     * Updates appearance of {@code Entity} objects. This includes color, transparency, etc.
+     *
+     * @param dt
+     */
     @Override
     public void update(long dt) {
-//        Group<Entity> entities = world.entities.get().filterActive(true).filterWithComponents(Style.class, Transform.class, Model.class);
-
-        // Update Style
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
 
             // Update Style
             if (entity.hasComponent(Extension.class)) {
-//                updateExtensionStyle(entity);
             } else if (entity.hasComponent(Host.class)) {
-                updateHostAppearance(entity);
+                setHostLightColor(entity);
             } else if (entity.hasComponent(Port.class)) {
             } else if (entity.hasComponent(Path.class)) {
             }
         }
     }
 
-    // <STYLE>
-    public void updateHostAppearance(Entity host) {
+    public void setHostLightColor(Entity host) {
 
         // TODO: Optimize regex calls to use ids/hashes! Cache!
 
@@ -60,21 +63,4 @@ public class AppearanceSystem extends System {
             lightShapes.get(i).getComponent(Primitive.class).shape.setColor(portColor);
         }
     }
-
-//    private void updateExtensionStyle(Entity extension) {
-//
-//        // Update Port Colors
-//        Group<Entity> ports = Portable.getPorts(extension);
-//        for (int i = 0; i < ports.size(); i++) {
-//            Entity portEntity = ports.get(i);
-//
-////            Shape portShape = extension.getComponent(Model.class).getShape(portEntity);
-////
-////            // Update color of Port shape based on type
-////            if (portShape != null) {
-////                portShape.setColor(Color.getColor(portEntity.getComponent(Port.class).getType()));
-////            }
-//        }
-//    }
-    // </STYLE>
 }
