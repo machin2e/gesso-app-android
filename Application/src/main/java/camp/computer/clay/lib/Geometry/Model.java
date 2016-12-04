@@ -11,10 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.entity.Entity;
@@ -44,22 +41,26 @@ import camp.computer.clay.platform.Application;
  */
 public class Model {
 
-    // TODO: Rename to BuildableImage? Collage? Model?
-
-    private long labelIndex = 0;
+    // <LABEL_CACHE>
+    private long labelCounter = 0;
     private HashMap<String, Long> labels = new HashMap<>();
 
     public long addLabel(String label) {
         if (!labels.containsKey(label)) {
-            labels.put(label, labelIndex++);
+            labels.put(label, labelCounter++);
             Log.v("MODEL_FILE_LOADER", "Indexing label \"" + label + "\" as " + labels.get(label));
         }
         return labels.get(label);
     }
 
-    // TODO: HashMap<Long, Shape> shapes;
+    public long getId(String label) {
+        return labels.get(label);
+    }
 
-    protected List<Shape> shapes = new ArrayList<>();
+    // TODO: private HashMap<Long, Shape> shapes2;
+    // </LABEL_CACHE>
+
+    private List<Shape> shapes = new ArrayList<>();
 
     public void addShape(Shape shape) {
         shapes.add(shape);
@@ -73,7 +74,8 @@ public class Model {
         return shapes;
     }
 
-    public Shape getShape(String label) {
+    /*
+    public Shape getPrimitive(String label) {
         World.getWorld().lookupCount++;
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
@@ -99,6 +101,9 @@ public class Model {
         return shapes;
     }
     // TODO: </REMOVE?>
+    */
+
+    // TODO: ModelComponent createModelComponent() --- after loading...
 
     // <FILE_IO>
 
@@ -113,22 +118,9 @@ public class Model {
         Model model = new Model();
 
         // <PLATFORM_LAYER>
-        InputStream inputStream = null;
-        try {
-            inputStream = Application.getContext().getAssets().open(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Open specified JSON file.
         String jsonString = null;
         try {
-            /*
-            // <HACK>
-            // NOTE: Hack is for locating file in Android application resources.
             InputStream inputStream = Application.getContext().getAssets().open(filename);
-            // <HACK>
-            */
             int fileSize = inputStream.available();
             byte[] fileBuffer = new byte[fileSize];
             inputStream.read(fileBuffer);
@@ -141,11 +133,9 @@ public class Model {
         // TODO: Crawl entire JSON hierarchy, extract labels, and generate UUIDs for each label in the model.
 
         // Create JSON object from file contents for parsing content.
-        JSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
+            JSONObject rootObject = new JSONObject(jsonString);
+            JSONObject hostObject = rootObject.getJSONObject("host"); // Handle to Host
             String hostLabel = hostObject.getString("label"); // Handle to Host's title
 
             // <REFACTOR>
@@ -202,9 +192,7 @@ public class Model {
                     }
                 }
 
-                if (type.equals("Point")) {
-
-                    // NOTE: Primitive N/A
+                if (type.equalsIgnoreCase("Point")) {
 
                     Point point = new Point();
                     point.setLabel(label);
@@ -227,7 +215,7 @@ public class Model {
                     // </HACK>
                     // </ENTITY>
 
-                } else if (type.equals("Rectangle")) {
+                } else if (type.equalsIgnoreCase("Rectangle")) {
 
                     double width = shape.getDouble("width") * scaleFactor;
                     double height = shape.getDouble("height") * scaleFactor;
@@ -255,7 +243,7 @@ public class Model {
                     // </HACK>
                     // </ENTITY>
 
-                } else if (type.equals("Circle")) {
+                } else if (type.equalsIgnoreCase("Circle")) {
 
                     double radius = shape.getDouble("radius") * scaleFactor;
 
@@ -271,6 +259,7 @@ public class Model {
                     model.addShape(circle);
 
                     // <ENTITY>
+                    // TODO: Move to createModelComponent(...)
                     // <HACK>
                     // Set Label
                     Entity shapeEntity = camp.computer.clay.engine.component.Model.addShape(entity, circle); // HACK
@@ -287,10 +276,12 @@ public class Model {
         }
         // </PLATFORM_LAYER>
 
+        // <DELETE>
         List<String> labelList = new ArrayList<>(model.labels.keySet());
         for (int i = 0; i < labelList.size(); i++) {
             Log.v("MODEL_FILE_LOADER", "" + model.labels.get(labelList.get(i)) + "\t" + labelList.get(i));
         }
+        // <DELETE>
 
         return model;
     }

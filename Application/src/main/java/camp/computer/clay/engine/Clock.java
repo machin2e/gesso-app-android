@@ -36,4 +36,12 @@ public class Clock extends Thread {
             return timer;
         }
     }
+
+    public static long getCurrentTime() {
+        return java.lang.System.currentTimeMillis();
+
+        // May also be able to use:
+        // - java.lang.System.nanoTime();
+        // - android.os.SystemClock.elapsedRealtime();
+    }
 }

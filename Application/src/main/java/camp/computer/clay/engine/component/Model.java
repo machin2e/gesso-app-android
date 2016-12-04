@@ -15,7 +15,7 @@ import camp.computer.clay.lib.Geometry.Shape;
 public class Model extends Component {
 
     // TODO: Add support for multiple geometry configurations.
-    public long designIndex = 0;
+    public long meshIndex = 0;
 
     // <REFACTOR>
     // TODO: Replace with AssetReference
@@ -51,7 +51,8 @@ public class Model extends Component {
         return primitiveEntity;
     }
 
-    public static Entity getShape(Entity entity, String label) {
+    // HACK: This is ridiculously expensive if you unpack it...
+    public static Entity getPrimitive(Entity entity, String label) {
         List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
         for (int i = 0; i < shapeUuids.size(); i++) {
             Entity shape = World.getWorld().entities.get(shapeUuids.get(i));

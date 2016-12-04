@@ -37,7 +37,6 @@ import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.PlatformUi;
-import camp.computer.clay.util.time.OLD_Clock;
 
 public class World {
 
@@ -156,11 +155,11 @@ public class World {
 
     public void update(long dt) {
 
-        long updateStartTime = OLD_Clock.getCurrentTime();
+        long updateStartTime = Clock.getCurrentTime();
         for (int i = 0; i < systems.size(); i++) {
             systems.get(i).update(dt);
         }
-        updateTime = OLD_Clock.getCurrentTime() - updateStartTime;
+        updateTime = Clock.getCurrentTime() - updateStartTime;
     }
 
     public Entity createEntity(Class<?> entityType) {

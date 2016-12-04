@@ -38,14 +38,11 @@ import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.Geometry.Circle;
-import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Polygon;
-import camp.computer.clay.lib.Geometry.Polyline;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
 import camp.computer.clay.lib.Geometry.Shape;
 import camp.computer.clay.lib.Geometry.Text;
-import camp.computer.clay.lib.Geometry.Triangle;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 
@@ -310,14 +307,14 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                 // <REFACTOR>
                 // TODO: Make the rendering state/configuration automatic... enable or disable geometry sets in the image?
-//                Visibility visibility = entity.getComponent(Visibility.class);
-//                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                if (entity.getComponent(Model.class).designIndex == 1) {
-                    drawEditablePath(entity, canvas, paint, palette);
-//                } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
-                } else if (entity.getComponent(Model.class).designIndex == 0) {
-                    if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
-                        drawOverviewPath(entity, canvas, paint, palette);
+                Visibility visibility = entity.getComponent(Visibility.class);
+                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+                    if (entity.getComponent(Model.class).meshIndex == 1) {
+                        drawEditablePath(entity, canvas, paint, palette);
+                    } else if (entity.getComponent(Model.class).meshIndex == 0) {
+                        if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
+                            drawOverviewPath(entity, canvas, paint, palette);
+                        }
                     }
                 }
                 // </REFACTOR>
@@ -763,7 +760,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawEditablePath(Entity path, Canvas canvas, Paint paint, Palette palette) {
 
         Entity sourcePort = Path.getSource(path);
-        Entity sourcePortShapeE = Model.getShape(sourcePort, "Port");
+        Entity sourcePortShapeE = Model.getPrimitive(sourcePort, "Port");
         Shape hostSourcePortShape = sourcePortShapeE.getComponent(Primitive.class).shape;
 
         boolean isSingletonPath = (Path.getTarget(path) == null);
@@ -772,18 +769,18 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
             // Singleton Path
 
-            Entity sourcePortPathShape = Model.getShape(path, "Source Port");
-            Shape sourcePortModel = sourcePortPathShape.getComponent(Primitive.class).shape;
+            Entity sourcePortPathShape = Model.getPrimitive(path, "Source Port");
+            Shape sourcePortShape = sourcePortPathShape.getComponent(Primitive.class).shape;
 
             // Color. Update color of mPort shape based on its type.
             Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-            sourcePortModel.setColor(pathColor);
+            sourcePortShape.setColor(pathColor);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
-            segment.setOutlineThickness(15.0);
-            segment.setOutlineColor(sourcePortModel.getColor());
+            Segment pathShape = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            pathShape.setOutlineThickness(15.0);
+            pathShape.setOutlineColor(sourcePortShape.getColor());
 
             // <REFACTOR>
             palette.outlineThickness = World.PATH_OVERVIEW_THICKNESS;
@@ -791,23 +788,13 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             // </REFACTOR>
 
             // Draw primitives in Path
-            drawShape(Model.getShape(path, "Path"), canvas, paint, palette); // drawSegment(segment, palette);
+            drawShape(Model.getPrimitive(path, "Path"), canvas, paint, palette); // drawSegment(segment, palette);
             drawShape(sourcePortPathShape, canvas, paint, palette); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
-
-            /*
-            // <DRAW_BOUNDARY>
-            // Draw Boundary
-            paint.setStrokeWidth(3.0f);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.CYAN);
-            drawPolygon(Boundary.get(sourcePortPathShape), canvas, paint, palette);
-            // </DRAW_BOUNDARY>
-            */
 
         } else {
 
-            Shape sourcePortShape = Model.getShape(path, "Source Port").getComponent(Primitive.class).shape;
-            Shape targetPortShape = Model.getShape(path, "Target Port").getComponent(Primitive.class).shape;
+            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
+            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
 
             sourcePortShape.setColor(hostSourcePortShape.getColor());
 
@@ -819,27 +806,13 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 
-//            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
-//            segment.setOutlineThickness(World.PATH_EDITVIEW_THICKNESS);
-//            segment.setOutlineColor(sourcePortShape.getColor());
             palette.outlineColor = sourcePortShape.getColor();
             palette.outlineThickness = World.PATH_EDITVIEW_THICKNESS;
 
             // Draw primitives in Path
-            drawSegment(Model.getShape(path, "Source Port").getComponent(Transform.class), Model.getShape(path, "Target Port").getComponent(Transform.class), canvas, paint, palette);
-            drawShape(Model.getShape(path, "Source Port"), canvas, paint, palette);
-            drawShape(Model.getShape(path, "Target Port"), canvas, paint, palette);
-
-            /*
-            // <DRAW_BOUNDARY>
-            paint.setStrokeWidth(3.0f);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.CYAN);
-            drawPolygon(Boundary.get(Model.getShape(path, "Source Port")), canvas, paint, palette);
-            drawPolygon(Boundary.get(Model.getShape(path, "Target Port")), canvas, paint, palette);
-            // </DRAW_BOUNDARY>
-            */
-
+            drawSegment(Model.getPrimitive(path, "Source Port").getComponent(Transform.class), Model.getPrimitive(path, "Target Port").getComponent(Transform.class), canvas, paint, palette);
+            drawShape(Model.getPrimitive(path, "Source Port"), canvas, paint, palette);
+            drawShape(Model.getPrimitive(path, "Target Port"), canvas, paint, palette);
         }
     }
 
@@ -875,7 +848,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                 paint.setStrokeWidth(10.0f);
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-                Entity shapeEntity = Model.getShape(path, "Path");
+                Entity shapeEntity = Model.getPrimitive(path, "Path");
                 Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
                 segment.setOutlineThickness(10.0);
                 segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
@@ -900,15 +873,9 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         palette.outlineThickness = shape.outlineThickness;
 
         // TODO: drawShape(shape, palette);
-        if (shape.getClass() == Point.class) {
-            // TODO:
-        } else if (shape.getClass() == Segment.class) {
+        if (shape.getClass() == Segment.class) {
             Segment segment = (Segment) shape;
             drawSegment(segment.getSource(), segment.getTarget(), canvas, paint, palette);
-        } else if (shape.getClass() == Polyline.class) {
-            // TODO: drawPolyline((Polyline) shape, palette);
-        } else if (shape.getClass() == Triangle.class) {
-            // TODO: drawTriangle((Triangle) shape);
         } else if (shape.getClass() == Rectangle.class) {
             Rectangle rectangle = (Rectangle) shape;
             drawRectangle(primitive.getComponent(Transform.class), rectangle.width, rectangle.height, rectangle.cornerRadius, canvas, paint, palette);
@@ -922,6 +889,9 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             Text text = (Text) shape;
             drawText(primitive.getComponent(Transform.class), text.getText(), text.size, canvas, paint, palette);
         }
+
+        // TODO: drawPolyline
+        // TODO: drawTriangle
         // </HACK>
     }
     // </TODO: REFACTOR>
@@ -1021,7 +991,6 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
-    // TODO: Refactor with transforms
     public void drawPolygon(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
 
         // <HACK>
@@ -1054,10 +1023,12 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize((float) size);
 
+        /*
         // Font
-//        Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
-//        Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
-//        paint.setTypeface(overlayTypefaceBold);
+        Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
+        Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
+        paint.setTypeface(overlayTypefaceBold);
+        */
 
         // Style (Guaranteed)
         String printText = text.toUpperCase();

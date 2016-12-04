@@ -1,6 +1,7 @@
 {
+  "type": "model",
   "host": {
-    "title": "Clay",
+    "label": "Clay",
     "geometry": [
       {
         "label": "Board",
@@ -15,11 +16,13 @@
         "rotation": 0.0,
         "style": {
           "color": "#1f1f1e",
-          "outlineThickness": 1.0
-        }
+          "outlineThickness": 0.0
+        },
+        "boundary": true
       },
       {
         "label": "Header 1",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -36,6 +39,7 @@
       },
       {
         "label": "Header 2",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -52,6 +56,7 @@
       },
       {
         "label": "Header 3",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -68,6 +73,7 @@
       },
       {
         "label": "Header 4",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -84,6 +90,7 @@
       },
       {
         "label": "Pin 1",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -2.54,
@@ -93,6 +100,7 @@
       },
       {
         "label": "Pin 2",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 0.0,
@@ -102,6 +110,7 @@
       },
       {
         "label": "Pin 3",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 2.54,
@@ -111,6 +120,7 @@
       },
       {
         "label": "Pin 4",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -120,6 +130,7 @@
       },
       {
         "label": "Pin 5",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -129,6 +140,7 @@
       },
       {
         "label": "Pin 6",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -138,6 +150,7 @@
       },
       {
         "label": "Pin 7",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 2.54,
@@ -147,6 +160,7 @@
       },
       {
         "label": "Pin 8",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 0.0,
@@ -156,6 +170,7 @@
       },
       {
         "label": "Pin 9",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -2.54,
@@ -165,6 +180,7 @@
       },
       {
         "label": "Pin 10",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -174,6 +190,7 @@
       },
       {
         "label": "Pin 11",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -183,6 +200,7 @@
       },
       {
         "label": "Pin 12",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -191,175 +209,8 @@
         "rotation": 270.0
       },
       {
-        "label": "Port 1",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": -19.0,
-          "y": 40.0
-        },
-        "rotation": 0.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 2",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 0.0,
-          "y": 40.0
-        },
-        "rotation": 0.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 3",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 19.0,
-          "y": 40.0
-        },
-        "rotation": 0.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 4",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 40.0,
-          "y": 19.0
-        },
-        "rotation": 90.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 5",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 40.0,
-          "y": 0.0
-        },
-        "rotation": 90.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 6",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 40.0,
-          "y": -19.0
-        },
-        "rotation": 90.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 7",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 19.0,
-          "y": -40.0
-        },
-        "rotation": 180.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 8",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": 0.0,
-          "y": -40.0
-        },
-        "rotation": 180.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 9",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": -19.0,
-          "y": -40.0
-        },
-        "rotation": 180.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 10",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": -40.0,
-          "y": -19.0
-        },
-        "rotation": 270.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 11",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": -40.0,
-          "y": 0.0
-        },
-        "rotation": 270.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
-        "label": "Port 12",
-        "type": "Circle",
-        "radius": 8.33,
-        "position": {
-          "x": -40.0,
-          "y": 19.0
-        },
-        "rotation": 270.0,
-        "style": {
-          "color": "#efefef",
-          "outlineThickness": 0.0
-        }
-      },
-      {
         "label": "LED 1",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -376,6 +227,7 @@
       },
       {
         "label": "LED 2",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -392,6 +244,7 @@
       },
       {
         "label": "LED 3",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -408,6 +261,7 @@
       },
       {
         "label": "LED 4",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -424,6 +278,7 @@
       },
       {
         "label": "LED 5",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -440,6 +295,7 @@
       },
       {
         "label": "LED 6",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -456,6 +312,7 @@
       },
       {
         "label": "LED 7",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -472,6 +329,7 @@
       },
       {
         "label": "LED 8",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -488,6 +346,7 @@
       },
       {
         "label": "LED 9",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -504,6 +363,7 @@
       },
       {
         "label": "LED 10",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -520,6 +380,7 @@
       },
       {
         "label": "LED 11",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -536,6 +397,7 @@
       },
       {
         "label": "LED 12",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -552,6 +414,7 @@
       },
       {
         "label": "Mount 1",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -566,6 +429,7 @@
       },
       {
         "label": "Mount 2",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -580,6 +444,7 @@
       },
       {
         "label": "Mount 3",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -594,6 +459,7 @@
       },
       {
         "label": "Mount 4",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {

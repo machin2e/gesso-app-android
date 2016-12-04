@@ -65,25 +65,12 @@ public class PortableLayoutSystem extends System {
     }
 
     private void updatePathGeometry(Entity path) {
-//        Visibility visibility = path.getComponent(Visibility.class);
-//        if (path.isActive == true) {
-////        if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-//            if (path.getComponent(Model.class).designIndex == 1) {
-//                updateEditablePath(path);
-////        } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
-//            } else if (path.getComponent(Model.class).designIndex == 0) {
-//                if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
-//                    updateOverviewPath(path);
-//                }
-//            }
-//        }
-
         if (path.isActive == true) {
-            if (path.getComponent(Model.class).designIndex == 0) {
+            if (path.getComponent(Model.class).meshIndex == 0) { // TODO: Replace magic number index
                 if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
                     updateOverviewPath(path);
                 }
-            } else if (path.getComponent(Model.class).designIndex == 1) {
+            } else if (path.getComponent(Model.class).meshIndex == 1) { // TODO: Replace magic number index
                 updateEditablePath(path);
             }
         }
@@ -96,37 +83,37 @@ public class PortableLayoutSystem extends System {
         if (!isSingletonPath) {
 
             Entity sourcePort = Path.getSource(path);
-            Entity sourcePortShapeE = Model.getShape(sourcePort, "Port");
-            Entity targetPortShapeE = Model.getShape(Path.getTarget(path), "Port");
+            Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
+            Entity targetPortPrimitive = Model.getPrimitive(Path.getTarget(path), "Port");
 
             // <REFACTOR>
             if (Path.getState(path) != Component.State.EDITING) {
                 // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
                 // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
-                Model.getShape(path, "Source Port").getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
-                Model.getShape(path, "Target Port").getComponent(Transform.class).set(targetPortShapeE.getComponent(Transform.class));
+                Model.getPrimitive(path, "Source Port").getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
+                Model.getPrimitive(path, "Target Port").getComponent(Transform.class).set(targetPortPrimitive.getComponent(Transform.class));
             }
             // </REFACTOR>
 
         } else {
 
             Entity sourcePort = Path.getSource(path);
-            Entity sourcePortPathShape = Model.getShape(path, "Source Port");
-            Entity sourcePortShapeE = Model.getShape(sourcePort, "Port");
+            Entity sourcePortPathPrimitive = Model.getPrimitive(path, "Source Port");
+            Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
 
             // <REFACTOR>
             path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
 
             if (Path.getState(path) != Component.State.EDITING) {
-                sourcePortPathShape.getComponent(Transform.class).set(sourcePortShapeE.getComponent(Transform.class));
+                sourcePortPathPrimitive.getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
             }
             // </REFACTOR>
 
             // <REFACTOR>
-            Segment segment = (Segment) Model.getShape(path, "Path").getComponent(Primitive.class).shape;
-            segment.setSource(sourcePortPathShape.getComponent(Transform.class));
+            Segment pathShape = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            pathShape.setSource(sourcePortPathPrimitive.getComponent(Transform.class));
             if (Path.getState(path) != Component.State.EDITING) {
-                segment.setTarget(sourcePortPathShape.getComponent(Transform.class));
+                pathShape.setTarget(sourcePortPathPrimitive.getComponent(Transform.class));
             }
             // </REFACTOR>
 
@@ -153,10 +140,10 @@ public class PortableLayoutSystem extends System {
             Transform hostContactTransform = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$").get(hostPortIndex).getComponent(Transform.class); // host.getComponent(Portable.class).headerContactPrimitives.get(hostPortIndex).getComponent(Transform.class);
             Transform extensionContactTransform = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$").get(extensionPortIndex).getComponent(Transform.class); // extension.getComponent(Portable.class).headerContactPrimitives.get(extensionPortIndex).getComponent(Transform.class);
 
-            Entity shapeEntity = Model.getShape(path, "Path");
-            Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
-            segment.setSource(hostContactTransform);
-            segment.setTarget(extensionContactTransform);
+            Entity pathPrimitive = Model.getPrimitive(path, "Path");
+            Segment pathShape = (Segment) pathPrimitive.getComponent(Primitive.class).shape;
+            pathShape.setSource(hostContactTransform);
+            pathShape.setTarget(extensionContactTransform);
             // </REFACTOR>
 
         }
@@ -171,13 +158,6 @@ public class PortableLayoutSystem extends System {
 
             Entity sourcePort = Path.getSource(path);
             Entity targetPort = Path.getTarget(path);
-
-//            // <HACK>
-//            // TODO/NOTE: For Prototype Entities that are missing some data...
-//            if (sourcePort == null) {
-//                continue;
-//            }
-//            // </HACK>
 
             // <REFACTOR>
             Path.Type pathType = Path.getType(path);
@@ -420,7 +400,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Entity boardShape = Model.getShape(host, "Board"); // host.getComponent(Model.class).getModel().getShape("Board");
+        Entity boardShape = Model.getPrimitive(host, "Board"); // host.getComponent(Model.class).getModel().getPrimitive("Board");
         List<Transform> hostShapeBoundary = Boundary.get(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
@@ -433,7 +413,7 @@ public class PortableLayoutSystem extends System {
             }
 
             Entity hostPort = Path.getHostPort(Port.getPaths(extensionPort).get(0)); // HACK: Using hard-coded index 0.
-            Transform hostPortPosition = Model.getShape(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Model.class).getModel().getShape("Port").getPosition();
+            Transform hostPortPosition = Model.getPrimitive(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Model.class).getModel().getPrimitive("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
@@ -559,10 +539,10 @@ public class PortableLayoutSystem extends System {
     /**
      * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Model}s.
      * <p>
-     * To enable layout algorithms to be changed at runtime, {@code updateLayout()} adopts the
+     * To enable layout algorithms to be changed at runtime, {@code updateWorldLayout()} adopts the
      * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
      */
-    public void updateLayout(LayoutStrategy layoutStrategy) {
+    public void updateWorldLayout(LayoutStrategy layoutStrategy) {
 
         layoutStrategy.execute(hosts);
     }
@@ -616,13 +596,13 @@ public class PortableLayoutSystem extends System {
 
         // final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
         double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
+        double extensionHeaderWidth = World.PIXEL_PER_MILLIMETER * A;
         // </FACTOR_OUT>
 
         // Update Headers Primitive to match the corresponding ExtensionEntity Configuration
-        Entity shape = Model.getShape(extension, "Header");
-        double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        Rectangle headerShape = (Rectangle) shape.getComponent(Primitive.class).shape;
-        headerShape.setWidth(headerWidth);
+        Entity extensionHeaderPrimitive = Model.getPrimitive(extension, "Header");
+        Rectangle extensionHeaderShape = (Rectangle) extensionHeaderPrimitive.getComponent(Primitive.class).shape;
+        extensionHeaderShape.setWidth(extensionHeaderWidth);
 
         // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
 
@@ -631,16 +611,18 @@ public class PortableLayoutSystem extends System {
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < extensionHeaderContactPrimitives.size()) {
-                Entity headerContactGeometry = extensionHeaderContactPrimitives.get(i);
-                headerContactGeometry.getComponent(TransformConstraint.class).relativeTransform.set(x, 107);
+                Entity headerContactPrimitive = extensionHeaderContactPrimitives.get(i);
+
+                Entity boardPrimitive = Model.getPrimitive(extension, "Board");
+                Rectangle boardShape = (Rectangle) boardPrimitive.getComponent(Primitive.class).shape;
+                double headerContactOffset = boardShape.height / 2.0f + 7.0f;
+
+                headerContactPrimitive.getComponent(TransformConstraint.class).relativeTransform.set(x, headerContactOffset); // was 107
             } else {
-                // <ENTITY>
-                // <HACK>
                 // Add header contact shape
                 Point headerContactShape = new Point();
-//                headerContactShape.setLabel("Pin " + (i + 1));
-                Entity headerContactGeometry = Model.addShape(extension, headerContactShape);
-                headerContactGeometry.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
+                Entity headerContactPrimitive = Model.addShape(extension, headerContactShape);
+                headerContactPrimitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
             }
         }
     }

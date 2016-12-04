@@ -88,8 +88,8 @@ public class EntityFactory {
         }
 
         // Load geometry from file into Model Component
-        // TODO: Application.getPlatform().openFile(this, "Host.json");
-        Model model = Model.openFile("Host.json", host);
+        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
+        Model model = Model.openFile("Model_Host_Clay-v7.1.0-beta.json", host);
 
         // <GEOMETRY_LOADER>
 //        for (int i = 0; i < model.getPrimitives().size(); i++) {
@@ -290,7 +290,7 @@ public class EntityFactory {
                     portEntities.setVisibility(Visible.INVISIBLE);
                     Group<camp.computer.clay.engine.component.Model> pathAndPortModels = pathAndPortEntities.getModels();
                     for (int i = 0; i < pathAndPortModels.size(); i++) {
-                        pathAndPortModels.get(i).designIndex = 0;
+                        pathAndPortModels.get(i).meshIndex = 0;
                     }
 
 
@@ -390,7 +390,6 @@ public class EntityFactory {
 //        Model imageBuilder = new Model();
 
         Rectangle rectangle;
-        long shapeUuid;
         Entity shape;
 
         // Create Shapes for Model
@@ -426,7 +425,7 @@ public class EntityFactory {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Model Component
-        // TODO: Application.getPlatform().openFile(this, "Host.json");
+        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
 
         // <EVENT_HANDLERS>
         world.events.subscribe(Event.Type.HOLD, new EventHandler<Entity>() {
@@ -455,7 +454,7 @@ public class EntityFactory {
 
                 /*
                 // TODO:
-                Shape board = extension.getComponent(Model.class).getModel().getShape("Board");
+                Shape board = extension.getComponent(Model.class).getModel().getPrimitive("Board");
                 List<Transform> vertices = board.getVertices();
                 Log.v("ExtPos", "ex: " + event.getPosition().x + ", y: " + event.getPosition().y);
                 for (int i = 0; i < vertices.size(); i++) {
@@ -608,7 +607,7 @@ public class EntityFactory {
 
                     Path.setState(path, Component.State.EDITING);
 
-                    Entity pathShape = camp.computer.clay.engine.component.Model.getShape(path, "Path");
+                    Entity pathShape = camp.computer.clay.engine.component.Model.getPrimitive(path, "Path");
                     Segment pathSegment = (Segment) pathShape.getComponent(Primitive.class).shape;
                     pathSegment.setTarget(event.getPosition());
                     pathShape.getComponent(Visibility.class).visible = Visible.VISIBLE;
@@ -695,7 +694,7 @@ public class EntityFactory {
 
                     // Multi-Port Path (non-singleton)
 
-                    Entity sourcePortShape = camp.computer.clay.engine.component.Model.getShape(path, "Source Port");
+                    Entity sourcePortShape = camp.computer.clay.engine.component.Model.getPrimitive(path, "Source Port");
                     if (event.getSecondaryTarget() == sourcePortShape) {
                         Log.v("handlePathEvent", "Touched Source");
                         //sourcePortShape.getComponent(Primitive.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
@@ -705,7 +704,7 @@ public class EntityFactory {
                         Path.setState(path, Component.State.EDITING);
                     }
 
-                    Entity targetPortShape = camp.computer.clay.engine.component.Model.getShape(path, "Target Port");
+                    Entity targetPortShape = camp.computer.clay.engine.component.Model.getPrimitive(path, "Target Port");
                     if (event.getSecondaryTarget() == targetPortShape) {
                         Log.v("handlePathEvent", "Touched Target");
                         targetPortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
@@ -726,8 +725,8 @@ public class EntityFactory {
                     return;
                 }
 
-                Entity sourcePortShape = camp.computer.clay.engine.component.Model.getShape(path, "Source Port"); // path.getComponent(Model.class).getModel().getShape("Source Port");
-                Entity targetPortShape = camp.computer.clay.engine.component.Model.getShape(path, "Target Port"); // path.getComponent(Model.class).getModel().getShape("Target Port");
+                Entity sourcePortShape = camp.computer.clay.engine.component.Model.getPrimitive(path, "Source Port"); // path.getComponent(Model.class).getModel().getPrimitive("Source Port");
+                Entity targetPortShape = camp.computer.clay.engine.component.Model.getPrimitive(path, "Target Port"); // path.getComponent(Model.class).getModel().getPrimitive("Target Port");
 
                 Log.v("handlePathEvent", "UNSELECT PATH.");
 
@@ -815,8 +814,8 @@ public class EntityFactory {
                                 // Remap the Path's Ports
 
                                 // Check if source or target in Path was moved, and reassign it
-                                Entity sourcePortShape2 = camp.computer.clay.engine.component.Model.getShape(path, "Source Port"); // path.getComponent(Model.class).getModel().getShape("Source Port");
-                                Entity targetPortShape2 = camp.computer.clay.engine.component.Model.getShape(path, "Target Port"); // path.getComponent(Model.class).getModel().getShape("Target Port");
+                                Entity sourcePortShape2 = camp.computer.clay.engine.component.Model.getPrimitive(path, "Source Port"); // path.getComponent(Model.class).getModel().getPrimitive("Source Port");
+                                Entity targetPortShape2 = camp.computer.clay.engine.component.Model.getPrimitive(path, "Target Port"); // path.getComponent(Model.class).getModel().getPrimitive("Target Port");
                                 if (camp.computer.clay.util.Geometry.contains(Boundary.get(sourcePortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable

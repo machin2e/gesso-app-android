@@ -91,7 +91,7 @@ public class Engine {
 
         // <HACK>
         // TODO: Place in a LayoutSystem
-        world.getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+        world.getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
         // </HACK>
     }
 }

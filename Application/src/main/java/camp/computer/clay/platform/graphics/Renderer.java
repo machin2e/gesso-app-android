@@ -5,13 +5,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.SurfaceHolder;
 
+import camp.computer.clay.engine.Clock;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.util.time.OLD_Clock;
 
 /**
  * Renderer is a background thread that periodically updates the world state
@@ -39,7 +39,7 @@ public class Renderer extends Thread {
     public long frameCount = 0;
     public long tickCount = 0; // TODO: Move tickCount into Engine
 
-    public double dt = OLD_Clock.getCurrentTime();
+    public double dt = Clock.getCurrentTime();
 
     Group<Entity> entities;
     Group<Entity> cameraEntities;
@@ -91,8 +91,8 @@ public class Renderer extends Thread {
                 continue;
             }
 
-            dt = OLD_Clock.getCurrentTime() - frameStartTime;
-            frameStartTime = OLD_Clock.getCurrentTime();
+            dt = Clock.getCurrentTime() - frameStartTime;
+            frameStartTime = Clock.getCurrentTime();
 
 //            platformRenderSurface.world.update();
 
@@ -155,7 +155,7 @@ public class Renderer extends Thread {
             }
 
             // Store actual frames per second
-            frameStopTime = OLD_Clock.getCurrentTime();
+            frameStopTime = Clock.getCurrentTime();
             currentFPS = (1000.0f / (float) (frameStopTime - frameStartTime));
             frameTimeDelta = frameStopTime - frameStartTime;
 
@@ -163,7 +163,7 @@ public class Renderer extends Thread {
             // This reduces energy consumption thereby increasing battery life.
             frameSleepTime = targetFramePeriod - (frameStopTime - frameStartTime);
             try {
-                sleepStartTime = OLD_Clock.getCurrentTime();
+                sleepStartTime = Clock.getCurrentTime();
                 if (frameSleepTime > 0) {
                     Thread.sleep(frameSleepTime);
                 } else {
@@ -172,7 +172,7 @@ public class Renderer extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            currentSleepTime = OLD_Clock.getCurrentTime() - sleepStartTime;
+            currentSleepTime = Clock.getCurrentTime() - sleepStartTime;
         }
     }
 

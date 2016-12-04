@@ -326,7 +326,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         switch (keyCode) {
             case KeyEvent.KEYCODE_A: {
                 Entity host = World.getWorld().createEntity(Host.class);
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
 
                 // Automatically focus on the first Host that appears in the workspace/world.
                 if (World.getWorld().entities.get().size() == 1) {
@@ -350,7 +350,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
                     World.getWorld().entities.remove(randomHost);
                 }
 
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 
@@ -361,7 +361,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 
@@ -389,8 +389,10 @@ public class Application extends FragmentActivity implements PlatformInterface {
                 // Monitor
                 if (World.ENABLE_GEOMETRY_OVERLAY) {
                     World.ENABLE_GEOMETRY_OVERLAY = false;
+                    World.ENABLE_GEOMETRY_ANNOTATIONS = false;
                 } else {
                     World.ENABLE_GEOMETRY_OVERLAY = true;
+                    World.ENABLE_GEOMETRY_ANNOTATIONS = true;
                 }
                 return true;
             }

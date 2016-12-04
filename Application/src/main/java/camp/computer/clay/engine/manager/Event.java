@@ -1,9 +1,9 @@
 package camp.computer.clay.engine.manager;
 
+import camp.computer.clay.engine.Clock;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Geometry;
-import camp.computer.clay.util.time.OLD_Clock;
 
 public class Event {
 
@@ -14,7 +14,17 @@ public class Event {
         SELECT,
         HOLD,
         MOVE,
-        UNSELECT
+        UNSELECT,
+
+        CAMERA_MOVE,
+        CAMERA_FOCUS,
+
+        PORT_CREATE_PATH,
+
+        PATH_CHANGE_MODE,
+        PATH_SWAP_DIRECTION,
+        PATH_MOVE_SOURCE,
+        PATH_MOVE_TARGET
     }
 
     public enum Commands {
@@ -96,7 +106,7 @@ public class Event {
     public int pointerIndex = -1;
 
     public Event() {
-        this.timestamp = OLD_Clock.getCurrentTime(); // TODO: Get from the World clock!
+        this.timestamp = Clock.getCurrentTime(); // TODO: Get from the World clock!
         setup();
     }
 
