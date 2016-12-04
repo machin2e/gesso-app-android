@@ -82,7 +82,7 @@ public class Clay {
 //
 //        // <HACK>
 //        // TODO: Place in a LayoutSystem
-//        world.getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
+//        world.getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
 //        // </HACK>
     }
 

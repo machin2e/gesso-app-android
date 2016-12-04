@@ -1,5 +1,7 @@
 package camp.computer.clay.lib.Geometry;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,10 +46,22 @@ public class Model {
 
     // TODO: Rename to BuildableImage? Collage? Model?
 
+    private long labelIndex = 0;
+    private HashMap<String, Long> labels = new HashMap<>();
+
+    public long addLabel(String label) {
+        if (!labels.containsKey(label)) {
+            labels.put(label, labelIndex++);
+            Log.v("MODEL_FILE_LOADER", "Indexing label \"" + label + "\" as " + labels.get(label));
+        }
+        return labels.get(label);
+    }
+
+    // TODO: HashMap<Long, Shape> shapes;
+
     protected List<Shape> shapes = new ArrayList<>();
 
     public void addShape(Shape shape) {
-//        shape.setImagePosition(shape.getPosition());
         shapes.add(shape);
     }
 
@@ -86,9 +101,13 @@ public class Model {
     // TODO: </REMOVE?>
 
     // <FILE_IO>
-    // Opens image data from JSON file stored in custom format.
-    // TODO: 11/2/2016 Consider adding support for constructing Model from SVG file.
-    public static Model open(String filename) {
+
+    /**
+     * File Format Specification Outline:
+     * - Labels in file must be unique (cannot be re-used).
+     * - Loader constructs index of labels, group names, and assigns a unique integer ID (asset ID?) to each for faster retrieval.
+     */
+    public static Model openFile(String filename, Entity entity) {
 
         // Create Empty image
         Model model = new Model();
@@ -119,13 +138,19 @@ public class Model {
             e.printStackTrace();
         }
 
+        // TODO: Crawl entire JSON hierarchy, extract labels, and generate UUIDs for each label in the model.
+
         // Create JSON object from file contents for parsing content.
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(jsonString);
 
             JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
-            String hostTitle = hostObject.getString("title"); // Handle to Host's title
+            String hostLabel = hostObject.getString("label"); // Handle to Host's title
+
+            // <REFACTOR>
+            model.addLabel(hostLabel);
+            // </REFACTOR>
 
             JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of primitives
 
@@ -145,148 +170,9 @@ public class Model {
                 String label = shape.getString("label");
                 String type = shape.getString("type");
 
-                // Primitive
-                double x = position.getDouble("x") * scaleFactor;
-                double y = position.getDouble("y") * scaleFactor;
-                double rotation = shape.getDouble("rotation");
-
-                // Boundary
-                boolean isBoundary = false;
-                if (shape.has("boundary")) {
-                    isBoundary = shape.getBoolean("boundary");
-                }
-
-                // Style
-                String color = "#ffffff";
-                String outlineColor = "#000000";
-                double outlineThickness = 0.0;
-
-                if (style != null) {
-                    if (style.has("color")) {
-                        color = style.getString("color");
-                    }
-                    if (style.has("outlineColor")) {
-                        outlineColor = style.getString("outlineColor");
-                    }
-                    if (style.has("outlineThickness")) {
-                        outlineThickness = style.getDouble("outlineThickness") * scaleFactor;
-                    }
-                }
-
-                if (type.equals("Point")) {
-
-                    // NOTE: Primitive N/A
-
-                    Point point = new Point();
-                    point.setLabel(label);
-                    point.setPosition(x, y);
-                    point.setRotation(rotation);
-                    point.setColor(color);
-                    point.setOutlineColor(outlineColor);
-                    point.setOutlineThickness(outlineThickness);
-//                    point.isBoundary = isBoundary;
-
-                    model.addShape(point);
-
-                } else if (type.equals("Rectangle")) {
-
-                    double width = shape.getDouble("width") * scaleFactor;
-                    double height = shape.getDouble("height") * scaleFactor;
-                    double cornerRadius = shape.getDouble("cornerRadius") * scaleFactor;
-
-                    Rectangle rectangle = new Rectangle(width, height);
-                    rectangle.setLabel(label);
-                    rectangle.setCornerRadius(cornerRadius);
-                    rectangle.setPosition(x, y);
-                    rectangle.setRotation(rotation);
-                    rectangle.setColor(color);
-                    rectangle.setOutlineColor(outlineColor);
-                    rectangle.setOutlineThickness(outlineThickness);
-//                    rectangle.isBoundary = isBoundary;
-
-                    model.addShape(rectangle);
-
-                } else if (type.equals("Circle")) {
-
-                    double radius = shape.getDouble("radius") * scaleFactor;
-
-                    Circle circle = new Circle(radius);
-                    circle.setLabel(label);
-                    circle.setPosition(x, y);
-                    circle.setRotation(rotation);
-                    circle.setColor(color);
-                    circle.setOutlineColor(outlineColor);
-                    circle.setOutlineThickness(outlineThickness);
-//                    circle.isBoundary = isBoundary;
-
-                    model.addShape(circle);
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        // </PLATFORM_LAYER>
-
-        return model;
-    }
-
-    public static Model open2(String filename, Entity entity) {
-
-        // Create Empty image
-        Model model = new Model();
-
-        // <PLATFORM_LAYER>
-        InputStream inputStream = null;
-        try {
-            inputStream = Application.getContext().getAssets().open(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Open specified JSON file.
-        String jsonString = null;
-        try {
-            /*
-            // <HACK>
-            // NOTE: Hack is for locating file in Android application resources.
-            InputStream inputStream = Application.getContext().getAssets().open(filename);
-            // <HACK>
-            */
-            int fileSize = inputStream.available();
-            byte[] fileBuffer = new byte[fileSize];
-            inputStream.read(fileBuffer);
-            inputStream.close();
-            jsonString = new String(fileBuffer, "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Create JSON object from file contents for parsing content.
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
-            String hostTitle = hostObject.getString("title"); // Handle to Host's title
-
-            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of primitives
-
-            // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
-            double scaleFactor = 6.0;
-
-            for (int i = 0; i < geometryArray.length(); i++) {
-                JSONObject shape = geometryArray.getJSONObject(i);
-                JSONObject position = shape.getJSONObject("position");
-
-                JSONObject style = null;
-                if (shape.has("style")) {
-                    style = shape.getJSONObject("style");
-                }
-
-                // Description
-                String label = shape.getString("label");
-                String type = shape.getString("type");
+                // <REFACTOR>
+                model.addLabel(label);
+                // </REFACTOR>
 
                 // Primitive
                 double x = position.getDouble("x") * scaleFactor;
@@ -400,6 +286,11 @@ public class Model {
             e.printStackTrace();
         }
         // </PLATFORM_LAYER>
+
+        List<String> labelList = new ArrayList<>(model.labels.keySet());
+        for (int i = 0; i < labelList.size(); i++) {
+            Log.v("MODEL_FILE_LOADER", "" + model.labels.get(labelList.get(i)) + "\t" + labelList.get(i));
+        }
 
         return model;
     }

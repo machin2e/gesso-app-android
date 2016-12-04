@@ -62,6 +62,28 @@ public class EntityManager {
 
     private List<Group> subscribers = new ArrayList<>();
 
+    // <TODO>
+    public interface SubscriptionStrategy {
+        void onAdd(Entity entity);
+    }
+
+    public <D> Group<Entity> subscribe(SubscriptionStrategy subscriptionStrategy) {
+        return null;
+    }
+
+    public void EXAMPLE() {
+
+        subscribe(new SubscriptionStrategy() {
+            @Override
+            public void onAdd(Entity entity) {
+                // TODO: apply filters
+                // TODO: apply sort algorithm
+            }
+        });
+
+    }
+    // </TODO>
+
     /**
      * Creates subscribe that is automatically updated using the specified {@code filter} when
      * elements are added or removed from the parent {@code Group}.

@@ -12,7 +12,6 @@ import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Rectangle;
@@ -23,7 +22,7 @@ import camp.computer.clay.util.Geometry;
 public class CameraSystem extends System {
 
     Group<Entity> cameraEntities;
-    Group<Entity> pathAndPortEntities;
+    //    Group<Entity> pathAndPortEntities, portEntities;
     Group<Entity> hostAndExtensionEntities;
 
     public CameraSystem(World world) {
@@ -33,7 +32,8 @@ public class CameraSystem extends System {
 
     private void setup() {
         cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
-        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+//        portEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Port.class);
+//        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
         hostAndExtensionEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
     }
 
@@ -78,13 +78,19 @@ public class CameraSystem extends System {
 
             if (focusEntity == null) {
 
-                // <MOVE_TO_WORLD_EVENT_HANDLER>
-                // Hide Portables' Ports.
-                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
-
-                // Update distance between Hosts and Extensions
-                world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
-                // </MOVE_TO_WORLD_EVENT_HANDLER>
+//                // <MOVE_TO_WORLD_EVENT_HANDLER>
+//                // Hide Portables' Ports.
+////                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
+//                portEntities.setVisibility(Visible.INVISIBLE);
+//                Group<Model> pathAndPortModels = pathAndPortEntities.getModels();
+//                for (int i = 0; i < pathAndPortModels.size(); i++) {
+//                    pathAndPortModels.get(i).designIndex = 0;
+//                }
+//
+//
+//                // Update distance between Hosts and Extensions
+//                world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+//                // </MOVE_TO_WORLD_EVENT_HANDLER>
 
                 // <REFACTOR>
                 cameraComponent.boundary = null;
@@ -120,6 +126,15 @@ public class CameraSystem extends System {
                             hostPathPorts.add(Path.getTarget(path));
                         }
                     }
+
+
+                    // <REFACTOR>
+                    // Update Path Model
+                    Group<Model> portPathModels = portPaths.getModels();
+                    for (int j = 0; j < portPathModels.size(); j++) {
+                        portPathModels.get(j).designIndex = 1;
+                    }
+                    // </REFACTOR>
                 }
 
                 // </REFACTOR>

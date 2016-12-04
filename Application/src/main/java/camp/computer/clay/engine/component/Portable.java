@@ -10,12 +10,8 @@ public class Portable extends Component {
 
     // <COMPONENT_DATA>
     // TODO: Change to Group<Long>
+    // TODO: REMOVE (ignore previous TODO). Replace with ParentReferenceComponent. Then remove Portable altogether?
     public Group<Entity> ports = new Group<>();
-
-    // <DELETE>
-    // TODO: Look up in the Model geometry?
-//    public List<Entity> headerContactPrimitives = new ArrayList<>(); // TODO: replace with List<Entity> for primitives
-    // </DELETE>
     // </COMPONENT_DATA>
 
 

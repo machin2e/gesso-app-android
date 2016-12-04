@@ -310,10 +310,12 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                 // <REFACTOR>
                 // TODO: Make the rendering state/configuration automatic... enable or disable geometry sets in the image?
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+//                Visibility visibility = entity.getComponent(Visibility.class);
+//                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+                if (entity.getComponent(Model.class).designIndex == 1) {
                     drawEditablePath(entity, canvas, paint, palette);
-                } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
+//                } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
+                } else if (entity.getComponent(Model.class).designIndex == 0) {
                     if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
                         drawOverviewPath(entity, canvas, paint, palette);
                     }

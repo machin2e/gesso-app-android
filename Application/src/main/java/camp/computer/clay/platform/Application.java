@@ -18,10 +18,12 @@ import camp.computer.clay.engine.Engine;
 import camp.computer.clay.engine.Platform;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Physics;
-import camp.computer.clay.engine.component.util.ProjectLayoutStrategy;
+import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UdpServer;
@@ -32,6 +34,7 @@ import camp.computer.clay.platform.sound.SpeechSynthesisEngine;
 import camp.computer.clay.platform.spatial.OrientationInput;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 import camp.computer.clay.platform.util.ViewGroupHelper;
+import camp.computer.clay.util.Random;
 
 public class Application extends FragmentActivity implements PlatformInterface {
 
@@ -321,6 +324,36 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // TODO: Queue key events in inputSystem
 
         switch (keyCode) {
+            case KeyEvent.KEYCODE_A: {
+                Entity host = World.getWorld().createEntity(Host.class);
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+
+                // Automatically focus on the first Host that appears in the workspace/world.
+                if (World.getWorld().entities.get().size() == 1) {
+                    Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                    camera.getComponent(Camera.class).focus = host;
+                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+                } else {
+                    Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                    camera.getComponent(Camera.class).focus = null;
+                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+                }
+
+
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_D: {
+                Group<Entity> hosts = World.getWorld().entities.get().filterWithComponent(Host.class);
+                if (hosts.size() > 0) {
+                    Entity randomHost = hosts.get(Random.generateRandomInteger(0, hosts.size()));
+                    World.getWorld().entities.remove(randomHost);
+                }
+
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
+                return true;
+            }
+
             case KeyEvent.KEYCODE_S: {
                 platformUi.openSettings();
                 //your Action code
@@ -328,7 +361,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().getSystem(PortableLayoutSystem.class).adjustLayout(new ProjectLayoutStrategy());
+                World.getWorld().getSystem(PortableLayoutSystem.class).updateLayout(new HostLayoutStrategy());
                 return true;
             }
 

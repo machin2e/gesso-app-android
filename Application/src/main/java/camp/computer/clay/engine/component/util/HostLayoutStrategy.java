@@ -8,7 +8,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Geometry;
 import camp.computer.clay.util.Random;
 
-public class ProjectLayoutStrategy implements LayoutStrategy<Entity> {
+public class HostLayoutStrategy implements LayoutStrategy<Entity> {
     @Override
     public void execute(List<Entity> hosts) {
 

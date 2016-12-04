@@ -1,6 +1,6 @@
 {
   "host": {
-    "title": "Clay",
+    "label": "Clay",
     "geometry": [
       {
         "label": "Board",
@@ -21,6 +21,7 @@
       },
       {
         "label": "Header 1",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -37,6 +38,7 @@
       },
       {
         "label": "Header 2",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -53,6 +55,7 @@
       },
       {
         "label": "Header 3",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -69,6 +72,7 @@
       },
       {
         "label": "Header 4",
+        "group": "Headers",
         "type": "Rectangle",
         "width": 7.62,
         "height": 2.33,
@@ -85,6 +89,7 @@
       },
       {
         "label": "Pin 1",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -2.54,
@@ -94,6 +99,7 @@
       },
       {
         "label": "Pin 2",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 0.0,
@@ -103,6 +109,7 @@
       },
       {
         "label": "Pin 3",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 2.54,
@@ -112,6 +119,7 @@
       },
       {
         "label": "Pin 4",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -121,6 +129,7 @@
       },
       {
         "label": "Pin 5",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -130,6 +139,7 @@
       },
       {
         "label": "Pin 6",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 26.5,
@@ -139,6 +149,7 @@
       },
       {
         "label": "Pin 7",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 2.54,
@@ -148,6 +159,7 @@
       },
       {
         "label": "Pin 8",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": 0.0,
@@ -157,6 +169,7 @@
       },
       {
         "label": "Pin 9",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -2.54,
@@ -166,6 +179,7 @@
       },
       {
         "label": "Pin 10",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -175,6 +189,7 @@
       },
       {
         "label": "Pin 11",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -184,6 +199,7 @@
       },
       {
         "label": "Pin 12",
+        "group": "Pins",
         "type": "Point",
         "position": {
           "x": -26.5,
@@ -193,6 +209,7 @@
       },
       {
         "label": "LED 1",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -209,6 +226,7 @@
       },
       {
         "label": "LED 2",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -225,6 +243,7 @@
       },
       {
         "label": "LED 3",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -241,6 +260,7 @@
       },
       {
         "label": "LED 4",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -257,6 +277,7 @@
       },
       {
         "label": "LED 5",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -273,6 +294,7 @@
       },
       {
         "label": "LED 6",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -289,6 +311,7 @@
       },
       {
         "label": "LED 7",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -305,6 +328,7 @@
       },
       {
         "label": "LED 8",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -321,6 +345,7 @@
       },
       {
         "label": "LED 9",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -337,6 +362,7 @@
       },
       {
         "label": "LED 10",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -353,6 +379,7 @@
       },
       {
         "label": "LED 11",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -369,6 +396,7 @@
       },
       {
         "label": "LED 12",
+        "group": "LEDs",
         "type": "Rectangle",
         "width": 2.0,
         "height": 3.33,
@@ -385,6 +413,7 @@
       },
       {
         "label": "Mount 1",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -399,6 +428,7 @@
       },
       {
         "label": "Mount 2",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -413,6 +443,7 @@
       },
       {
         "label": "Mount 3",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {
@@ -427,6 +458,7 @@
       },
       {
         "label": "Mount 4",
+        "group": "Mounts",
         "type": "Circle",
         "radius": 1.45,
         "position": {

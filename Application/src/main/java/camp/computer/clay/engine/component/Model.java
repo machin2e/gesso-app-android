@@ -14,7 +14,13 @@ import camp.computer.clay.lib.Geometry.Shape;
 
 public class Model extends Component {
 
+    // TODO: Add support for multiple geometry configurations.
+    public long designIndex = 0;
+
+    // <REFACTOR>
+    // TODO: Replace with AssetReference
     public List<Long> primitives;
+    // </REFACTOR>
 
     public Model() {
         super();

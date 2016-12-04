@@ -17,9 +17,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
-import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
-import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Point;
@@ -67,12 +65,26 @@ public class PortableLayoutSystem extends System {
     }
 
     private void updatePathGeometry(Entity path) {
-        Visibility visibility = path.getComponent(Visibility.class);
-        if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-            updateEditablePath(path);
-        } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
-            if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
-                updateOverviewPath(path);
+//        Visibility visibility = path.getComponent(Visibility.class);
+//        if (path.isActive == true) {
+////        if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+//            if (path.getComponent(Model.class).designIndex == 1) {
+//                updateEditablePath(path);
+////        } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
+//            } else if (path.getComponent(Model.class).designIndex == 0) {
+//                if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
+//                    updateOverviewPath(path);
+//                }
+//            }
+//        }
+
+        if (path.isActive == true) {
+            if (path.getComponent(Model.class).designIndex == 0) {
+                if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
+                    updateOverviewPath(path);
+                }
+            } else if (path.getComponent(Model.class).designIndex == 1) {
+                updateEditablePath(path);
             }
         }
     }
@@ -160,12 +172,12 @@ public class PortableLayoutSystem extends System {
             Entity sourcePort = Path.getSource(path);
             Entity targetPort = Path.getTarget(path);
 
-            // <HACK>
-            // TODO/NOTE: For Prototype Entities that are missing some data...
-            if (sourcePort == null) {
-                continue;
-            }
-            // </HACK>
+//            // <HACK>
+//            // TODO/NOTE: For Prototype Entities that are missing some data...
+//            if (sourcePort == null) {
+//                continue;
+//            }
+//            // </HACK>
 
             // <REFACTOR>
             Path.Type pathType = Path.getType(path);
@@ -268,8 +280,6 @@ public class PortableLayoutSystem extends System {
 
         // Configure Extension's Ports (i.e., the Path's target Port)
         Entity extensionPort = Portable.getPorts(extension).get(0);
-//        extensionPort.getComponent(Port.class).setDirection(Port.Direction.INPUT);
-//        extensionPort.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
         // Create Path from Host to Extension and configure the new Path
         // TODO: Create the Path and then apply it. It should automatically configure the
@@ -549,10 +559,10 @@ public class PortableLayoutSystem extends System {
     /**
      * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Model}s.
      * <p>
-     * To enable layout algorithms to be changed at runtime, {@code adjustLayout()} adopts the
+     * To enable layout algorithms to be changed at runtime, {@code updateLayout()} adopts the
      * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
      */
-    public void adjustLayout(LayoutStrategy layoutStrategy) {
+    public void updateLayout(LayoutStrategy layoutStrategy) {
 
         layoutStrategy.execute(hosts);
     }

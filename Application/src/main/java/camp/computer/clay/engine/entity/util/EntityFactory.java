@@ -65,6 +65,12 @@ public class EntityFactory {
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
+        // <FUN>
+        host.getComponent(Physics.class).velocity.x = Random.getRandomGenerator().nextFloat() * 0.01;
+        host.getComponent(Physics.class).velocity.y = Random.getRandomGenerator().nextFloat() * 0.01;
+        host.getComponent(Physics.class).velocity.z = Random.getRandomGenerator().nextFloat() * 0.01;
+        // </FUN>
+
         // Portable Component (Model Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
@@ -83,7 +89,7 @@ public class EntityFactory {
 
         // Load geometry from file into Model Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
-        Model model = Model.open2("Host.json", host);
+        Model model = Model.openFile("Host.json", host);
 
         // <GEOMETRY_LOADER>
 //        for (int i = 0; i < model.getPrimitives().size(); i++) {
@@ -123,14 +129,6 @@ public class EntityFactory {
                     Portable.getPort(host, i).getComponent(TransformConstraint.class).relativeTransform.y * 6.0
             );
         }
-        // Add pin contact points to PortableComponent
-//        // <HACK>
-//        Group<Entity> pinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
-////        Group<Entity> pinContactPoints = host.getComponent(camp.computer.clay.engine.component.Model.class).getPrimitives(host);
-//        for (int i = 0; i < pinContactPoints.size(); i++) {
-//            host.getComponent(Portable.class).headerContactPrimitives.add(pinContactPoints.get(i));
-//        }
-//        // </HACK>
 
         // <EVENT_HANDLERS>
         world.events.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
@@ -246,8 +244,8 @@ public class EntityFactory {
                     }
                 }
 
-                // Camera
-                world.getSystem(CameraSystem.class).setFocus(camera, host);
+//                // Camera
+//                world.getSystem(CameraSystem.class).setFocus(camera, host);
             }
         });
         // </EVENT_HANDLERS>
@@ -258,10 +256,51 @@ public class EntityFactory {
     public static Entity createWorkspaceEntity(final World world) {
 
         // Create Entity
-        Entity workspace = new Entity();
+        final Entity workspace = new Entity();
 
         // Add Components
         workspace.addComponent(new Workspace()); // Unique to Workspace
+
+        // <EVENT_HANDLERS>
+        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+            @Override
+            public void execute(Event event) {
+
+//                if (event.getTarget() != workspace) {
+//                    return;
+//                }
+
+                if (event.getTarget().hasComponent(Camera.class)) {
+
+                    // <HACK>
+                    Group<Entity> portEntities = null;
+                    Group<Entity> pathAndPortEntities = null;
+
+                    if (portEntities == null) {
+                        portEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Port.class);
+                    }
+                    if (pathAndPortEntities == null) {
+                        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+                    }
+                    // </HACK>
+
+                    // <MOVE_TO_WORLD_EVENT_HANDLER>
+                    // Hide Portables' Ports.
+//                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
+                    portEntities.setVisibility(Visible.INVISIBLE);
+                    Group<camp.computer.clay.engine.component.Model> pathAndPortModels = pathAndPortEntities.getModels();
+                    for (int i = 0; i < pathAndPortModels.size(); i++) {
+                        pathAndPortModels.get(i).designIndex = 0;
+                    }
+
+
+                    // Update distance between Hosts and Extensions
+                    world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+                    // </MOVE_TO_WORLD_EVENT_HANDLER>
+                }
+            }
+        });
+        // </EVENT_HANDLERS>
 
         return workspace;
     }
@@ -473,8 +512,8 @@ public class EntityFactory {
                 // TODO: 11/13/2016 Set Title
 
                 // Camera
-                Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0);
-                world.getSystem(CameraSystem.class).setFocus(camera, extension);
+//                Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0);
+//                world.getSystem(CameraSystem.class).setFocus(camera, extension);
             }
         });
         // </EVENT_HANDLERS>
@@ -484,6 +523,7 @@ public class EntityFactory {
 
     public static Entity createPathEntity(final World world) {
         final Entity path = new Entity();
+        path.isActive = false;
 
         // Add Path Component (for type identification)
         path.addComponent(new Path()); // Unique to Path
@@ -989,6 +1029,8 @@ public class EntityFactory {
         });
         // </EVENT_HANDLERS>
 
+        path.isActive = true;
+
         return path;
     }
 
@@ -1105,16 +1147,30 @@ public class EntityFactory {
             @Override
             public void execute(Event event) {
 
-                if (event.getTarget() != camera) {
-                    return;
-                }
+                if (event.getTarget() == camera) {
+                    Camera cameraComponent = camera.getComponent(Camera.class);
 
-                Camera cameraComponent = camera.getComponent(Camera.class);
+                    // Camera
+                    if (event.isTap()) {
+                        cameraComponent.focus = null;
+                        cameraComponent.mode = Camera.Mode.FOCUS;
+                    }
 
-                // Camera
-                if (event.isTap()) {
-                    cameraComponent.focus = null;
+                } else if (event.getTarget().hasComponent(Host.class)) {
+
+//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTarget());
+                    Camera cameraComponent = camera.getComponent(Camera.class);
+                    cameraComponent.focus = event.getTarget();
                     cameraComponent.mode = Camera.Mode.FOCUS;
+
+                } else if (event.getTarget().hasComponent(Extension.class)) {
+
+//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTarget());
+                    // TODO: Create CameraEvent.SetFocus(target)
+                    Camera cameraComponent = camera.getComponent(Camera.class);
+                    cameraComponent.focus = event.getTarget();
+                    cameraComponent.mode = Camera.Mode.FOCUS;
+
                 }
             }
         });
