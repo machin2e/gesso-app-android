@@ -17,7 +17,7 @@ public class Configuration {
 
     private List<PortConfiguration> portConfigurations = new ArrayList<>();
 
-    // TODO: Add geometry endpoints or UUID to Model
+    // TODO: Add geometry endpoints or UUID to ModelBuilder
 
     public Configuration() {
     }

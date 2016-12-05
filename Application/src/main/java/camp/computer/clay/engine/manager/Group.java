@@ -315,7 +315,7 @@ public class Group<E> implements List<E> {
     }
 
     // Exepcts Group<Entity>
-    // Requires components: Model
+    // Requires components: ModelBuilder
     public Group<Entity> sortByLayer() {
         Group<Entity> group = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
@@ -362,7 +362,7 @@ public class Group<E> implements List<E> {
     }
 
     // Expects Group<Entity>
-    // Requires components: Model
+    // Requires components: ModelBuilder
     public void setTransparency(double transparency) {
         map(Mappers.setTransparency, transparency);
     }
@@ -378,7 +378,7 @@ public class Group<E> implements List<E> {
         return map(Mappers.getModel, null);
     }
 
-    // Assumes Group<Model>
+    // Assumes Group<ModelBuilder>
     public Group<Entity> getPrimitives() {
         Group<Entity> primitives = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
@@ -460,18 +460,18 @@ public class Group<E> implements List<E> {
     }
 
     /**
-     * Finds and returns the nearest <em>visible</em> <code>Model</code>.
+     * Finds and returns the nearest <em>visible</em> <code>ModelBuilder</code>.
      *
      * @return
      */
-//    // HACK: Expects Group<Model>
-//    public Model getNearestImage(Transform position) {
+//    // HACK: Expects Group<ModelBuilder>
+//    public ModelBuilder getNearestImage(Transform position) {
 //
 //        double shortestDistance = Float.MAX_VALUE;
-//        Model nearestImage = null;
+//        ModelBuilder nearestImage = null;
 //
 //        for (int i = 0; i < elements.size(); i++) {
-//            Model image = (Model) elements.get(i);
+//            ModelBuilder image = (ModelBuilder) elements.get(i);
 //
 //            double currentDistance = Primitive.distance(position, image.getPosition());
 //
@@ -484,7 +484,7 @@ public class Group<E> implements List<E> {
 //        return nearestImage;
 //    }
 
-    // HACK: Expects Group<Model>
+    // HACK: Expects Group<ModelBuilder>
     // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
     public Transform getCenterPoint() {
         return camp.computer.clay.util.Geometry.getCenterPoint(getPositions());

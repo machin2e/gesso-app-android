@@ -14,64 +14,38 @@ public class Event {
         SELECT,
         HOLD,
         MOVE,
-        UNSELECT,
+        UNSELECT
 
+        /*
+        KEY_A,
+        KEY_B,
+        ...
+        KEY_LEFT,
+        KEY_UP,
+        KEY_RIGHT,
+        KEY_DOWN,
+        ...
+        */
+
+        /*
         CAMERA_MOVE,
         CAMERA_FOCUS,
 
-        PORT_CREATE_PATH,
+        HOST_SHOW_PORT_CONTROLS,
+        HOST_HIDE_PORT_CONTROLS,
+        HOST_SHOW_PATHS,
+        HOST_HIDE_PATHS,
+
+        PORT_CREATE_PATH, // CREATE_PATH
 
         PATH_CHANGE_MODE,
         PATH_SWAP_DIRECTION,
         PATH_MOVE_SOURCE,
-        PATH_MOVE_TARGET
+        PATH_MOVE_TARGET,
+
+        WORLD_SHOW_OVERVIEW
+        */
     }
-
-    public enum Commands {
-
-        // Host
-
-        // Extension
-
-        // Portable
-
-        // Path
-        PATH_CREATE,
-        PATH_MOVE_SOURCE_PORT,
-        PATH_MOVE_TARGET_PORT,
-        PATH_REMOVE_SOURCE_PORT,
-        PATH_REMOVE_TARGET_PORT,
-        PATH_REMOVE,
-        PATH_CHANGE_TYPE,
-        PATH_CHANGE_DIRECTION,
-
-        // Camera
-        CAMERA_SET_POSITION,
-        CAMERA_SET_ZOOM,
-        CAMERA_SET_FOCUS
-    }
-
-    // Clay: Entities can register events it will publish to EventManager. Others can subscribe to published messages.
-    // e.g.,
-    /*
-    ? CREATE_PORT
-    CHANGE_PORT_TYPE
-    CHANGE_PORT_DIRECTION
-    ? REMOVE_PORT
-
-    CREATE_PATH
-    MOVE_PATH_SOURCE_PORT -> MOVE_PORT
-    MOVE_PATH_TARGET_PORT -> MOVE_PORT
-    REMOVE_PATH_SOURCE_PORT -> REMOVE_PORT
-    REMOVE_PATH_TARGET_PORT -> REMOVE_PORT
-    REMOVE_PATH
-    CHANGE_PATH_TYPE
-    CHANGE_PATH_DIRECTION
-    subscribe(Event.Type.CREATE_PATH, new EventProcess() {
-        public void processEvent(Event event, EventData data) {
-        }
-    });
-    */
 
     public static int MAXIMUM_POINT_COUNT = 5;
 
@@ -188,6 +162,7 @@ public class Event {
         }
     }
 
+    // TODO: DELETE
     public Event getPreviousEvent() {
         return previousEvent;
     }
@@ -196,6 +171,7 @@ public class Event {
     public double xOffset = 0;
     public double yOffset = 0;
 
+    // TODO: DELETE
     public Event getFirstEvent() {
         Event firstEvent = this;
         while (firstEvent.previousEvent != null) {
@@ -204,6 +180,7 @@ public class Event {
         return firstEvent;
     }
 
+    // TODO: DELETE
     public int getEventCount() {
         int count = 1;
         Event firstEvent = this;
@@ -214,6 +191,7 @@ public class Event {
         return count;
     }
 
+    // TODO: DELETE
     public long getDuration() {
         return getTimestamp() - getFirstEvent().getTimestamp();
     }
@@ -234,6 +212,7 @@ public class Event {
         return dragDistance[pointerIndex];
     }
 
+    // TODO: DELETE
     public double getDistance() {
         Event firstEvent = getFirstEvent();
         Event lastEvent = this;

@@ -134,7 +134,7 @@ public class InputSystem extends System {
             }
             event.setTarget(primaryTarget);
 
-            if (primaryTarget.hasComponent(Model.class)) { // Needed because entitiesWithBoundary like Camera without Model component are also processed here.
+            if (primaryTarget.hasComponent(Model.class)) { // Needed because entitiesWithBoundary like Camera without ModelBuilder component are also processed here.
                 for (int i = 0; i < secondaryBoundaries.size(); i++) {
                     if (Model.getPrimitives(primaryTarget).contains(secondaryBoundaries.get(i))) {
                         event.setSecondaryTarget(secondaryBoundaries.get(i));

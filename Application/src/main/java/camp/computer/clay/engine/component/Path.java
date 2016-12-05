@@ -158,7 +158,7 @@ public class Path extends Component {
 
 //        // <REFACTOR_INTO_SYSTEM>
 //        // Set up layout constraint
-//        Entity pathSourcePort = Model.getPrimitive(path, "Source Port");
+//        Entity pathSourcePort = ModelBuilder.getPrimitive(path, "Source Port");
 //        if (!pathSourcePort.hasComponent(TransformConstraint.class)) {
 //            pathSourcePort.addComponent(new TransformConstraint());
 //        }
@@ -180,7 +180,7 @@ public class Path extends Component {
 
 //        // <REFACTOR_INTO_SYSTEM>
 //        // Set up layout constraint
-//        Entity pathTargetPort = Model.getPrimitive(path, "Target Port");
+//        Entity pathTargetPort = ModelBuilder.getPrimitive(path, "Target Port");
 //        if (!pathTargetPort.hasComponent(TransformConstraint.class)) {
 //            pathTargetPort.addComponent(new TransformConstraint());
 //        }

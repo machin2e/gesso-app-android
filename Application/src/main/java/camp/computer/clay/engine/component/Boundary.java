@@ -20,7 +20,7 @@ public class Boundary extends Component {
     }
 
     /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Model} contain the
+     * Returns {@code true} if any of the {@code Shape}s in the {@code ModelBuilder} contain the
      * {@code point}.
      *
      * @param point

@@ -34,7 +34,7 @@ public class PortableLayoutSystem extends System {
         super(world);
 
         entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
-        // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(Model.class, Transform.class);
+        // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(ModelBuilder.class, Transform.class);
 
         //paths = world.entitiesWithBoundary.get().filterActive(true).filterWithComponent(Path.class);
         paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
@@ -400,7 +400,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Entity boardShape = Model.getPrimitive(host, "Board"); // host.getComponent(Model.class).getModel().getPrimitive("Board");
+        Entity boardShape = Model.getPrimitive(host, "Board"); // host.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Board");
         List<Transform> hostShapeBoundary = Boundary.get(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
@@ -413,7 +413,7 @@ public class PortableLayoutSystem extends System {
             }
 
             Entity hostPort = Path.getHostPort(Port.getPaths(extensionPort).get(0)); // HACK: Using hard-coded index 0.
-            Transform hostPortPosition = Model.getPrimitive(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Model.class).getModel().getPrimitive("Port").getPosition();
+            Transform hostPortPosition = Model.getPrimitive(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
@@ -537,7 +537,7 @@ public class PortableLayoutSystem extends System {
     // <HOST_LAYOUT>
 
     /**
-     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Model}s.
+     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code ModelBuilder}s.
      * <p>
      * To enable layout algorithms to be changed at runtime, {@code updateWorldLayout()} adopts the
      * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
@@ -553,7 +553,7 @@ public class PortableLayoutSystem extends System {
     }
 
     /**
-     * Update the {@code Model} to match the state of the corresponding {@code Entity}.
+     * Update the {@code ModelBuilder} to match the state of the corresponding {@code Entity}.
      */
     public void updateExtensionGeometry(Entity extension) {
 

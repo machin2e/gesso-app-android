@@ -2388,7 +2388,7 @@ public class PlatformUi {
                             }
                             // </HACK>
 
-                            // Add point to Model
+                            // Add point to ModelBuilder
                             imagePoints.add(new Transform(motionEvent.getX(), motionEvent.getY()));
 
                             // Set background color
@@ -2675,7 +2675,7 @@ public class PlatformUi {
 //            titleText.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
-//                    if (v.getId() == titleText.getId()) {
+//                    if (v.getLabelUid() == titleText.getLabelUid()) {
 //
 //                        // Move the cursor to the end of the line
 //                        titleText.setSelection(titleText.getText().length());

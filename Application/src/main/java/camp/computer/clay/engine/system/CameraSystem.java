@@ -82,7 +82,7 @@ public class CameraSystem extends System {
 //                // Hide Portables' Ports.
 ////                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
 //                portEntities.setVisibility(Visible.INVISIBLE);
-//                Group<Model> pathAndPortModels = pathAndPortEntities.getModels();
+//                Group<ModelBuilder> pathAndPortModels = pathAndPortEntities.getModels();
 //                for (int i = 0; i < pathAndPortModels.size(); i++) {
 //                    pathAndPortModels.get(i).meshIndex = 0;
 //                }
@@ -129,7 +129,7 @@ public class CameraSystem extends System {
 
 
                     // <REFACTOR>
-                    // Update Path Model
+                    // Update Path ModelBuilder
                     Group<Model> portPathModels = portPaths.getModels();
                     for (int j = 0; j < portPathModels.size(); j++) {
                         portPathModels.get(j).meshIndex = 1;

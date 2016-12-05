@@ -29,8 +29,8 @@ public class ModelSystem extends System {
         }
     }
 
-    // Previously: Model.update()
-    // Required Components: Model, Transform
+    // Previously: ModelBuilder.update()
+    // Required Components: ModelBuilder, Transform
     private void updateTransform(Entity entity) {
 
         // Start by transforming base images. They will never have more than one level of constraints (?).
@@ -70,11 +70,11 @@ public class ModelSystem extends System {
      * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
      * preparation for drawing and collision detection.
      * <p>
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Model}. Translate
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code ModelBuilder}. Translate
      * the center position of the {@code Shape}. Effectively, this updates the position of the
      * {@code Shape}.
      *
-     * @param referenceTransform Position of the containing {@code Model} relative to which the
+     * @param referenceTransform Position of the containing {@code ModelBuilder} relative to which the
      *                           {@code Shape} will be drawn.
      */
     private void updateRelativeTransform(Entity shape, Transform referenceTransform) { // previously updateShapeRelativeTransform

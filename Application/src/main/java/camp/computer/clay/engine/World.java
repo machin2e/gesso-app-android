@@ -29,6 +29,7 @@ import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
 import camp.computer.clay.engine.manager.EntityManager;
+import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.EventManager;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
@@ -55,11 +56,9 @@ public class World {
 
     // <SETTINGS>
     public static boolean ENABLE_OVERLAY = true;
-
-    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = false;
     public static boolean ENABLE_ANNOTATION_ENTITY_TRANSFORM = false;
-
-    public static boolean ENABLE_GEOMETRY_OVERLAY = true;
+    public static boolean ENABLE_GEOMETRY_OVERLAY = false;
     // </SETTINGS>
 
     // <REFACTOR_INTO_ENGINE>
@@ -87,6 +86,9 @@ public class World {
     public long tickFrequency = Clock.NANOS_PER_SECOND / 30;
 
     // <MANAGERS>
+    public List<Event> eventQueue = new ArrayList<>();
+    public int nextEventIndex = 0;
+
     public EventManager events;
 
     public EntityManager entities;
@@ -205,7 +207,7 @@ public class World {
         notification.getComponent(Transform.class).rotation = 0;
         // </HACK>
 
-//        Text text2 = (Text) notification.getComponent(Model.class).getModel().getPrimitives().get(0);
+//        Text text2 = (Text) notification.getComponent(ModelBuilder.class).getModelComponent().getPrimitives().get(0);
         Text text2 = (Text) Model.getPrimitives(notification).get(0).getComponent(Primitive.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");

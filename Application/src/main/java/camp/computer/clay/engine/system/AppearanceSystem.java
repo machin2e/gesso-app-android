@@ -15,7 +15,7 @@ import camp.computer.clay.engine.manager.Group;
 
 public class AppearanceSystem extends System {
 
-    // TODO: Use this system to change the Model's currently displayed "frame" or "suit"? Maybe ModelSystem is better for that. And update style here?
+    // TODO: Use this system to change the ModelBuilder's currently displayed "frame" or "suit"? Maybe ModelSystem is better for that. And update style here?
 
     Group<Entity> entities;
 
@@ -27,7 +27,7 @@ public class AppearanceSystem extends System {
     private void setup() {
         // Setup subscriptions for needed Entity groups.
         entities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class);
-        // TODO: (if needed) entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, Model.class);
+        // TODO: (if needed) entities = world.entities.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, ModelBuilder.class);
     }
 
     /**

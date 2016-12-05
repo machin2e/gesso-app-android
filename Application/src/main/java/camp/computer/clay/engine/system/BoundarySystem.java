@@ -43,7 +43,7 @@ public class BoundarySystem extends System {
             // Translate and rotate the boundary about the updated position
             for (int i = 0; i < vertices.size(); i++) {
                 boundary.get(i).set(vertices.get(i));
-                Geometry.rotatePoint(boundary.get(i), entity.getComponent(Transform.class).rotation); // Rotate Shape boundary about Model position
+                Geometry.rotatePoint(boundary.get(i), entity.getComponent(Transform.class).rotation); // Rotate Shape boundary about ModelBuilder position
                 Geometry.translatePoint(boundary.get(i), entity.getComponent(Transform.class).x, entity.getComponent(Transform.class).y); // Translate Shape
             }
 

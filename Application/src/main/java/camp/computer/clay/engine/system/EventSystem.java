@@ -1,28 +1,30 @@
 package camp.computer.clay.engine.system;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Event;
 
 public class EventSystem extends System {
 
-    private List<Event> eventQueue = new ArrayList<>();
+//    private List<Event> eventQueue = new ArrayList<>();
 
     public EventSystem(World world) {
         super(world);
     }
 
     public void update(long dt) {
-        while (eventQueue.size() > 0) {
-            dispatch(dequeue());
+//        while (world.eventQueue.size() > 0) {
+//            dispatch(dequeue());
+//        }
+
+        while (world.nextEventIndex < world.eventQueue.size()) {
+            dispatch(world.eventQueue.get(world.nextEventIndex));
+            world.nextEventIndex++;
         }
     }
 
     public void queue(Event event) {
-        eventQueue.add(event);
+        world.eventQueue.add(event);
     }
 
     /**
@@ -31,7 +33,7 @@ public class EventSystem extends System {
      * @return
      */
     private Event dequeue() {
-        return eventQueue.remove(0);
+        return world.eventQueue.remove(0);
     }
 
     /**

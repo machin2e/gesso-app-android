@@ -49,8 +49,8 @@ public abstract class Shape {
     }
 
     public double getRotation() {
-        // return this.position.rotation;
-        return 0;
+        return this.position.rotation;
+//        return 0;
     }
 
     public abstract List<Transform> getVertices();

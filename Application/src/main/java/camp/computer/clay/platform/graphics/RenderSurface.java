@@ -834,8 +834,8 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             Entity host = hostPort.getParent();
             Entity extension = extensionPort.getParent();
 
-            Group<Entity> pinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
-            Group<Entity> extensionPinContactPoints = camp.computer.clay.engine.component.Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+            Group<Entity> pinContactPoints = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
+            Group<Entity> extensionPinContactPoints = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
 
             if (pinContactPoints.size() > Port.getIndex(hostPort)
                     && extensionPinContactPoints.size() > Port.getIndex(extensionPort)) {

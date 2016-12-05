@@ -16,6 +16,10 @@ public class HostLayoutStrategy implements LayoutStrategy<Entity> {
 
         for (int i = 0; i < hosts.size(); i++) {
 
+            // <TEST>
+            minDistanceBetweenPoints = Random.getRandomInteger(800, 1000);
+            // </TEST>
+
             if (i == 0) {
                 // Set initial position to (0, 0)
                 hosts.get(i).getComponent(Physics.class).targetTransform.set(0, 0);
