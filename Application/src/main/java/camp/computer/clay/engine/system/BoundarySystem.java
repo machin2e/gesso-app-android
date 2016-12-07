@@ -32,7 +32,7 @@ public class BoundarySystem extends System {
     }
 
     private void computeBoundary(Entity entity) {
-        // TODO: Cache the boundary and only update when it has been invalidated!
+        // TODO: Cache_OLD the boundary and only update when it has been invalidated!
 
         Shape shape = entity.getComponent(Primitive.class).shape;
 

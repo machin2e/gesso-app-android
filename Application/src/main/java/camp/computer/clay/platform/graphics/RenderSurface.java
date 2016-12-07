@@ -842,7 +842,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                 // Draw connection between Ports
                 // <REFACTOR>
-                // TODO: Cache the integer color code.
+                // TODO: Cache_OLD the integer color code.
                 paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
                 // </REFACTOR>
                 paint.setStrokeWidth(10.0f);

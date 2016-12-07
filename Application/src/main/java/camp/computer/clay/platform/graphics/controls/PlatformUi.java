@@ -385,8 +385,8 @@ public class PlatformUi {
         // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
 
         // <REFACTOR>
-        // TODO: Relocate so these are stored in Cache.
-        // Cache Action and Script in Repository. Retrieve Actions and Scripts from Remote Server.
+        // TODO: Relocate so these are stored in Cache_OLD.
+        // Cache_OLD Action and Script in Repository. Retrieve Actions and Scripts from Remote Server.
         if (!reqeustedActions) {
             HttpRequestTasks.HttpRequestTask httpRequestTask = new HttpRequestTasks.HttpRequestTask();
             httpRequestTask.uri = HttpRequestTasks.DEFAULT_HTTP_GET_ACTIONS_URI;
@@ -2394,13 +2394,37 @@ public class PlatformUi {
                             // Set background color
                             canvas.drawColor(Color.WHITE);
 
+                            // Draw vertex Points in Shape
+                            paint.setColor(Color.BLUE);
+                            paint.setStyle(Paint.Style.STROKE);
+                            paint.setStrokeWidth(3.0f);
+                            if (imagePoints.size() > 0) {
+                                android.graphics.Path path = new android.graphics.Path();
+                                path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+                                path.moveTo((float) imagePoints.get(0).x, (float) imagePoints.get(0).y);
+                                for (int i = 1; i < imagePoints.size(); i++) {
+                                    path.lineTo((float) imagePoints.get(i).x, (float) imagePoints.get(i).y);
+                                }
+                                // path.lineTo((float) boundary.get(0).x, (float) boundary.get(0).y);
+                                path.close();
+                                canvas.drawPath(path, paint);
+                            }
+
                             for (int i = 0; i < imagePoints.size(); i++) {
                                 Transform transform = imagePoints.get(i);
 
+                                // Center
                                 paint.setColor(Color.BLACK);
                                 paint.setStyle(Paint.Style.FILL);
-                                canvas.drawCircle((float) transform.x, (float) transform.y, 4, paint);
+                                canvas.drawCircle((float) transform.x, (float) transform.y, 8, paint);
 
+                                // Outline
+                                paint.setColor(Color.LTGRAY);
+                                paint.setStyle(Paint.Style.STROKE);
+                                paint.setStrokeWidth(1.0f);
+                                canvas.drawCircle((float) transform.x, (float) transform.y, 100, paint);
+
+                                // Coordinate
                                 paint.setColor(Color.BLACK);
                                 paint.setStyle(Paint.Style.FILL);
                                 paint.setTextSize(15);

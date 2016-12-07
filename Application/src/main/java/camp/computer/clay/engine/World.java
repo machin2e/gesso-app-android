@@ -305,7 +305,7 @@ public class World {
                     // Assign the Configuration to the ExtensionEntity
 //                    configureExtensionFromProfile(extension, configuration);
 
-                    // Cache the new ExtensionEntity Configuration
+                    // Cache_OLD the new ExtensionEntity Configuration
                     Application.getInstance().getClay().getConfigurations().add(configuration);
 
                     // TODO: Persist the configuration in the user's private store (either local or online)

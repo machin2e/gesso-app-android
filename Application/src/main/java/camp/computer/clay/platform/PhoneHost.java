@@ -31,7 +31,7 @@ public class PhoneHost {
 
     private Date timeOfLastContact = null;
 
-    // TODO: Cache/entity the unit's state and behavior
+    // TODO: Cache_OLD/entity the unit's state and behavior
 
     private TCPMessageClientHost TCPMessageClientHost;
 

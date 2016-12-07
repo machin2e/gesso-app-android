@@ -126,7 +126,7 @@ public class Renderer extends Thread {
 
                         // <UPDATE>
                         // TODO: Draw Renderables.
-                        // TODO: This call is expensive. Make it way faster. Cache? Sublist?
+                        // TODO: This call is expensive. Make it way faster. Cache_OLD? Sublist?
                         renderSurface.drawRenderables(entities.sortByLayer(), canvas, paint, palette);
                         // </UPDATE>
 

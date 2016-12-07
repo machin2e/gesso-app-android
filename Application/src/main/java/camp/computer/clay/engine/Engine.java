@@ -1,6 +1,7 @@
 package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.system.AppearanceSystem;
@@ -12,6 +13,7 @@ import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.util.Random;
 
 public class Engine {
 
@@ -61,14 +63,12 @@ public class Engine {
         // </REFACTOR>
 
         // <VIRTUAL_HOSTS>
-        /*
         int minHostCount = 5;
         int maxHostCount = 6;
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
             world.createEntity(Host.class);
         }
-        */
         // </VIRTUAL_HOSTS>
 
         addWorld(world);

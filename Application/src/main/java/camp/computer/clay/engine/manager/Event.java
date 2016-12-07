@@ -17,6 +17,7 @@ public class Event {
         UNSELECT
 
         /*
+        // Raw input to InputSystem
         KEY_A,
         KEY_B,
         ...
@@ -28,15 +29,16 @@ public class Event {
         */
 
         /*
+        // Intents/Commands generated from Events
         CAMERA_MOVE,
         CAMERA_FOCUS,
 
-        HOST_SHOW_PORT_CONTROLS,
+        HOST_SHOW_PORT_CONTROLS, // Host.State = EDITING
         HOST_HIDE_PORT_CONTROLS,
         HOST_SHOW_PATHS,
         HOST_HIDE_PATHS,
 
-        PORT_CREATE_PATH, // CREATE_PATH
+        PATH_CREATE, // PORT_CREATE_PATH
 
         PATH_CHANGE_MODE,
         PATH_SWAP_DIRECTION,
@@ -46,6 +48,73 @@ public class Event {
         WORLD_SHOW_OVERVIEW
         */
     }
+
+    /*
+    // <RECOGNIZER>
+    class Sequence {
+
+    }
+
+    class Single extends Sequence {
+        private List<Event.Type> events;
+
+        public Single(Event.Type... events) {
+            this.events = new ArrayList<>();
+            for (int i = 0; i < events.length; i++) {
+                this.events.add(events[i]);
+            }
+        }
+    }
+
+    class Repeat extends Sequence {
+        private List<Event.Type> events;
+
+        // Repeat() means repeat anything...
+        public Repeat(Event.Type... events) {
+            this.events = new ArrayList<>();
+            for (int i = 0; i < events.length; i++) {
+                this.events.add(events[i]);
+            }
+        }
+    }
+
+    public void matchSequence(Sequence... sequences) {
+        // e.g., Single(EVENT_TOUCH), Repeat(EVENT_MOVE), Single(EVENT_UNTOUCH)
+
+        matchSequence(
+                new Single(Type.SELECT),
+                new Repeat(Type.MOVE),
+                new Single(Type.UNSELECT)
+        );
+
+        matchSequence(
+                new Single(Type.SELECT),
+                new Repeat(Type.MOVE),
+                new Single(Type.HOLD)
+        );
+
+        // TODO: Double-click!
+        matchSequence(
+                new Single(Type.SELECT),
+                new Repeat(Type.MOVE),
+                new Single(Type.HOLD),
+                new Single(Type.SELECT)
+        );
+    }
+
+    // TODO: States for editable entities (states: VIEWING, EDITING)
+    static class RecognizerStateMachine {
+
+        enum State {
+            INVALID,
+        }
+
+        public void update() {
+
+        }
+    }
+    // </RECOGNIZER>
+    */
 
     public static int MAXIMUM_POINT_COUNT = 5;
 

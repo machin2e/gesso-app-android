@@ -13,7 +13,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.Cache;
+import camp.computer.clay.platform.Cache_OLD;
 import camp.computer.clay.platform.Internet;
 import camp.computer.clay.platform.Messenger;
 import camp.computer.clay.platform.PhoneHost;
@@ -23,7 +23,7 @@ import camp.computer.clay.platform.communication.MessengerInterface;
 
 public class Clay {
 
-    private Cache cache = null;
+    private Cache_OLD cacheOLD = null;
 
     private Messenger messenger = null;
 
@@ -45,7 +45,7 @@ public class Clay {
 
     public Clay() {
 
-        this.cache = new Cache(this); // Set up cache
+        this.cacheOLD = new Cache_OLD(this); // Set up cacheOLD
 
         this.messenger = new Messenger(this); // Start the messaging systems
 
@@ -115,8 +115,8 @@ public class Clay {
         return platform;
     }
 
-    public Cache getCache() {
-        return this.cache;
+    public Cache_OLD getCacheOLD() {
+        return this.cacheOLD;
     }
 
     public List<PhoneHost> getPhoneHosts() {
@@ -190,7 +190,7 @@ public class Clay {
     // </TODO: MOVE_TO_MANAGER>
 
     private boolean hasCache() {
-        return this.cache != null;
+        return this.cacheOLD != null;
     }
 
     /**

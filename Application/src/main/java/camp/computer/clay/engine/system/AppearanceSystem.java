@@ -52,7 +52,7 @@ public class AppearanceSystem extends System {
 
     public void setHostLightColor(Entity host) {
 
-        // TODO: Optimize regex calls to use ids/hashes! Cache!
+        // TODO: Optimize regex calls to use ids/hashes! Cache_OLD!
 
         // Get LED primitives
         Group<Entity> ports = Portable.getPorts(host);
