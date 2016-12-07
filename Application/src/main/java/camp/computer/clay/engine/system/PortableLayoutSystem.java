@@ -243,7 +243,7 @@ public class PortableLayoutSystem extends System {
         // (2) drag signal to base, or
         // (3) touch elsewhere to cancel
 
-        // TODO: PlatformUi to select Extension from repository then copy that Extension configuration!
+        // TODO: Widgets to select Extension from repository then copy that Extension configuration!
         // TODO: (...) Then use that profile to create and configure Ports for the Extension.
 
         // Create Extension Entity

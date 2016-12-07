@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Cache {
+// TODO: Bundle is a "mobile cache" that can be passed around. Similar to a key-value store.
+public class Bundle {
 
     private long cacheUid = 0L;
 
     private HashMap<Long, Object> elements;
 
-    public Cache() {
+    public Bundle() {
         elements = new HashMap<>();
     }
 
@@ -32,8 +33,8 @@ public class Cache {
         return new ArrayList<>(elements.values());
     }
 
-    public <T> List<T> getObjects(Class<T> objectType) {
-        List<T> objects = new ArrayList<>();
-        return objects;
+    public List<Object> getObjects(Class<? extends Object>... objectTypes) {
+        // TODO:
+        return null;
     }
 }

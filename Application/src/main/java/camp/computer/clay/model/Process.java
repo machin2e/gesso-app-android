@@ -5,9 +5,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Groupable;
+import camp.computer.clay.engine.manager.Handle;
 
-public class Process extends Groupable {
+public class Process extends Handle {
 
     // TODO: 11/8/2016 Consider renaming to Process, Program, Behavior, or Calendar
 
@@ -23,7 +23,7 @@ public class Process extends Groupable {
     }
 
     public void addAction(Action action) {
-        actionUuids.add(action.getUuid());
+        actionUuids.add(action.getUid());
 
 //        Log.v("ActionEditor", "---");
 //        for (int i = 0; i < actionUuids.size(); i++) {
@@ -50,11 +50,11 @@ public class Process extends Groupable {
         long actionUuid = actionUuids.get(index);
 //        return Repository.actions.get(actionUuid);
 
-        for (int i = 0; i < Repository.actions.size(); i++) {
-            if (Repository.actions.get(i).getUuid() == actionUuid) {
-                return Repository.actions.get(i);
-            }
-        }
+//        for (int i = 0; i < Repository.actions.size(); i++) {
+//            if (Repository.actions.get(i).getUid() == actionUuid) {
+//                return Repository.actions.get(i);
+//            }
+//        }
         return null;
     }
 

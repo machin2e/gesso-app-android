@@ -39,7 +39,7 @@ public class Renderer extends Thread {
     public long frameCount = 0;
     public long tickCount = 0; // TODO: Move tickCount into Engine
 
-    public double dt = Clock.getCurrentTime();
+    public double dt = Clock.getTime(Clock.Unit.MILLISECONDS);
 
     Group<Entity> entities;
     Group<Entity> cameraEntities;
@@ -91,8 +91,8 @@ public class Renderer extends Thread {
                 continue;
             }
 
-            dt = Clock.getCurrentTime() - frameStartTime;
-            frameStartTime = Clock.getCurrentTime();
+            dt = Clock.getTime(Clock.Unit.MILLISECONDS) - frameStartTime;
+            frameStartTime = Clock.getTime(Clock.Unit.MILLISECONDS);
 
 //            platformRenderSurface.world.update();
 
@@ -155,7 +155,7 @@ public class Renderer extends Thread {
             }
 
             // Store actual frames per second
-            frameStopTime = Clock.getCurrentTime();
+            frameStopTime = Clock.getTime(Clock.Unit.MILLISECONDS);
             currentFPS = (1000.0f / (float) (frameStopTime - frameStartTime));
             frameTimeDelta = frameStopTime - frameStartTime;
 
@@ -163,7 +163,7 @@ public class Renderer extends Thread {
             // This reduces energy consumption thereby increasing battery life.
             frameSleepTime = targetFramePeriod - (frameStopTime - frameStartTime);
             try {
-                sleepStartTime = Clock.getCurrentTime();
+                sleepStartTime = Clock.getTime(Clock.Unit.MILLISECONDS);
                 if (frameSleepTime > 0) {
                     Thread.sleep(frameSleepTime);
                 } else {
@@ -172,7 +172,7 @@ public class Renderer extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            currentSleepTime = Clock.getCurrentTime() - sleepStartTime;
+            currentSleepTime = Clock.getTime(Clock.Unit.MILLISECONDS) - sleepStartTime;
         }
     }
 

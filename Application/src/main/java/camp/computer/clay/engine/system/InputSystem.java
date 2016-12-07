@@ -10,7 +10,7 @@ import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
 
 public class InputSystem extends System {
@@ -54,54 +54,90 @@ public class InputSystem extends System {
             event.pointerCoordinates[i].y = (event.surfaceCoordinates[i].y - (origin.y + cameraEntities.get(0).getComponent(Transform.class).y)) / cameraEntities.get(0).getComponent(Transform.class).scale;
         }
 
-        switch (event.getType()) {
-            case SELECT: {
-                // Set previous Event
-                previousEvent = event;
-                break;
-            }
-
-            case HOLD: {
-
-                // Set previous Event
-                if (previousEvent != null) {
-                    event.setPreviousEvent(previousEvent);
-                } else {
-                    event.setPreviousEvent(null);
-                }
-                previousEvent = event;
-
-                // <REFACTOR>
-                // There might be a better way to do this. How can I assign reasonable coordinates to the synthetic HOLD event?
-                // TODO: Set coordinates of hold... to first event?
-                Event firstEvent = event.getFirstEvent();
-                for (int i = 0; i < firstEvent.pointerCoordinates.length; i++) {
-                    event.pointerCoordinates[i].x = firstEvent.pointerCoordinates[i].x;
-                    event.pointerCoordinates[i].y = firstEvent.pointerCoordinates[i].y;
-                }
-                // </REFACTOR>
-
-                break;
-            }
-
-            case MOVE: {
-
-                // Set previous Event
+        if (event.getType() == world.events.getEventType("SELECT")) {
+            // Set previous Event
+            previousEvent = event;
+        } else if (event.getType() == world.events.getEventType("HOLD")) {
+            // Set previous Event
+            if (previousEvent != null) {
                 event.setPreviousEvent(previousEvent);
-                previousEvent = event;
-
-                break;
+            } else {
+                event.setPreviousEvent(null);
             }
+            previousEvent = event;
 
-            case UNSELECT: {
-
-                // Set previous Event
-                event.setPreviousEvent(previousEvent);
-                previousEvent = event;
-
-                break;
+            // <REFACTOR>
+            // There might be a better way to do this. How can I assign reasonable coordinates to the synthetic HOLD event?
+            // TODO: Set coordinates of hold... to first event?
+            Event firstEvent = event.getFirstEvent();
+            for (int i = 0; i < firstEvent.pointerCoordinates.length; i++) {
+                event.pointerCoordinates[i].x = firstEvent.pointerCoordinates[i].x;
+                event.pointerCoordinates[i].y = firstEvent.pointerCoordinates[i].y;
             }
+            // </REFACTOR>
+
+        } else if (event.getType() == world.events.getEventType("MOVE")) {
+
+            // Set previous Event
+            event.setPreviousEvent(previousEvent);
+            previousEvent = event;
+
+        } else if (event.getType() == world.events.getEventType("UNSELECT")) {
+
+            // Set previous Event
+            event.setPreviousEvent(previousEvent);
+            previousEvent = event;
+
         }
+
+//        switch (event.getType()) {
+//            case SELECT: {
+//                // Set previous Event
+//                previousEvent = event;
+//                break;
+//            }
+//
+//            case HOLD: {
+//
+//                // Set previous Event
+//                if (previousEvent != null) {
+//                    event.setPreviousEvent(previousEvent);
+//                } else {
+//                    event.setPreviousEvent(null);
+//                }
+//                previousEvent = event;
+//
+//                // <REFACTOR>
+//                // There might be a better way to do this. How can I assign reasonable coordinates to the synthetic HOLD event?
+//                // TODO: Set coordinates of hold... to first event?
+//                Event firstEvent = event.getFirstEvent();
+//                for (int i = 0; i < firstEvent.pointerCoordinates.length; i++) {
+//                    event.pointerCoordinates[i].x = firstEvent.pointerCoordinates[i].x;
+//                    event.pointerCoordinates[i].y = firstEvent.pointerCoordinates[i].y;
+//                }
+//                // </REFACTOR>
+//
+//                break;
+//            }
+//
+//            case MOVE: {
+//
+//                // Set previous Event
+//                event.setPreviousEvent(previousEvent);
+//                previousEvent = event;
+//
+//                break;
+//            }
+//
+//            case UNSELECT: {
+//
+//                // Set previous Event
+//                event.setPreviousEvent(previousEvent);
+//                previousEvent = event;
+//
+//                break;
+//            }
+//        }
 
         setTargets(event);
 
@@ -115,7 +151,8 @@ public class InputSystem extends System {
         Entity primaryTarget = null;
 
         // Handle special cases for SELECT and non-SELECT events
-        if (event.getType() != Event.Type.SELECT) {
+        //if (event.getType() != Event.Type.SELECT) {
+        if (event.getType() != world.events.getEventType("SELECT")) {
             event.setTarget(event.getFirstEvent().getTarget());
             event.setSecondaryTarget(event.getFirstEvent().getSecondaryTarget());
         } else {
@@ -144,7 +181,8 @@ public class InputSystem extends System {
         }
 
         // Handle special bookkeeping storing previous target Entity
-        if (event.getType() == Event.Type.UNSELECT) {
+//        if (event.getType() == Event.Type.UNSELECT) {
+        if (event.getType() == world.events.getEventType("UNSELECT")) {
             previousPrimaryTarget = event.getTarget();
         }
     }

@@ -29,8 +29,8 @@ import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
-import camp.computer.clay.engine.manager.EventHandler;
+import camp.computer.clay.engine.event.Event;
+import camp.computer.clay.engine.manager.EventResponse;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
@@ -42,7 +42,7 @@ import camp.computer.clay.lib.Geometry.Segment;
 import camp.computer.clay.lib.Geometry.Text;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.PlatformUi;
+import camp.computer.clay.platform.graphics.controls.Widgets;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.Random;
 
@@ -125,7 +125,7 @@ public class EntityFactory {
         }
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.events.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -134,7 +134,7 @@ public class EntityFactory {
                 }
 
                 // Show prototype Extension if any are saved and available in the repository
-                if (Application.getInstance().getClay().getConfigurations().size() > 0) {
+                if (world.cache.getObjects(Configuration.class).size() > 0) {
 
                     Entity extensionPrototype = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
@@ -156,7 +156,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(final Event event) {
 
@@ -210,8 +210,8 @@ public class EntityFactory {
                     Entity extensionPrototype = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
-                    // Get cached extension configurations (and retrieve additional from Internet store)
-                    List<Configuration> configurations = Application.getInstance().getClay().getConfigurations();
+                    // Get cached extension configurations (and retrieve additional from Internet2 store)
+                    List<Configuration> configurations = world.cache.getObjects(Configuration.class);
 
                     if (configurations.size() == 0) {
 
@@ -219,9 +219,9 @@ public class EntityFactory {
 
                     } else if (configurations.size() > 0) {
 
-                        // PlatformUi Player to select an ExtensionEntity from the Store
-                        // i.e., PlatformUi to select extension to use! Then use that profile to create and configure ports for the extension.
-                        Application.getInstance().getPlatformUi().openInteractiveAssembler(configurations, new PlatformUi.OnActionListener<Configuration>() {
+                        // Widgets Player to select an ExtensionEntity from the Store
+                        // i.e., Widgets to select extension to use! Then use that profile to create and configure ports for the extension.
+                        Application.getInstance().getWidgets().openInteractiveAssembler(configurations, new Widgets.OnActionListener<Configuration>() {
                             @Override
                             public void onComplete(Configuration configuration) {
 
@@ -256,7 +256,7 @@ public class EntityFactory {
         workspace.addComponent(new Workspace()); // Unique to Workspace
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -422,7 +422,7 @@ public class EntityFactory {
         // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.HOLD, new EventHandler<Entity>() {
+        world.events.subscribe("HOLD", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -434,7 +434,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -466,9 +466,9 @@ public class EntityFactory {
                     // </HACK>
 
                     if (openImageEditor) {
-                        Application.getInstance().getPlatformUi().openImageEditor(extension);
+                        Application.getInstance().getWidgets().openImageEditor(extension);
                     } else {
-                        Application.getInstance().getPlatformUi().openActionEditor(extension);
+                        Application.getInstance().getWidgets().openActionEditor(extension);
                     }
                 }
 
@@ -584,7 +584,7 @@ public class EntityFactory {
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.events.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -715,7 +715,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1067,7 +1067,7 @@ public class EntityFactory {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1118,7 +1118,7 @@ public class EntityFactory {
         camera.addComponent(new Physics());
 
         // <EVENT_HANDLERS>
-        world.events.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.events.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1140,7 +1140,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 

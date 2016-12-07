@@ -2,9 +2,9 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
-import camp.computer.clay.engine.manager.Groupable;
+import camp.computer.clay.engine.manager.Handle;
 
-public class Script extends Groupable {
+public class Script extends Handle {
 
     private UUID parentAction;
 

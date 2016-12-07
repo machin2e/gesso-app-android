@@ -34,7 +34,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.Geometry.Circle;
@@ -204,7 +204,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         InputSystem inputSystem = world.getSystem(InputSystem.class);
 
         // Create pointerCoordinates event
-        Event event = new Event();
+        Event event = new Event("NONE");
 
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
@@ -223,7 +223,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
                     holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
-                    event.setType(Event.Type.SELECT);
+                    event.setType("SELECT");
                     event.pointerIndex = pointerId;
                     inputSystem.queue(event);
 
@@ -231,7 +231,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
 
-                    event.setType(Event.Type.MOVE);
+                    event.setType("MOVE");
                     event.pointerIndex = pointerId;
 
                     inputSystem.queue(event);
@@ -240,7 +240,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
 
-                    event.setType(Event.Type.UNSELECT);
+                    event.setType("UNSELECT");
                     event.pointerIndex = pointerId;
                     inputSystem.queue(event);
 

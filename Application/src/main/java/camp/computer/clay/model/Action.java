@@ -1,8 +1,8 @@
 package camp.computer.clay.model;
 
-import camp.computer.clay.engine.manager.Groupable;
+import camp.computer.clay.engine.manager.Handle;
 
-public class Action extends Groupable {
+public class Action extends Handle {
 
     // TODO: Version/Revision UUID
     // TODO: Execution pre-condition
@@ -39,16 +39,16 @@ public class Action extends Groupable {
     }
 
     public void setScript(Script script) {
-        scriptUuid = script.getUuid();
+        scriptUuid = script.getUid();
     }
 
     public Script getScript() {
 //        return Repository.scripts.get(scriptUuid);
-        for (int i = 0; i < Repository.scripts.size(); i++) {
-            if (Repository.scripts.get(i).getUuid() == scriptUuid) {
-                return Repository.scripts.get(i);
-            }
-        }
+//        for (int i = 0; i < Repository.scripts.size(); i++) {
+//            if (Repository.scripts.get(i).getUid() == scriptUuid) {
+//                return Repository.scripts.get(i);
+//            }
+//        }
         return null;
     }
 }

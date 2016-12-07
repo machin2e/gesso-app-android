@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Engine;
 import camp.computer.clay.engine.Platform;
 import camp.computer.clay.engine.World;
@@ -22,28 +21,24 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.platform.communication.Internet;
-import camp.computer.clay.platform.communication.UdpServer;
+import camp.computer.clay.platform.compute.JavaScriptEngine;
 import camp.computer.clay.platform.graphics.RenderSurface;
-import camp.computer.clay.platform.graphics.controls.PlatformUi;
-import camp.computer.clay.platform.scripting.JavaScriptEngine;
-import camp.computer.clay.platform.sound.SpeechSynthesisEngine;
-import camp.computer.clay.platform.spatial.OrientationInput;
+import camp.computer.clay.platform.graphics.controls.Widgets;
+import camp.computer.clay.platform.io.OrientationInput;
+import camp.computer.clay.platform.io.SpeechSynthesizer;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 import camp.computer.clay.platform.util.ViewGroupHelper;
 import camp.computer.clay.util.Random;
 
-public class Application extends FragmentActivity implements PlatformInterface {
+public class Application extends FragmentActivity {
 
     // <SETTINGS>
     public static class Settings {
         public static final boolean ENABLE_SPEECH_OUTPUT = false;
         public static final boolean ENABLE_MOTION_INPUT = true;
-
-        public static final long MESSAGE_SEND_FREQUENCY = 5000; // 500;
 
         /**
          * Hides the operating system's status and navigation bars. Setting this to false is helpful
@@ -55,9 +50,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         public static boolean ENABLE_HARDWARE_ACCELERATION = false;
 
         public static boolean ENABLE_JAVASCRIPT_ENGINE = true;
-
-        // Platform Adapter
-        public static boolean ENABLE_MESSAGING_SERVICE = true;
     }
     // </SETTINGS>
 
@@ -65,30 +57,24 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     private static Application application;
 
-    private PlatformUi platformUi;
+    private Widgets widgets;
 
     public RenderSurface renderSurface;
 
-    private SpeechSynthesisEngine speechSynthesisEngine;
+    private SpeechSynthesizer speechSynthesizer;
 
     private OrientationInput orientationInput;
 
-    private UdpServer UdpServer;
-
-    private Internet networkResource;
-
     private JavaScriptEngine javaScriptEngine;
-
-    private Clay clay;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (Settings.ENABLE_SPEECH_OUTPUT) {
-            if (requestCode == SpeechSynthesisEngine.CHECK_CODE) {
+            if (requestCode == SpeechSynthesizer.CHECK_CODE) {
                 if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                    speechSynthesisEngine = new SpeechSynthesisEngine(this);
+                    speechSynthesizer = new SpeechSynthesizer(this);
                 } else {
                     Intent install = new Intent();
                     install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
@@ -126,7 +112,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         ViewGroupHelper.setContext(getApplicationContext());
 
         // Generate Application View ID
-        applicationViewId = PlatformUi.generateViewId();
+        applicationViewId = Widgets.generateViewId();
 
         // Create Application Layout View
         FrameLayout applicationView = new FrameLayout(getApplicationContext());
@@ -135,10 +121,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
         // Lock screen orientation to vertical orientation.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-//        if (Settings.ENABLE_FULLSCREEN) {
-//            startFullscreenService();
-//        }
 
         // Prevent on-screen keyboard from pushing up content. Instead it will overlay content.
         //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
@@ -150,7 +132,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
         // Check availability of speech synthesis engine on Android host device.
         if (Settings.ENABLE_SPEECH_OUTPUT) {
-            SpeechSynthesisEngine.checkAvailability(this);
+            SpeechSynthesizer.checkAvailability(this);
         }
 
         // <HARDWARE_ACCELERATION>
@@ -164,96 +146,21 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // </PLATFORM>
 
         // <PLATFORM_ADAPTER>
-        platformUi = new PlatformUi(getApplicationContext());
-
-        /*
-        for (int i = 0; i < 100; i++) {
-            String outgoingMessage = "announce device " + UUID.randomUUID();
-            CRC16 CRC16 = new CRC16();
-            int seed = 0;
-            byte[] outgoingMessageBytes = outgoingMessage.getBytes();
-            int check = CRC16.calculate(outgoingMessageBytes, seed);
-            String outmsg =
-                    "\f" +
-                            String.valueOf(outgoingMessage.length()) + "\t" +
-                            String.valueOf(check) + "\t" +
-                            "text" + "\t" +
-                            outgoingMessage;
-            Log.v("CRC_Demo", "" + outmsg);
-        }
-        */
+        widgets = new Widgets(getApplicationContext());
 
         // Create Platform Rendering Surface and add it to the application view.
         renderSurface = new RenderSurface(getContext());
         FrameLayout frameLayout = (FrameLayout) Application.getInstance().findViewById(applicationViewId);
         frameLayout.setPadding(0, 0, 0, 0);
         FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
-                DeviceDimensionsHelper.getDisplayWidth(context),
-                DeviceDimensionsHelper.getDisplayHeight(context)
-//                FrameLayout.LayoutParams.MATCH_PARENT,
-//                FrameLayout.LayoutParams.MATCH_PARENT
+                DeviceDimensionsHelper.getDisplayWidth(context), // FrameLayout.LayoutParams.MATCH_PARENT
+                DeviceDimensionsHelper.getDisplayHeight(context) // FrameLayout.LayoutParams.MATCH_PARENT
         );
         frameLayoutParams.setMargins(0, 0, 0, 0);
         frameLayout.addView(renderSurface, frameLayoutParams);
 
         renderSurface.onResume();
-
-        // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
-        //setContentView(visualizationSurface);
-
-        // UDP Datagram Server
-        if (UdpServer == null) {
-            UdpServer = new UdpServer("udp");
-            UdpServer.startServer(); // TODO: Move into BootstrapComponent
-        }
-
-        // Internet Network Interface
-        if (networkResource == null) {
-            networkResource = new Internet();
-        }
-
-        // Start Messaging Thread
-        if (Settings.ENABLE_MESSAGING_SERVICE) {
-            startMessagingService();
-            // TODO: Move MessengingService.startService() into BootstrapComponent
-        }
         // </PLATFORM_ADAPTER>
-
-        // <ENGINE>
-        // Clay
-        clay = new Clay();
-        clay.addPlatform(this); // Add the view provided by the host device.
-
-        if (UdpServer == null) {
-            clay.addHost(this.UdpServer);
-        }
-
-        if (networkResource == null) {
-            clay.addResource(this.networkResource);
-        }
-        // </ENGINE>
-
-        // <REDIS>
-        /*
-        new JedisConnectToDatabaseTask().execute("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com:14268");
-
-        while (this.jedis == null) {
-            // Waiting for connection...
-        }
-
-        new Thread(
-                new RedisSubThread(this.jedis)
-        ).start();
-        */
-        // </REDIS>
-
-
-        // <REDIS>
-        /*
-        RedisDBThread redisDB = new RedisDBThread();
-        redisDB.start();
-        */
-        // </REDIS>
 
         // <JAVASCRIPT_ENGINE>
         if (Settings.ENABLE_JAVASCRIPT_ENGINE) {
@@ -263,12 +170,13 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
         /*
         // <SHOW_MAIN_MENU>
-        platformUi.openMainMenu();
+        widgets.openMainMenu();
         // </SHOW_MAIN_MENU>
         */
 
         // <TIMER_THREAD>
-        final Engine engine = new Engine(new Platform());
+        //final Engine engine = new Engine(new Platform());
+        new Engine(new Platform());
         // </TIMER_THREAD>
     }
 
@@ -289,14 +197,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
     protected void onResume() {
         super.onResume();
 
-        // UDP Client/Server
-        if (UdpServer == null) {
-            UdpServer = new UdpServer("udp");
-        }
-        if (!UdpServer.isActive()) {
-            UdpServer.startServer();
-        }
-
         // Rendering Surface
         renderSurface.onResume();
     }
@@ -306,8 +206,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
         super.onDestroy();
 
         // Speech Synthesis Engine. Stop.
-        if (speechSynthesisEngine != null) {
-            speechSynthesisEngine.destroy();
+        if (speechSynthesizer != null) {
+            speechSynthesizer.destroy();
         }
     }
 
@@ -355,7 +255,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_S: {
-                platformUi.openSettings();
+                widgets.openSettings();
                 //your Action code
                 return true;
             }
@@ -366,7 +266,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_M: {
-                platformUi.openMainMenu();
+                widgets.openMainMenu();
                 return true;
             }
 
@@ -450,8 +350,8 @@ public class Application extends FragmentActivity implements PlatformInterface {
         return Application.application;
     }
 
-    public PlatformUi getPlatformUi() {
-        return this.platformUi;
+    public Widgets getWidgets() {
+        return this.widgets;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -503,23 +403,23 @@ public class Application extends FragmentActivity implements PlatformInterface {
     // </FULLSCREEN_SERVICE>
 
 
-    // <MESSAGING_THREAD>
-    // Create the Handler object. This will be run on the main thread by default.
-    public void startMessagingService() {
-        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
-        final Handler messagingThreadHandler = new Handler();
-        messagingThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // Action the outgoing messages
-                clay.update();
-
-                // Repeat this the same runnable code block again another 2 seconds
-                messagingThreadHandler.postDelayed(this, Settings.MESSAGE_SEND_FREQUENCY);
-            }
-        });
-    }
-    // </MESSAGING_THREAD>
+//    // <MESSAGING_THREAD>
+//    // Create the Handler object. This will be run on the main thread by default.
+//    public void startMessagingService() {
+//        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
+//        final Handler messagingThreadHandler = new Handler();
+//        messagingThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                // Action the outgoing messages
+//                clay.update();
+//
+//                // Repeat this the same runnable code block again another 2 seconds
+//                messagingThreadHandler.postDelayed(this, Settings.MESSAGE_SEND_FREQUENCY);
+//            }
+//        });
+//    }
+//    // </MESSAGING_THREAD>
 
     // <PLATFORM_THREAD_ADAPTER>
     /*
@@ -547,16 +447,4 @@ public class Application extends FragmentActivity implements PlatformInterface {
     }
     */
     // </PLATFORM_THREAD_ADAPTER>
-
-    // <TODO: DELETE>
-    @Override
-    public void setClay(Clay clay) {
-        this.clay = clay;
-    }
-
-    @Override
-    public Clay getClay() {
-        return this.clay;
-    }
-    // </TODO: DELETE>
 }

@@ -2,6 +2,12 @@ package camp.computer.clay.engine;
 
 public class Clock extends Thread {
 
+    public enum Unit {
+        NANOSECONDS,
+        MILLISECONDS,
+        SECONDS
+    }
+
     public static long NANOS_PER_MILLISECOND = 1000000;
     public static long NANOS_PER_SECOND = 1000000000;
 
@@ -37,8 +43,13 @@ public class Clock extends Thread {
         }
     }
 
-    public static long getCurrentTime() {
-        return java.lang.System.currentTimeMillis();
+    public static long getTime(Unit unit) {
+        switch (unit) {
+            case MILLISECONDS:
+            default: {
+                return java.lang.System.currentTimeMillis();
+            }
+        }
 
         // May also be able to use:
         // - java.lang.System.nanoTime();

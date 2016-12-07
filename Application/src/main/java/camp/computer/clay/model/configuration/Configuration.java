@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 
 public class Configuration {
     private UUID uuid = null;
@@ -26,8 +26,8 @@ public class Configuration {
         Group<Entity> ports = Portable.getPorts(portableEntity);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
-            PortConfiguration portConfiguration = new PortConfiguration(port);
-            addPort(portConfiguration);
+//            PortConfiguration portConfiguration = new PortConfiguration(port);
+//            addPort(portConfiguration);
         }
         Log.v("Configuration", "created Extension Configuration with # ports: " + ports.size());
     }

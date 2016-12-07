@@ -2,7 +2,7 @@ package camp.computer.clay.engine.system;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.event.Event;
 
 public class EventSystem extends System {
 

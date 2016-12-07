@@ -7,7 +7,7 @@ import camp.computer.clay.engine.manager.Group;
 public final class Entity {
 
     // <HACK>
-    public long uuid = EntityManager.count++; // entities.INVALID_UUID;
+    public long uuid = EntityManager.count++; // entities.INVALID_UID;
     // </HACK>
 
     public long getUuid() {

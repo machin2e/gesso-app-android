@@ -28,16 +28,16 @@ import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
+import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.EntityManager;
-import camp.computer.clay.engine.manager.Event;
 import camp.computer.clay.engine.manager.EventManager;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Text;
-import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.PlatformUi;
+import camp.computer.clay.platform.Cache;
+import camp.computer.clay.platform.graphics.controls.Widgets;
 
 public class World {
 
@@ -97,7 +97,8 @@ public class World {
     private List<System> systems = new ArrayList<>();
 
     // <TEMPORARY>
-    public Repository repository;
+//    public Repository repository;
+    public Cache cache;
     // </TEMPORARY>
 
     public Engine engine;
@@ -115,14 +116,20 @@ public class World {
         // </TODO: DELETE>
 
         events = new EventManager();
+        events.registerEventType("NONE");
+        events.registerEventType("SELECT");
+        events.registerEventType("HOLD");
+        events.registerEventType("MOVE");
+        events.registerEventType("UNSELECT");
 
         entities = new EntityManager();
 
         createPrototypeExtensionEntity();
 
         // <TEMPORARY>
-        repository = new Repository();
-        repository.populateTestData();
+//        repository = new Repository();
+//        repository.populateTestData();
+        cache = new Cache();
         // </TEMPORARY>
     }
 
@@ -157,11 +164,11 @@ public class World {
 
     public void update(long dt) {
 
-        long updateStartTime = Clock.getCurrentTime();
+        long updateStartTime = Clock.getTime(Clock.Unit.MILLISECONDS);
         for (int i = 0; i < systems.size(); i++) {
             systems.get(i).update(dt);
         }
-        updateTime = Clock.getCurrentTime() - updateStartTime;
+        updateTime = Clock.getTime(Clock.Unit.MILLISECONDS) - updateStartTime;
     }
 
     public Entity createEntity(Class<?> entityType) {
@@ -292,7 +299,7 @@ public class World {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call openCreateExtensionView if the extensionEntity is a draft (i.e., does not have an associated Configuration)
-            Application.getInstance().getPlatformUi().openCreateExtensionView(new PlatformUi.OnActionListener<String>() {
+            Application.getInstance().getWidgets().openCreateExtensionView(new Widgets.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
@@ -306,7 +313,7 @@ public class World {
 //                    configureExtensionFromProfile(extension, configuration);
 
                     // Cache_OLD the new ExtensionEntity Configuration
-                    Application.getInstance().getClay().getConfigurations().add(configuration);
+                    cache.add(configuration);
 
                     // TODO: Persist the configuration in the user's private store (either local or online)
 
@@ -314,7 +321,7 @@ public class World {
                 }
             });
         } else {
-            Application.getInstance().getPlatformUi().promptAcknowledgment(new PlatformUi.OnActionListener() {
+            Application.getInstance().getWidgets().promptAcknowledgment(new Widgets.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 
