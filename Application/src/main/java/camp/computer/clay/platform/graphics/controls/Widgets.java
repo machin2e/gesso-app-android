@@ -574,7 +574,7 @@ public class Widgets {
                         } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            final List<Action> actions = (List<Action>) World.getWorld().cache.getObjects(Action.class); // repository.getActions();
+                            final List<Action> actions = (List<Action>) World.getInstance().cache.getObjects(Action.class); // repository.getActions();
 
                             createListView(
                                     actions,
@@ -1072,7 +1072,7 @@ public class Widgets {
                 } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    final List<Action> actions = (List<Action>) World.getWorld().cache.getObjects(Action.class);
+                    final List<Action> actions = (List<Action>) World.getInstance().cache.getObjects(Action.class);
 
                     // TODO: Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i))))
 

@@ -90,7 +90,7 @@ public class ModelBuilder {
 
     /*
     public Shape getPrimitive(String label) {
-        World.getWorld().lookupCount++;
+        World.getInstance().lookupCount++;
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.getLabel().equals(label)) {

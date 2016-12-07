@@ -17,7 +17,7 @@ public class PhysicsSystem extends System {
     }
 
     private void setup() {
-        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class);
+        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class);
     }
 
     @Override
@@ -26,8 +26,8 @@ public class PhysicsSystem extends System {
 
             /*
             // TODO: Update this to use time-based velocity and acceleration!
-            entities.get(i).getComponent(Transform.class).set(
-                    entities.get(i).getComponent(Physics.class).targetTransform
+            entityManager.get(i).getComponent(Transform.class).set(
+                    entityManager.get(i).getComponent(Physics.class).targetTransform
             );
             */
 

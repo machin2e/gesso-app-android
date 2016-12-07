@@ -33,20 +33,20 @@ public class PortableLayoutSystem extends System {
     public PortableLayoutSystem(World world) {
         super(world);
 
-        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
+        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
         // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(ModelBuilder.class, Transform.class);
 
         //paths = world.entitiesWithBoundary.get().filterActive(true).filterWithComponent(Path.class);
-        paths = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
+        paths = world.entityManager.subscribe(Group.Filters.filterWithComponents, Path.class);
 
         //Group<Entity> hosts = world.entitiesWithBoundary.get().filterWithComponent(Host.class);
-        hosts = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
+        hosts = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class);
 
         //extensions = world.entitiesWithBoundary.get().filterWithComponent(Extension.class);
-        extensions = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
+        extensions = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class);
 
 //        Group<Entity> ports = world.entitiesWithBoundary.get().filterWithComponent(Port.class);
-        ports = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
+        ports = world.entityManager.subscribe(Group.Filters.filterWithComponents, Port.class);
     }
 
     @Override

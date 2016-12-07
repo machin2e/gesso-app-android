@@ -25,12 +25,15 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
+import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.EventManager;
+import camp.computer.clay.engine.manager.EventResponse;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Text;
@@ -89,9 +92,9 @@ public class World {
     public List<Event> eventQueue = new ArrayList<>();
     public int nextEventIndex = 0;
 
-    public EventManager events;
+    public EventManager eventManager;
 
-    public EntityManager entities;
+    public EntityManager entityManager;
     // </MANAGERS>
 
     private List<System> systems = new ArrayList<>();
@@ -115,14 +118,17 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-        events = new EventManager();
-        events.registerEventType("NONE");
-        events.registerEventType("SELECT");
-        events.registerEventType("HOLD");
-        events.registerEventType("MOVE");
-        events.registerEventType("UNSELECT");
+        eventManager = new EventManager();
+        eventManager.registerEvent("NONE"); // TODO: Delete!
 
-        entities = new EntityManager();
+        eventManager.registerEvent("SELECT");
+        eventManager.registerEvent("HOLD");
+        eventManager.registerEvent("MOVE");
+        eventManager.registerEvent("UNSELECT");
+
+        eventManager.registerEvent("CREATE_HOST");
+
+        entityManager = new EntityManager();
 
         createPrototypeExtensionEntity();
 
@@ -131,12 +137,32 @@ public class World {
 //        repository.populateTestData();
         cache = new Cache();
         // </TEMPORARY>
+
+        eventManager.subscribe("CREATE_HOST", new EventResponse() {
+            @Override
+            public void execute(Event event) {
+                Log.v("EVENT_QUEUE", "CREATE_HOST");
+                Entity host = World.getInstance().createEntity(Host.class);
+                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+
+//                // Automatically focus on the first Host that appears in the workspace/world.
+//                if (World.getInstance().entityManager.get().size() == 1) {
+//                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+//                    camera.getComponent(Camera.class).focus = host;
+//                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+//                } else {
+//                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+//                    camera.getComponent(Camera.class).focus = null;
+//                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+//                }
+            }
+        });
     }
 
     // <TODO: DELETE>
     private static World world = null;
 
-    public static World getWorld() {
+    public static World getInstance() {
         return World.world;
     }
     // </TODO: DELETE>
@@ -196,8 +222,8 @@ public class World {
             entity = EntityFactory.createWorkspaceEntity(this);
         }
 
-        // Add Entity to entities
-        entities.add(entity);
+        // Add Entity to entityManager
+        entityManager.add(entity);
 
         return entity;
     }
@@ -254,7 +280,7 @@ public class World {
 
         // <HACK>
         // TODO: Add to common createEntity method.
-        entities.add(prototypeExtension);
+        entityManager.add(prototypeExtension);
         // <HACK>
 
         return prototypeExtension;

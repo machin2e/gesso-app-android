@@ -168,7 +168,7 @@ public class Path extends Component {
 
     public static Entity getSource(Entity path) {
         long sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
-        return World.getWorld().entities.get(sourcePortUuid);
+        return World.getInstance().entityManager.get(sourcePortUuid);
     }
 
     public static void setTarget(Entity path, Entity target) {
@@ -190,7 +190,7 @@ public class Path extends Component {
 
     public static Entity getTarget(Entity path) {
         long targetPortUuid = path.getComponent(Path.class).targetPortUuid;
-        return World.getWorld().entities.get().get(targetPortUuid);
+        return World.getInstance().entityManager.get().get(targetPortUuid);
     }
 
     public static Group<Entity> getPorts(Entity path) {

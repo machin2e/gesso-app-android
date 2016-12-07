@@ -156,14 +156,14 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
     /*
     // NOTES:
-    // - Motion events contain information about all of the pointers that are currently active
+    // - Motion eventManager contain information about all of the pointers that are currently active
     //   even if some of them have not moved since the getLastEvent event was delivered.
     //
     // - The index of pointers only ever changes by one as individual pointers go up and down,
     //   except when the gesture is canceled.
     //
     // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
-    //   across all subsequent motion events in a gesture. Then for successive motion events,
+    //   across all subsequent motion eventManager in a gesture. Then for successive motion eventManager,
     //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
     //   id in that motion event.
     //
@@ -364,14 +364,14 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawOverlay(Canvas canvas, Paint paint) {
 
         if (!isValid) {
-            this.entities = world.entities.subscribe(null, null);
-            hostEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
-            portEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
-            extensionEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
-            pathEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
-            cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+            this.entities = world.entityManager.subscribe(null, null);
+            hostEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class);
+            portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Port.class);
+            extensionEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class);
+            pathEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Path.class);
+            cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
 
-            boundaryEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
+            boundaryEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
 
             isValid = true;
         }
@@ -575,22 +575,22 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
 
         if (!isValid) {
-            this.entities = world.entities.subscribe(null, null);
-            hostEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Host.class);
-            portEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Port.class);
-            extensionEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class);
-            pathEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Path.class);
-            cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+            this.entities = world.entityManager.subscribe(null, null);
+            hostEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class);
+            portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Port.class);
+            extensionEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class);
+            pathEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Path.class);
+            cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
 
-            boundaryEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
+            boundaryEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
 
             isValid = true;
         }
 
         // <BOUNDARY>
-        // TODO: Clean up: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
-        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getWorld().entities.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
-        //Group<Entity> boundaryEntities = World.getWorld().entities.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getPrimitives();
+        // TODO: Clean up: Group<Entity> entities2 = World.getInstance().entityManager.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
+        // TODO: FIX PATH! Integrate into multi-"skin" (or multi-configuration) model/image.: Group<Entity> entities2 = World.getInstance().entityManager.get().filterActive(true).filterWithComponents(Path.class, Boundary.class).getModels().getPrimitives();
+        //Group<Entity> boundaryEntities = World.getInstance().entityManager.get().filterActive(true).filterWithComponents(Extension.class, Boundary.class).getModels().getPrimitives();
         paint.setColor(Color.parseColor(World.GEOMETRY_ANNOTATION_FONT_COLOR));
         paint.setStrokeWidth(2.0f);
         paint.setStyle(Paint.Style.STROKE);

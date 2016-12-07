@@ -25,7 +25,7 @@ public class InputSystem extends System {
     }
 
     private void setup() {
-        cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+        cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
     }
 
     private Event previousEvent = null;
@@ -54,10 +54,10 @@ public class InputSystem extends System {
             event.pointerCoordinates[i].y = (event.surfaceCoordinates[i].y - (origin.y + cameraEntities.get(0).getComponent(Transform.class).y)) / cameraEntities.get(0).getComponent(Transform.class).scale;
         }
 
-        if (event.getType() == world.events.getEventType("SELECT")) {
+        if (event.getType() == world.eventManager.getEventUid("SELECT")) {
             // Set previous Event
             previousEvent = event;
-        } else if (event.getType() == world.events.getEventType("HOLD")) {
+        } else if (event.getType() == world.eventManager.getEventUid("HOLD")) {
             // Set previous Event
             if (previousEvent != null) {
                 event.setPreviousEvent(previousEvent);
@@ -76,13 +76,13 @@ public class InputSystem extends System {
             }
             // </REFACTOR>
 
-        } else if (event.getType() == world.events.getEventType("MOVE")) {
+        } else if (event.getType() == world.eventManager.getEventUid("MOVE")) {
 
             // Set previous Event
             event.setPreviousEvent(previousEvent);
             previousEvent = event;
 
-        } else if (event.getType() == world.events.getEventType("UNSELECT")) {
+        } else if (event.getType() == world.eventManager.getEventUid("UNSELECT")) {
 
             // Set previous Event
             event.setPreviousEvent(previousEvent);
@@ -150,23 +150,23 @@ public class InputSystem extends System {
 
         Entity primaryTarget = null;
 
-        // Handle special cases for SELECT and non-SELECT events
+        // Handle special cases for SELECT and non-SELECT eventManager
         //if (event.getType() != Event.Type.SELECT) {
-        if (event.getType() != world.events.getEventType("SELECT")) {
+        if (event.getType() != world.eventManager.getEventUid("SELECT")) {
             event.setTarget(event.getFirstEvent().getTarget());
             event.setSecondaryTarget(event.getFirstEvent().getSecondaryTarget());
         } else {
 
             // Assign target Entities
             // <REFACTOR>
-            Group<Entity> primaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
-            Group<Entity> secondaryBoundaries = world.entities.get().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
+            Group<Entity> primaryBoundaries = world.entityManager.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
+            Group<Entity> secondaryBoundaries = world.entityManager.get().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
             // </REFACTOR>
 
             if (primaryBoundaries.size() > 0) {
                 primaryTarget = primaryBoundaries.get(primaryBoundaries.size() - 1); // Get primary target from the top layer (will be last in the list of targets)
             } else {
-                Group<Entity> cameras = world.entities.get().filterWithComponent(Camera.class);
+                Group<Entity> cameras = world.entityManager.get().filterWithComponent(Camera.class);
                 primaryTarget = cameras.get(0);
             }
             event.setTarget(primaryTarget);
@@ -182,7 +182,7 @@ public class InputSystem extends System {
 
         // Handle special bookkeeping storing previous target Entity
 //        if (event.getType() == Event.Type.UNSELECT) {
-        if (event.getType() == world.events.getEventType("UNSELECT")) {
+        if (event.getType() == world.eventManager.getEventUid("UNSELECT")) {
             previousPrimaryTarget = event.getTarget();
         }
     }

@@ -112,9 +112,9 @@ public class EntityManager {
 
 //    public <D> Group filter(Group.Filter filter, D data) {
 //        Group<Entity> result = new Group<>();
-//        entities.
-//        for (int i = 0; i < entities.size(); i++) {
-//            if (filter.filter(entities.get(i), data) == true) {
+//        entityManager.
+//        for (int i = 0; i < entityManager.size(); i++) {
+//            if (filter.filter(entityManager.get(i), data) == true) {
 //                result.add(elements.get(i));
 //            }
 //        }

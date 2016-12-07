@@ -24,7 +24,7 @@ import camp.computer.clay.lib.Geometry.Shape;
 public class Group<E> implements List<E> {
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
-    // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
+    // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entityManager.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
 
     // <GROUP>

@@ -7,7 +7,7 @@ import camp.computer.clay.engine.manager.Group;
 public final class Entity {
 
     // <HACK>
-    public long uuid = EntityManager.count++; // entities.INVALID_UID;
+    public long uuid = EntityManager.count++; // entityManager.INVALID_UID;
     // </HACK>
 
     public long getUuid() {
@@ -17,7 +17,7 @@ public final class Entity {
     public boolean isActive = true;
 
     // TODO?: Move into World. Allows World-specific Entities.
-//    public static Group<Entity> entities = new Group<>();
+//    public static Group<Entity> entityManager = new Group<>();
 
     private Group<Component> components = null;
 

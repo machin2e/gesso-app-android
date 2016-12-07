@@ -23,6 +23,7 @@ import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
+import camp.computer.clay.engine.system.EventSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.compute.JavaScriptEngine;
 import camp.computer.clay.platform.graphics.RenderSurface;
@@ -221,36 +222,40 @@ public class Application extends FragmentActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        // TODO: Queue key events in inputSystem
+        // TODO: Queue key eventManager in inputSystem
 
         switch (keyCode) {
             case KeyEvent.KEYCODE_A: {
-                Entity host = World.getWorld().createEntity(Host.class);
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                /*
+                Entity host = World.getInstance().createEntity(Host.class);
+                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
 
                 // Automatically focus on the first Host that appears in the workspace/world.
-                if (World.getWorld().entities.get().size() == 1) {
-                    Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                if (World.getInstance().entityManager.get().size() == 1) {
+                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
                     camera.getComponent(Camera.class).focus = host;
                     camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
                 } else {
-                    Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
                     camera.getComponent(Camera.class).focus = null;
                     camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
                 }
+                */
+                World.getInstance().getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
+                // TODO: World.getInstance().getSystem(EventSystem.class).queue(new Event("CREATE_HOST"));
 
 
                 return true;
             }
 
             case KeyEvent.KEYCODE_D: {
-                Group<Entity> hosts = World.getWorld().entities.get().filterWithComponent(Host.class);
+                Group<Entity> hosts = World.getInstance().entityManager.get().filterWithComponent(Host.class);
                 if (hosts.size() > 0) {
                     Entity randomHost = hosts.get(Random.generateRandomInteger(0, hosts.size()));
-                    World.getWorld().entities.remove(randomHost);
+                    World.getInstance().entityManager.remove(randomHost);
                 }
 
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 
@@ -261,7 +266,7 @@ public class Application extends FragmentActivity {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 
@@ -299,7 +304,7 @@ public class Application extends FragmentActivity {
 
             case KeyEvent.KEYCODE_1: {
                 // Monitor
-                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale -= 0.10;
                 }
@@ -308,7 +313,7 @@ public class Application extends FragmentActivity {
 
             case KeyEvent.KEYCODE_2: {
                 // Monitor
-                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale = 1.0;
                 }
@@ -317,7 +322,7 @@ public class Application extends FragmentActivity {
 
             case KeyEvent.KEYCODE_3: {
                 // Monitor
-                Entity camera = World.getWorld().entities.get().filterWithComponent(Camera.class).get(0);
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
                 if (camera != null) {
                     camera.getComponent(Physics.class).targetTransform.scale += 0.10;
                 }

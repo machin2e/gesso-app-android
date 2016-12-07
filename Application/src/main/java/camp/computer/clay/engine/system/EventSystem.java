@@ -1,7 +1,6 @@
 package camp.computer.clay.engine.system;
 
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 
 public class EventSystem extends System {
@@ -27,6 +26,10 @@ public class EventSystem extends System {
         world.eventQueue.add(event);
     }
 
+    public void execute(Event event) {
+        world.eventManager.dispatch(event);
+    }
+
     /**
      * Dequeues element
      *
@@ -42,9 +45,9 @@ public class EventSystem extends System {
      * @param event
      */
     private void dispatch(Event event) {
-        Entity eventTarget = event.getTarget();
-        if (eventTarget != null) {
-            world.events.dispatch(event);
-        }
+//        Entity eventTarget = event.getTarget();
+//        if (eventTarget != null) {
+        world.eventManager.dispatch(event);
+//        }
     }
 }

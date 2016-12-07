@@ -19,7 +19,7 @@ public class BoundarySystem extends System {
     public BoundarySystem(World world) {
         super(world);
 
-        entitiesWithBoundary = world.entities.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
+        entitiesWithBoundary = world.entityManager.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class Model extends Component {
     public static Entity addShape(Entity entity, Shape shape) {
 
         // Create Shape entity and assign shape to it
-        Entity primitiveEntity = World.getWorld().createEntity(Primitive.class);
+        Entity primitiveEntity = World.getInstance().createEntity(Primitive.class);
         primitiveEntity.getComponent(Primitive.class).shape = shape;
 
         primitiveEntity.getComponent(TransformConstraint.class).setReferenceEntity(entity);
@@ -55,7 +55,7 @@ public class Model extends Component {
     public static Entity getPrimitive(Entity entity, String label) {
         List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
         for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
+            Entity shape = World.getInstance().entityManager.get(shapeUuids.get(i));
             if (Label.getLabel(shape).equals(label)) {
                 return shape;
             }
@@ -70,7 +70,7 @@ public class Model extends Component {
         List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getWorld().entities.get(shapeUuids.get(i));
+            Entity shape = World.getInstance().entityManager.get(shapeUuids.get(i));
             shapes.add(shape);
         }
         return shapes;

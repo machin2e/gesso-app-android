@@ -31,10 +31,10 @@ public class CameraSystem extends System {
     }
 
     private void setup() {
-        cameraEntities = world.entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
-//        portEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Port.class);
-//        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
-        hostAndExtensionEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
+        cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
+//        portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Port.class);
+//        pathAndPortEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+        hostAndExtensionEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
     }
 
     @Override

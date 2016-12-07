@@ -1,9 +1,9 @@
 package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.HostLayoutStrategy;
+import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.system.AppearanceSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
@@ -16,6 +16,8 @@ import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.Random;
 
 public class Engine {
+
+//    private static Engine instance;
 
     public long tickCount = 0;
 
@@ -35,6 +37,13 @@ public class Engine {
             }
         });
     }
+
+//    public static Engine getInstance() {
+//        if (instance == null) {
+//            instance = new Engine();
+//        }
+//        return instance;
+//    }
 
     private void setup() {
 
@@ -67,7 +76,8 @@ public class Engine {
         int maxHostCount = 6;
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
-            world.createEntity(Host.class);
+//            world.createEntity(Host.class);
+            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
         }
         // </VIRTUAL_HOSTS>
 
@@ -78,7 +88,7 @@ public class Engine {
 //        Log.v("TIMING", "Engine Update");
         tickCount++;
 
-        // TODO: Move events queued in Engine into associated World.
+        // TODO: Move eventManager queued in Engine into associated World.
     }
 
     public void addWorld(final World world) {

@@ -57,10 +57,10 @@ public class Renderer extends Thread {
     public void run() {
 
         // <REFACTOR>
-        if (entities == null && World.getWorld() != null) {
-            // TODO: Group<Entity> entities = World.getWorld().entities.get().filterActive(true).filterWithComponent(ModelBuilder.class).sortByLayer();
-            entities = World.getWorld().entities.subscribe(Group.Filters.filterWithComponents, Model.class);
-            cameraEntities = World.getWorld().entities.subscribe(Group.Filters.filterWithComponents, Camera.class);
+        if (entities == null && World.getInstance() != null) {
+            // TODO: Group<Entity> entityManager = World.getInstance().entityManager.get().filterActive(true).filterWithComponent(ModelBuilder.class).sortByLayer();
+            entities = World.getInstance().entityManager.subscribe(Group.Filters.filterWithComponents, Model.class);
+            cameraEntities = World.getInstance().entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
         }
 
         if (entities == null) {

@@ -26,7 +26,7 @@ public class TransformConstraint extends Component {
     }
 
     public Entity getReferenceEntity() {
-        return World.getWorld().entities.get(referenceEntityUuid);
+        return World.getInstance().entityManager.get(referenceEntityUuid);
     }
 
     public void setReferenceEntity(Entity entity) {

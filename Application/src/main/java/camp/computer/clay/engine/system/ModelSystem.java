@@ -19,7 +19,7 @@ public class ModelSystem extends System {
     }
 
     private void setup() {
-        entities = world.entities.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
+        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
     }
 
     @Override

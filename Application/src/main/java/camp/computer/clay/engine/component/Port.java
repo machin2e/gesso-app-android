@@ -99,7 +99,7 @@ public class Port extends Component {
     }
 
     public static boolean hasPath(Entity port) {
-        Group<Entity> paths = World.getWorld().entities.get().filterWithComponent(Path.class);
+        Group<Entity> paths = World.getInstance().entityManager.get().filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
             if (Path.contains(path, port)) {
@@ -117,7 +117,7 @@ public class Port extends Component {
      */
     public static Group<Entity> getPaths(Entity port) {
 
-        Group<Entity> paths = World.getWorld().entities.get().filterWithComponent(Path.class);
+        Group<Entity> paths = World.getInstance().entityManager.get().filterWithComponent(Path.class);
 
         // TODO: Make into Filter
         Group<Entity> portPaths = new Group<>();

@@ -57,24 +57,24 @@ public class Event {
     }
 
     class Single extends Sequence {
-        private List<Event.Type> events;
+        private List<Event.Type> eventManager;
 
-        public Single(Event.Type... events) {
-            this.events = new ArrayList<>();
-            for (int i = 0; i < events.length; i++) {
-                this.events.add(events[i]);
+        public Single(Event.Type... eventManager) {
+            this.eventManager = new ArrayList<>();
+            for (int i = 0; i < eventManager.length; i++) {
+                this.eventManager.add(eventManager[i]);
             }
         }
     }
 
     class Repeat extends Sequence {
-        private List<Event.Type> events;
+        private List<Event.Type> eventManager;
 
         // Repeat() means repeat anything...
-        public Repeat(Event.Type... events) {
-            this.events = new ArrayList<>();
-            for (int i = 0; i < events.length; i++) {
-                this.events.add(events[i]);
+        public Repeat(Event.Type... eventManager) {
+            this.eventManager = new ArrayList<>();
+            for (int i = 0; i < eventManager.length; i++) {
+                this.eventManager.add(eventManager[i]);
             }
         }
     }
@@ -103,7 +103,7 @@ public class Event {
         );
     }
 
-    // TODO: States for editable entities (states: VIEWING, EDITING)
+    // TODO: States for editable entityManager (states: VIEWING, EDITING)
     static class RecognizerStateMachine {
 
         enum State {
@@ -153,7 +153,7 @@ public class Event {
     private long eventTypeUid;
 
     public Event(String eventType) {
-        this.eventTypeUid = World.getWorld().events.getEventType(eventType);
+        this.eventTypeUid = World.getInstance().eventManager.getEventUid(eventType);
         this.timestamp = Clock.getTime(Clock.Unit.MILLISECONDS); // TODO: Get from the World clock!
         setup();
     }
@@ -185,7 +185,7 @@ public class Event {
 
     public void setType(String eventType) {
         // <REFACTOR>
-        this.eventTypeUid = World.getWorld().events.getEventType(eventType);
+        this.eventTypeUid = World.getInstance().eventManager.getEventUid(eventType);
         // </REFACTOR>
     }
 

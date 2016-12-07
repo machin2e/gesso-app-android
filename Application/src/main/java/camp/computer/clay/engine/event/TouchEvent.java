@@ -2,9 +2,9 @@ package camp.computer.clay.engine.event;
 
 import camp.computer.clay.engine.component.Transform;
 
-public class TouchEvent extends Event2 {
+public class TouchEvent extends Event {
 
-    // Contains a single touch event for a single finger. Multiple events can potentially have the
+    // Contains a single touch event for a single finger. Multiple eventManager can potentially have the
     // same timestamp (e.g., simultaneous press). These are used to update a "touch state
     // accumulator" that represents the most up-to-date state (each finger's state register).
 

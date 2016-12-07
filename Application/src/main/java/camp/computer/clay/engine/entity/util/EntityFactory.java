@@ -125,7 +125,7 @@ public class EntityFactory {
         }
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -136,7 +136,7 @@ public class EntityFactory {
                 // Show prototype Extension if any are saved and available in the repository
                 if (world.cache.getObjects(Configuration.class).size() > 0) {
 
-                    Entity extensionPrototype = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
                     // Update position of prototype Extension
                     // world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
@@ -156,7 +156,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(final Event event) {
 
@@ -164,7 +164,7 @@ public class EntityFactory {
                     return;
                 }
 
-                final Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0);
+                final Entity camera = world.entityManager.get().filterWithComponent(Camera.class).get(0);
 
                 // Focus on touched Host
                 Portable.getPaths(host).setVisibility(Visible.VISIBLE);
@@ -204,10 +204,10 @@ public class EntityFactory {
                 // TODO: 11/13/2016 Set Title
 
                 // Check if connecting to a Extension
-                Entity prototypeExtension = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+                Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
                 if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
-                    Entity extensionPrototype = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
                     // Get cached extension configurations (and retrieve additional from Internet2 store)
@@ -256,7 +256,7 @@ public class EntityFactory {
         workspace.addComponent(new Workspace()); // Unique to Workspace
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -271,10 +271,10 @@ public class EntityFactory {
                     Group<Entity> pathAndPortEntities = null;
 
                     if (portEntities == null) {
-                        portEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Port.class);
+                        portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Port.class);
                     }
                     if (pathAndPortEntities == null) {
-                        pathAndPortEntities = world.entities.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+                        pathAndPortEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
                     }
                     // </HACK>
 
@@ -422,7 +422,7 @@ public class EntityFactory {
         // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("HOLD", new EventResponse<Entity>() {
+        world.eventManager.subscribe("HOLD", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -434,7 +434,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -505,7 +505,7 @@ public class EntityFactory {
                 // TODO: 11/13/2016 Set Title
 
                 // Camera
-//                Entity camera = world.entities.get().filterWithComponent(Camera.class).get(0);
+//                Entity camera = world.entityManager.get().filterWithComponent(Camera.class).get(0);
 //                world.getSystem(CameraSystem.class).setFocus(camera, extension);
             }
         });
@@ -552,7 +552,7 @@ public class EntityFactory {
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         pathShapeEntity = Model.addShape(path, circle);
-//        Entity shapeEntity = world.entities.get(pathShapeUuid);
+//        Entity shapeEntity = world.entityManager.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set();
         // </HACK>
@@ -584,7 +584,7 @@ public class EntityFactory {
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -613,7 +613,7 @@ public class EntityFactory {
                     // Determine if taking "create new Extension" action. This is determined to be true
                     // if at least one Extension is "near enough" to the Event's target position.
                     boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
-                    Group<Entity> extensions = world.entities.get().filterWithComponent(Extension.class);
+                    Group<Entity> extensions = world.entityManager.get().filterWithComponent(Extension.class);
                     for (int i = 0; i < extensions.size(); i++) {
 
                         double distanceToExtension = camp.computer.clay.util.Geometry.distance(
@@ -630,7 +630,7 @@ public class EntityFactory {
                     }
 
                     // Update position of prototype Path and Extension
-                    Entity extensionPrototype = world.entities.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     if (isCreateExtensionAction) {
                         extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
@@ -715,7 +715,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -750,7 +750,7 @@ public class EntityFactory {
 
                     } else if (Path.getState(path) == Component.State.EDITING) {
 
-                        Group<Entity> dropTargetPorts = world.entities.get().filterWithComponent(Port.class).filterContains(event.getPosition());
+                        Group<Entity> dropTargetPorts = world.entityManager.get().filterWithComponent(Port.class).filterContains(event.getPosition());
 
                         // Moved the Path to another Port
                         if (dropTargetPorts.size() > 0) {
@@ -851,7 +851,7 @@ public class EntityFactory {
 
                             // Remove the Path (and the Extension if the removed Path was the only one)
                             path.isActive = false;
-                            world.entities.remove(path);
+                            world.entityManager.remove(path);
 
 //                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable
@@ -886,11 +886,11 @@ public class EntityFactory {
 //                        for (int i = 0; i < extensionPorts.size(); i++) {
                                 while (extensionPorts.size() > 0) {
                                     Entity extensionPort = extensionPorts.get(0);
-                                    world.entities.remove(extensionPort);
+                                    world.entityManager.remove(extensionPort);
                                     extensionPorts.remove(extensionPort); // Remove from Portable
                                 }
 
-                                world.entities.remove(extension);
+                                world.entityManager.remove(extension);
 
                                 // Notification
                                 world.createAndConfigureNotification("removed extension", extension.getComponent(Transform.class), 1000);
@@ -908,13 +908,13 @@ public class EntityFactory {
 
                     // (Host.Port, ..., World) Action Pattern
 
-                    Group<Entity> targetAreaPorts = world.entities.get().filterWithComponent(Port.class).filterContains(event.getPosition());
+                    Group<Entity> targetAreaPorts = world.entityManager.get().filterWithComponent(Port.class).filterContains(event.getPosition());
 
                     Log.v("handlePathEvent", "creating extension");
 
                     // If prototype Extension is visible, create Extension
 //                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
-                    Entity prototypeExtension = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
                         Log.v("handlePathEvent", "creating extension");
@@ -922,7 +922,7 @@ public class EntityFactory {
 //                    // Hide prototype Path and prototype Extension
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
 //                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                        Entity extensionPrototype = world.entities.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                        Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                         extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
 //                    Entity hostPort = event.getFirstEvent().getTarget();
@@ -998,7 +998,7 @@ public class EntityFactory {
                                 Entity tempSourcePort = Path.getSource(dropTargetPath);
                                 Path.setSource(dropTargetPath, null); // Reset path
                                 Path.setTarget(dropTargetPath, null); // Reset path
-                                world.entities.remove(dropTargetPath); // Delete path!
+                                world.entityManager.remove(dropTargetPath); // Delete path!
                                 // </CLEANUP_ENTITY_DELETE_CODE>
 
                                 // Update the Path from the source Port
@@ -1067,7 +1067,7 @@ public class EntityFactory {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1080,7 +1080,7 @@ public class EntityFactory {
                 if (event.isTap() && event.getTarget() == port) {
 
                     // (Host.Port A, ..., Host.Port A) Action Pattern
-                    // i.e., The action's first and last events address the same Port. Therefore, it must be either a tap or a hold.
+                    // i.e., The action's first and last eventManager address the same Port. Therefore, it must be either a tap or a hold.
 
                     // Get Port associated with the touched Port
                     Entity sourcePort = event.getFirstEvent().getTarget();
@@ -1118,7 +1118,7 @@ public class EntityFactory {
         camera.addComponent(new Physics());
 
         // <EVENT_HANDLERS>
-        world.events.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1140,7 +1140,7 @@ public class EntityFactory {
             }
         });
 
-        world.events.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 

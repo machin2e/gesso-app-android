@@ -9,5 +9,5 @@ public class EventProcessor extends Component {
     }
 
     // TODO: Store of event handlers for an Entity, e.g., HashMap<String, EventProcessor>
-    // TODO: EventSystem registers events, subscribes to events, etc.
+    // TODO: EventSystem registers eventManager, subscribes to eventManager, etc.
 }

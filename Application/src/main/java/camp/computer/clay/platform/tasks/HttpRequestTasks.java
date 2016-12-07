@@ -103,7 +103,7 @@ public class HttpRequestTasks {
                             // TODO: Create event in global event queue to fetch and cache this data when Builder loads! It shouldn't be happenin' in UI codez!!
                             // <TODO>
                             /*
-                            // World.getWorld().repository.createTestAction(actionTitle, actionScript);
+                            // World.getInstance().repository.createTestAction(actionTitle, actionScript);
                             Script script = new Script();
                             script.setCode(code);
                             addScript(script);
