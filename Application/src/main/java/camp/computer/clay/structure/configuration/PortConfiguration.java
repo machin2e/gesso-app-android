@@ -1,8 +1,9 @@
-package camp.computer.clay.model.configuration;
+package camp.computer.clay.structure.configuration;
 
 import java.util.UUID;
 
 import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 
 public class PortConfiguration {
@@ -10,9 +11,9 @@ public class PortConfiguration {
 
     private String label = "";
 
-    private Port.Type type = Port.Type.NONE;
+    private Signal.Type type = Signal.Type.NONE;
 
-    private Port.Direction direction = Port.Direction.NONE;
+    private Signal.Direction direction = Signal.Direction.NONE;
 
     public PortConfiguration() {
 
@@ -28,19 +29,19 @@ public class PortConfiguration {
         return uuid;
     }
 
-    public Port.Type getType() {
+    public Signal.Type getType() {
         return type;
     }
 
-    public void setType(Port.Type type) {
+    public void setType(Signal.Type type) {
         this.type = type;
     }
 
-    public Port.Direction getDirection() {
+    public Signal.Direction getDirection() {
         return direction;
     }
 
-    public void setDirection(Port.Direction direction) {
+    public void setDirection(Signal.Direction direction) {
         this.direction = direction;
     }
 

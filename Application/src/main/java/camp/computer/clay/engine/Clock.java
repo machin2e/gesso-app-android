@@ -1,7 +1,7 @@
 package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.event.Event;
-import camp.computer.clay.engine.manager.EventResponse;
+import camp.computer.clay.engine.event.EventResponse;
 
 /**
  * {@code Clock} generates an {@code Event} ("CLOCK_TICK") each at specified frequency.

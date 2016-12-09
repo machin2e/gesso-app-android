@@ -1,4 +1,4 @@
-package camp.computer.clay.model.configuration;
+package camp.computer.clay.structure.configuration;
 
 import android.util.Log;
 

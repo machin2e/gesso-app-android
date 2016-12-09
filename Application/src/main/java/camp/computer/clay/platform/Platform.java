@@ -1,4 +1,4 @@
-package camp.computer.clay.engine;
+package camp.computer.clay.platform;
 
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.RenderSurface;

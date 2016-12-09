@@ -40,11 +40,12 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.model.Action;
-import camp.computer.clay.model.Script;
-import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.structure.Action;
+import camp.computer.clay.structure.Script;
+import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.tasks.HttpRequestTasks;
 import camp.computer.clay.platform.util.ViewGroupHelper;
@@ -506,21 +507,21 @@ public class Widgets {
 
                 for (int i = 0; i < ports.size(); i++) {
 
-                    if (Port.getType(ports.get(i)) == Port.Type.SWITCH) {
+                    if (Port.getType(ports.get(i)) == Signal.Type.SWITCH) {
                         // <DIGITAL_PORT_CONTROL>
                         View digitalPortLayout = createSwitchControllerView(ports.get(i));
                         linearLayout.addView(digitalPortLayout);
                         // </DIGITAL_PORT_CONTROL>
                     }
 
-                    if (Port.getType(ports.get(i)) == Port.Type.PULSE) {
+                    if (Port.getType(ports.get(i)) == Signal.Type.PULSE) {
                         // <PWM_PORT_CONTROL>
                         View pulsePortLayout = createPulseControllerView(ports.get(i));
                         linearLayout.addView(pulsePortLayout);
                         // </PWM_PORT_CONTROL>
                     }
 
-                    if (Port.getType(ports.get(i)) == Port.Type.WAVE) {
+                    if (Port.getType(ports.get(i)) == Signal.Type.WAVE) {
                         // <ADC_PORT_CONTROL>
                         View wavePortLayout = createWaveControllerView(ports.get(i));
                         linearLayout.addView(wavePortLayout);
@@ -1127,7 +1128,7 @@ public class Widgets {
 
         int BUTTON_TEXT_SIZE = 12;
 
-        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.SWITCH);
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Signal.Type.SWITCH);
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
 
@@ -1388,7 +1389,7 @@ public class Widgets {
         // ...
         int TASK_BUTTON_WIDTH = 400;
 
-        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.PULSE);
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Signal.Type.PULSE);
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
 
@@ -1663,7 +1664,7 @@ public class Widgets {
         // ...
         int TASK_BUTTON_WIDTH = 400;
 
-        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Port.Type.WAVE);
+        String CONTAINER_BACKGROUND_COLOR = camp.computer.clay.util.Color.getColor(Signal.Type.WAVE);
 
         String BUTTON_BACKGROUND_COLOR = "#00000000";
 

@@ -3,8 +3,7 @@ package camp.computer.clay.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Color {
@@ -113,7 +112,6 @@ public abstract class Color {
         return String.format("#%08X", (0xFFFFFFFF & color));
     }
 
-    // <HACK>
     // Color palette generated with i want hue.
     // Reference: http://tools.medialab.sciences-po.fr/iwanthue/index.php
     public static String PORT_COLOR_OFF = "#ffefefef";
@@ -124,44 +122,23 @@ public abstract class Color {
     public static String PORT_COLOR_CMOS = "#ffFF4300"; // Reds: #cc0000, #E41900
     public static String PORT_COLOR_TTL = "#ffFF1493";
 
-    public static String getColor(Port.Type portType) {
-        if (portType == Port.Type.NONE) {
+    public static String getColor(Signal.Type portType) {
+        if (portType == Signal.Type.NONE) {
             return PORT_COLOR_OFF;
-        } else if (portType == Port.Type.SWITCH) {
+        } else if (portType == Signal.Type.SWITCH) {
             return PORT_COLOR_SWITCH;
-        } else if (portType == Port.Type.PULSE) {
+        } else if (portType == Signal.Type.PULSE) {
             return PORT_COLOR_PULSE;
-        } else if (portType == Port.Type.WAVE) {
+        } else if (portType == Signal.Type.WAVE) {
             return PORT_COLOR_WAVE;
-        } else if (portType == Port.Type.POWER_REFERENCE) {
+        } else if (portType == Signal.Type.POWER_REFERENCE) {
             return PORT_COLOR_REFERENCE;
-        } else if (portType == Port.Type.POWER_CMOS) {
+        } else if (portType == Signal.Type.POWER_CMOS) {
             return PORT_COLOR_CMOS;
-        } else if (portType == Port.Type.POWER_TTL) {
+        } else if (portType == Signal.Type.POWER_TTL) {
             return PORT_COLOR_TTL;
         } else {
             return PORT_COLOR_OFF;
         }
     }
-
-    public static String getColor(Path.Type pathType) {
-        if (pathType == Path.Type.NONE) {
-            return PORT_COLOR_OFF;
-        } else if (pathType == Path.Type.SWITCH) {
-            return PORT_COLOR_SWITCH;
-        } else if (pathType == Path.Type.PULSE) {
-            return PORT_COLOR_PULSE;
-        } else if (pathType == Path.Type.WAVE) {
-            return PORT_COLOR_WAVE;
-        } else if (pathType == Path.Type.POWER_REFERENCE) {
-            return PORT_COLOR_REFERENCE;
-        } else if (pathType == Path.Type.POWER_CMOS) {
-            return PORT_COLOR_CMOS;
-        } else if (pathType == Path.Type.POWER_TTL) {
-            return PORT_COLOR_TTL;
-        } else {
-            return PORT_COLOR_OFF;
-        }
-    }
-    // </HACK>
 }

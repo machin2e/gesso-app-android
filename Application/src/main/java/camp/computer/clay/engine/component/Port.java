@@ -1,48 +1,11 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 
 public class Port extends Component {
-
-    // <COMPONENT_DATA>
-    public enum Direction {
-
-        NONE(0),   // sourcePortUuid  |  destination
-        OUTPUT(1), // sourcePortUuid --> destination
-        INPUT(2),  // sourcePortUuid <-- destination
-        BOTH(3);   // sourcePortUuid <-> destination
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Direction(int index) {
-            this.index = index;
-        }
-    }
-
-    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
-    public enum Type {
-        NONE,
-        SWITCH,
-        PULSE,
-        WAVE,
-        POWER_REFERENCE,
-        POWER_CMOS,
-        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
-
-        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
-        // TODO: TCP, UDP, HTTP, HTTPS
-
-        public static Type getNext(Type currentType) {
-            Type[] values = Type.values();
-            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
-            return values[(currentIndex + 1) % values.length];
-        }
-    }
-    // </COMPONENT_DATA>
-
 
     // <CONSTRUCTOR>
     public Port() {
@@ -65,9 +28,9 @@ public class Port extends Component {
      */
     private int index = 0;
 
-    private Type type = Type.NONE;
+    private Signal.Type type = Signal.Type.NONE;
 
-    private Direction direction = Direction.NONE;
+    private Signal.Direction direction = Signal.Direction.NONE;
     // </COMPONENT_DATA>
 
 
@@ -80,21 +43,21 @@ public class Port extends Component {
         port.getComponent(Port.class).index = index;
     }
 
-    public static Type getType(Entity port) {
+    public static Signal.Type getType(Entity port) {
         return port.getComponent(Port.class).type;
     }
 
-    public static void setType(Entity port, Type type) {
+    public static void setType(Entity port, Signal.Type type) {
         port.getComponent(Port.class).type = type;
 
         // TODO: Update all other Ports in the connected PathEntity
     }
 
-    public static Direction getDirection(Entity port) {
+    public static Signal.Direction getDirection(Entity port) {
         return port.getComponent(Port.class).direction;
     }
 
-    public static void setDirection(Entity port, Direction direction) {
+    public static void setDirection(Entity port, Signal.Direction direction) {
         port.getComponent(Port.class).direction = direction;
     }
 

@@ -1,6 +1,7 @@
 package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.Group;
@@ -8,21 +9,6 @@ import camp.computer.clay.engine.manager.Group;
 public class Path extends Component {
 
     // <COMPONENT_DATA>
-    public enum Direction {
-
-        NONE(0),   // sourcePortUuid  |  destination
-        OUTPUT(1), // sourcePortUuid --> destination
-        INPUT(2),  // sourcePortUuid <-- destination
-        BOTH(3);   // sourcePortUuid <-> destination
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Direction(int index) {
-            this.index = index;
-        }
-    }
-
     public enum Mode {
 
         NONE(0),
@@ -46,30 +32,30 @@ public class Path extends Component {
         }
     }
 
-    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
-    public enum Type {
-        NONE,
-        SWITCH,
-        PULSE,
-        WAVE,
-        POWER_REFERENCE,
-        POWER_CMOS,
-        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
-
-        public static Path.Type getNext(Path.Type currentType) {
-            Path.Type[] values = Path.Type.values();
-            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
-            return values[(currentIndex + 1) % values.length];
-        }
-    }
+//    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
+//    public enum Type {
+//        NONE,
+//        SWITCH,
+//        PULSE,
+//        WAVE,
+//        POWER_REFERENCE,
+//        POWER_CMOS,
+//        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
+//
+//        public static Path.Type getNext(Path.Type currentType) {
+//            Path.Type[] values = Path.Type.values();
+//            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
+//            return values[(currentIndex + 1) % values.length];
+//        }
+//    }
 
     // TODO: public enum Protocol (i.e., BLUETOOTH, TCP, UDP, HTTP, HTTPS)
 
     public Mode mode = Mode.NONE;
 
-    public Type type = Type.NONE;
+    public Signal.Type type = Signal.Type.NONE;
 
-    public Direction direction = Direction.NONE;
+    public Signal.Direction direction = Signal.Direction.NONE;
 
     public long sourcePortUuid = EntityManager.INVALID_UUID;
 
@@ -85,8 +71,8 @@ public class Path extends Component {
 
     private void setup() {
         this.mode = Mode.ELECTRONIC;
-        this.type = Type.NONE; // Default to ELECTRONIC
-        this.direction = Direction.BOTH; // Default to BOTH
+        this.type = Signal.Type.NONE; // Default to ELECTRONIC
+        this.direction = Signal.Direction.BOTH; // Default to BOTH
 
         // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
     }
@@ -94,11 +80,11 @@ public class Path extends Component {
 
 
     // <ABSTRACT_ENTITY_INTERFACE>
-    public static Type getType(Entity path) {
+    public static Signal.Type getType(Entity path) {
         return path.getComponent(Path.class).type;
     }
 
-    public static void setType(Entity path, Type type) {
+    public static void setType(Entity path, Signal.Type type) {
         path.getComponent(Path.class).type = type;
     }
 
@@ -110,11 +96,11 @@ public class Path extends Component {
         path.getComponent(Path.class).mode = mode;
     }
 
-    public static Direction getDirection(Entity path) {
+    public static Signal.Direction getDirection(Entity path) {
         return path.getComponent(Path.class).direction;
     }
 
-    public static void setDirection(Entity path, Direction direction) {
+    public static void setDirection(Entity path, Signal.Direction direction) {
         path.getComponent(Path.class).direction = direction;
     }
 
@@ -123,27 +109,27 @@ public class Path extends Component {
         Path pathComponent = path.getComponent(Path.class);
 
         pathComponent.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
-        if (pathComponent.type == Type.NONE) {
-            pathComponent.type = Type.getNext(pathComponent.type);
+        if (pathComponent.type == Signal.Type.NONE) {
+            pathComponent.type = Signal.Type.getNext(pathComponent.type);
         }
-        pathComponent.direction = Direction.BOTH; // Default to BOTH
+        pathComponent.direction = Signal.Direction.BOTH; // Default to BOTH
 
         pathComponent.sourcePortUuid = sourcePort.getUuid();
         pathComponent.targetPortUuid = targetPort.getUuid();
 
         // Update sourcePortUuid PortEntity configuration
-        if (Port.getDirection(sourcePort) == Port.Direction.NONE) {
-            Port.setDirection(sourcePort, Port.Direction.BOTH); // Default to BOTH
+        if (Port.getDirection(sourcePort) == Signal.Direction.NONE) {
+            Port.setDirection(sourcePort, Signal.Direction.BOTH); // Default to BOTH
         }
-        if (Port.getType(sourcePort) == Port.Type.NONE) {
-            Port.setType(sourcePort, Port.Type.getNext(Port.getType(sourcePort)));
+        if (Port.getType(sourcePort) == Signal.Type.NONE) {
+            Port.setType(sourcePort, Signal.Type.getNext(Port.getType(sourcePort)));
         }
 
         // Update targetPortUuid PortEntity configuration
-        if (Port.getDirection(targetPort) == Port.Direction.NONE) {
-            Port.setDirection(targetPort, Port.Direction.BOTH); // Default to BOTH
+        if (Port.getDirection(targetPort) == Signal.Direction.NONE) {
+            Port.setDirection(targetPort, Signal.Direction.BOTH); // Default to BOTH
         }
-        if (Port.getType(targetPort) == Port.Type.NONE) {
+        if (Port.getType(targetPort) == Signal.Type.NONE) {
             Port.setType(targetPort, Port.getType(sourcePort));
         }
     }

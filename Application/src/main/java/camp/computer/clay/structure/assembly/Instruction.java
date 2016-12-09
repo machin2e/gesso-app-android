@@ -1,4 +1,4 @@
-package camp.computer.clay.model.assembly;
+package camp.computer.clay.structure.assembly;
 
 public class Instruction {
 

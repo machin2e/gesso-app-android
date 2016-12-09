@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.event.Event;
+import camp.computer.clay.engine.event.EventResponse;
 
 public class EventManager {
 

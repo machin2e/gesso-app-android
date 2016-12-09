@@ -1,4 +1,4 @@
-package camp.computer.clay.model.player;
+package camp.computer.clay.structure.player;
 
 public class Project
 {

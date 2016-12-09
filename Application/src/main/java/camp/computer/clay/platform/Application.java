@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import camp.computer.clay.engine.Engine;
-import camp.computer.clay.engine.Platform;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Host;

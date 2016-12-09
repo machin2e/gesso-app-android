@@ -18,12 +18,13 @@ import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
-import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.util.Geometry;
 
 public class PortableLayoutSystem extends System {
@@ -160,40 +161,45 @@ public class PortableLayoutSystem extends System {
             Entity targetPort = Path.getTarget(path);
 
             // <REFACTOR>
-            Path.Type pathType = Path.getType(path);
-            if (pathType == Path.Type.NONE) {
-                Port.setType(sourcePort, Port.Type.NONE);
-            } else if (pathType == Path.Type.SWITCH) {
-                Port.setType(sourcePort, Port.Type.SWITCH);
-            } else if (pathType == Path.Type.PULSE) {
-                Port.setType(sourcePort, Port.Type.PULSE);
-            } else if (pathType == Path.Type.WAVE) {
-                Port.setType(sourcePort, Port.Type.WAVE);
-            } else if (pathType == Path.Type.POWER_REFERENCE) {
-                Port.setType(sourcePort, Port.Type.POWER_REFERENCE);
-            } else if (pathType == Path.Type.POWER_CMOS) {
-                Port.setType(sourcePort, Port.Type.POWER_CMOS);
-            } else if (pathType == Path.Type.POWER_TTL) {
-                Port.setType(sourcePort, Port.Type.POWER_TTL);
+            Port.setType(sourcePort, Path.getType(path));
+            if (targetPort != null) {
+                Port.setType(targetPort, Path.getType(path));
             }
 
-            if (targetPort != null) {
-                if (pathType == Path.Type.NONE) {
-                    Port.setType(targetPort, Port.Type.NONE);
-                } else if (pathType == Path.Type.SWITCH) {
-                    Port.setType(targetPort, Port.Type.SWITCH);
-                } else if (pathType == Path.Type.PULSE) {
-                    Port.setType(targetPort, Port.Type.PULSE);
-                } else if (pathType == Path.Type.WAVE) {
-                    Port.setType(targetPort, Port.Type.WAVE);
-                } else if (pathType == Path.Type.POWER_REFERENCE) {
-                    Port.setType(targetPort, Port.Type.POWER_REFERENCE);
-                } else if (pathType == Path.Type.POWER_CMOS) {
-                    Port.setType(targetPort, Port.Type.POWER_CMOS);
-                } else if (pathType == Path.Type.POWER_TTL) {
-                    Port.setType(targetPort, Port.Type.POWER_TTL);
-                }
-            }
+//            Path.Type pathType = Path.getType(path);
+//            if (pathType == Path.Type.NONE) {
+//                Port.setType(sourcePort, Port.Type.NONE);
+//            } else if (pathType == Path.Type.SWITCH) {
+//                Port.setType(sourcePort, Port.Type.SWITCH);
+//            } else if (pathType == Path.Type.PULSE) {
+//                Port.setType(sourcePort, Port.Type.PULSE);
+//            } else if (pathType == Path.Type.WAVE) {
+//                Port.setType(sourcePort, Port.Type.WAVE);
+//            } else if (pathType == Path.Type.POWER_REFERENCE) {
+//                Port.setType(sourcePort, Port.Type.POWER_REFERENCE);
+//            } else if (pathType == Path.Type.POWER_CMOS) {
+//                Port.setType(sourcePort, Port.Type.POWER_CMOS);
+//            } else if (pathType == Path.Type.POWER_TTL) {
+//                Port.setType(sourcePort, Port.Type.POWER_TTL);
+//            }
+//
+//            if (targetPort != null) {
+//                if (pathType == Path.Type.NONE) {
+//                    Port.setType(targetPort, Port.Type.NONE);
+//                } else if (pathType == Path.Type.SWITCH) {
+//                    Port.setType(targetPort, Port.Type.SWITCH);
+//                } else if (pathType == Path.Type.PULSE) {
+//                    Port.setType(targetPort, Port.Type.PULSE);
+//                } else if (pathType == Path.Type.WAVE) {
+//                    Port.setType(targetPort, Port.Type.WAVE);
+//                } else if (pathType == Path.Type.POWER_REFERENCE) {
+//                    Port.setType(targetPort, Port.Type.POWER_REFERENCE);
+//                } else if (pathType == Path.Type.POWER_CMOS) {
+//                    Port.setType(targetPort, Port.Type.POWER_CMOS);
+//                } else if (pathType == Path.Type.POWER_TTL) {
+//                    Port.setType(targetPort, Port.Type.POWER_TTL);
+//                }
+//            }
             // </REFACTOR>
         }
     }
@@ -214,8 +220,8 @@ public class PortableLayoutSystem extends System {
                 }
             }
             if (!isPortInPath) {
-                Port.setType(port, Port.Type.NONE);
-                Port.setDirection(port, Port.Direction.NONE);
+                Port.setType(port, Signal.Type.NONE);
+                Port.setDirection(port, Signal.Direction.NONE);
             }
         }
     }
@@ -253,9 +259,9 @@ public class PortableLayoutSystem extends System {
         extension.getComponent(Transform.class).set(initialPosition); // TODO: Set Physics.targetPosition instead? Probs!
 
         // Configure Host's Port (i.e., the Path's source Port)
-        if (Port.getType(hostPort) == Port.Type.NONE || Port.getDirection(hostPort) == Port.Direction.NONE) {
-            Port.setType(hostPort, Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
-            Port.setDirection(hostPort, Port.Direction.BOTH);
+        if (Port.getType(hostPort) == Signal.Type.NONE || Port.getDirection(hostPort) == Signal.Direction.NONE) {
+            Port.setType(hostPort, Signal.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+            Port.setDirection(hostPort, Signal.Direction.BOTH);
         }
 
         // Configure Extension's Ports (i.e., the Path's target Port)
@@ -332,31 +338,7 @@ public class PortableLayoutSystem extends System {
             Entity path = world.createEntity(Path.class);
             Path.set(path, selectedHostPort, ports.get(i));
 
-            // <HACK>
-            switch (Port.getType(ports.get(i))) {
-                case NONE:
-                    Path.setType(path, Path.Type.NONE);
-                    break;
-                case SWITCH:
-                    Path.setType(path, Path.Type.SWITCH);
-                    break;
-                case PULSE:
-                    Path.setType(path, Path.Type.PULSE);
-                    break;
-                case WAVE:
-                    Path.setType(path, Path.Type.WAVE);
-                    break;
-                case POWER_REFERENCE:
-                    Path.setType(path, Path.Type.POWER_REFERENCE);
-                    break;
-                case POWER_TTL:
-                    Path.setType(path, Path.Type.POWER_TTL);
-                    break;
-                case POWER_CMOS:
-                    Path.setType(path, Path.Type.POWER_CMOS);
-                    break;
-            }
-            // </HACK>
+            Path.setType(path, Port.getType(ports.get(i)));
 
             Path.setMode(path, Path.Mode.ELECTRONIC);
         }
@@ -372,7 +354,7 @@ public class PortableLayoutSystem extends System {
 
         Group<Entity> ports = Portable.getPorts(host);
         for (int j = 0; j < ports.size(); j++) {
-            if (Port.getType(ports.get(j)) == Port.Type.NONE) {
+            if (Port.getType(ports.get(j)) == Signal.Type.NONE) {
 
                 Entity port = ports.get(j);
 

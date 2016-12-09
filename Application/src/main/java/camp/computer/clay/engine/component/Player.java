@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.model.player.Inventory;
+import camp.computer.clay.structure.player.Inventory;
 
 public class Player extends Component {
 

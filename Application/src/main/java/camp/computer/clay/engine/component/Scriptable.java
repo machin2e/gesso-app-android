@@ -1,7 +1,7 @@
 package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.Process;
+import camp.computer.clay.structure.Process;
 
 public class Scriptable extends Component {
 

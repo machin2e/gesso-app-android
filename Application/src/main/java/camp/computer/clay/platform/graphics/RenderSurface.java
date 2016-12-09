@@ -32,6 +32,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
@@ -773,7 +774,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             Shape sourcePortShape = sourcePortPathShape.getComponent(Primitive.class).shape;
 
             // Color. Update color of mPort shape based on its type.
-            Path.Type pathType = Path.getType(path);
+            Signal.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
             sourcePortShape.setColor(pathColor);
 
@@ -799,7 +800,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             sourcePortShape.setColor(hostSourcePortShape.getColor());
 
             // Update color of Port shape based on its type
-            Path.Type pathType = Path.getType(path);
+            Signal.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
             sourcePortShape.setColor(pathColor);
             targetPortShape.setColor(pathColor);

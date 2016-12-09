@@ -1,4 +1,4 @@
-package camp.computer.clay.model;
+package camp.computer.clay.structure;
 
 import camp.computer.clay.engine.manager.Handle;
 

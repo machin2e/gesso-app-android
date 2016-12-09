@@ -4,7 +4,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.event.Event;
-import camp.computer.clay.engine.manager.EventResponse;
+import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.system.AppearanceSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
@@ -14,6 +14,7 @@ import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.platform.Platform;
 import camp.computer.clay.util.Random;
 
 public class Engine {

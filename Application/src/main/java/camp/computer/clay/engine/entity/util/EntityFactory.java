@@ -27,10 +27,11 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
+import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
-import camp.computer.clay.engine.manager.EventResponse;
+import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
@@ -40,7 +41,7 @@ import camp.computer.clay.lib.Geometry.ModelBuilder;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
 import camp.computer.clay.lib.Geometry.Text;
-import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.Widgets;
 import camp.computer.clay.util.Color;
@@ -663,7 +664,7 @@ public class EntityFactory {
                             boolean addNewPort = true;
                             for (int j = 0; j < nearbyExtensionPorts.size(); j++) {
                                 Entity existingPort = nearbyExtensionPorts.get(j);
-                                if (Port.getType(existingPort) == Port.Type.NONE) {
+                                if (Port.getType(existingPort) == Signal.Type.NONE) {
                                     addNewPort = false;
                                     break;
                                 }
@@ -738,9 +739,9 @@ public class EntityFactory {
 
                         // <PATH>
                         // Set next Path type
-                        Path.Type nextType = Path.Type.getNext(Path.getType(path));
-                        while ((nextType == Path.Type.NONE) || (nextType == Path.getType(path))) {
-                            nextType = Path.Type.getNext(nextType);
+                        Signal.Type nextType = Signal.Type.getNext(Path.getType(path));
+                        while ((nextType == Signal.Type.NONE) || (nextType == Path.getType(path))) {
+                            nextType = Signal.Type.getNext(nextType);
                         }
                         Path.setType(path, nextType);
                         // <PATH>
@@ -861,9 +862,9 @@ public class EntityFactory {
 
                             // Reset Ports that were in removed Path
                             Entity sourcePort = Path.getSource(path);
-                            Port.setType(sourcePort, Port.Type.NONE);
+                            Port.setType(sourcePort, Signal.Type.NONE);
                             Entity targetPort = Path.getTarget(path);
-                            Port.setType(targetPort, Port.Type.NONE);
+                            Port.setType(targetPort, Signal.Type.NONE);
 
                             // Update the Path
                             Entity extension = Path.getExtension(path);
@@ -965,9 +966,9 @@ public class EntityFactory {
                         // <PATH>
                         // Set next Path type
                         Path pathComponent = path.getComponent(Path.class);
-                        Path.Type nextType = Path.Type.getNext(Path.getType(path));
-                        while ((nextType == Path.Type.NONE) || (nextType == Path.getType(path))) {
-                            nextType = Path.Type.getNext(nextType);
+                        Signal.Type nextType = Signal.Type.getNext(Path.getType(path));
+                        while ((nextType == Signal.Type.NONE) || (nextType == Path.getType(path))) {
+                            nextType = Signal.Type.getNext(nextType);
                         }
                         Path.setType(path, nextType);
 //                Log.v("EventHandlerSystem", "Setting path type to: " + nextType);
@@ -1096,7 +1097,7 @@ public class EntityFactory {
                     if (!portHasPath) {
                         Entity singletonPath = world.createEntity(Path.class);
                         Path.setSource(singletonPath, sourcePort);
-                        Path.setType(singletonPath, Path.Type.SWITCH);
+                        Path.setType(singletonPath, Signal.Type.SWITCH);
                     }
 
                 }

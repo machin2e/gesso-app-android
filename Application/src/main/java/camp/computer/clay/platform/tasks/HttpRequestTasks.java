@@ -17,8 +17,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 import camp.computer.clay.engine.component.Scriptable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.Action;
-import camp.computer.clay.model.Process;
+import camp.computer.clay.structure.Action;
+import camp.computer.clay.structure.Process;
 
 public class HttpRequestTasks {
 
