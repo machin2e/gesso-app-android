@@ -121,6 +121,8 @@ public class World {
         eventManager = new EventManager();
         eventManager.registerEvent("NONE"); // TODO: Delete!
 
+        eventManager.registerEvent("CLOCK_TICK");
+
         eventManager.registerEvent("SELECT");
         eventManager.registerEvent("HOLD");
         eventManager.registerEvent("MOVE");

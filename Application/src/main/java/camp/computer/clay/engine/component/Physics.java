@@ -4,6 +4,7 @@ import camp.computer.clay.lib.Geometry.Vector;
 
 public class Physics extends Component {
 
+    // 0.0030, 0.0060
     public static double DEFAULT_VELOCITY_X = 0.0060; // previously scaleVelocity
     public static double DEFAULT_VELOCITY_Y = 0.0060; // previously panVelocity
     public static double DEFAULT_VELOCITY_Z = 0.0060; // previously panVelocity

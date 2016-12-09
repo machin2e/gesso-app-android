@@ -4,6 +4,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.event.Event;
+import camp.computer.clay.engine.manager.EventResponse;
 import camp.computer.clay.engine.system.AppearanceSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
@@ -19,6 +20,8 @@ public class Engine {
 
 //    private static Engine instance;
 
+    private Clock clock;
+
     public long tickCount = 0;
 
     public Platform platform;
@@ -30,12 +33,26 @@ public class Engine {
 
         setup();
 
-        platform.getClock().getTimer().add(new Schedule() {
+        // Configure clock to respond to a tick Event by executing all EventResponses subscribing
+        // to the Event in the EventSystem.
+        clock = new Clock(new EventResponse() {
             @Override
-            public void execute(long dt) {
-                update(dt);
+            public void execute(Event event) {
+                World.getInstance().getSystem(EventSystem.class).execute(event);
             }
         });
+        clock.start();
+
+        /*
+        // Create an event response for each clock tick event that updates the Engine each time
+        // it is received.
+        World.getInstance().eventManager.subscribe("CLOCK_TICK", new EventResponse() {
+            @Override
+            public void execute(Event event) {
+                update(16);
+            }
+        });
+        */
     }
 
 //    public static Engine getInstance() {
@@ -47,7 +64,7 @@ public class Engine {
 
     private void setup() {
 
-        World world;
+        final World world;
 
         // Create World
         world = new World(this);
@@ -91,11 +108,13 @@ public class Engine {
         // TODO: Move eventManager queued in Engine into associated World.
     }
 
+    // Decouples with EventQueue/Manager and call EventManager.execute(eventResponses...) from Clock (generator of a periodic event that can be used to update the world). Delete Timer.
     public void addWorld(final World world) {
-        platform.getClock().getTimer().add(new Schedule() {
+
+        World.getInstance().eventManager.subscribe("CLOCK_TICK", new EventResponse() {
             @Override
-            public void execute(long dt) {
-                world.update(dt);
+            public void execute(Event event) {
+                world.update(event.dt / Clock.NANOS_PER_MILLISECOND);
             }
         });
 
