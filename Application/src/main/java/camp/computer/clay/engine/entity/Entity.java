@@ -14,17 +14,12 @@ public final class Entity {
         return uuid;
     }
 
-    public boolean isActive = true;
-
+    public boolean isActive = false;
     public boolean isDestroyable = false;
-
-    // TODO?: Move into World. Allows World-specific Entities.
-//    public static Group<Entity> entityManager = new Group<>();
 
     private Group<Component> components = null;
 
     public Entity() {
-        super();
         setup();
     }
 

@@ -19,7 +19,7 @@ import camp.computer.clay.util.Random;
 
 public class Engine {
 
-//    private static Engine instance;
+    private static Engine instance;
 
     private Clock clock;
 
@@ -27,7 +27,7 @@ public class Engine {
 
     public Platform platform;
 
-//    public World world;
+    public World world;
 
     public Engine(Platform platform) {
         this.platform = platform;
@@ -65,7 +65,7 @@ public class Engine {
 
     private void setup() {
 
-        final World world;
+        // final World world;
 
         // Create World
         world = new World(this);
@@ -95,18 +95,11 @@ public class Engine {
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
 //            world.createEntity(Host.class);
-//            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
+            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
         }
         // </VIRTUAL_HOSTS>
 
         addWorld(world);
-    }
-
-    public void update(long dt) {
-//        Log.v("TIMING", "Engine Update");
-        tickCount++;
-
-        // TODO: Move eventManager queued in Engine into associated World.
     }
 
     // Decouples with EventQueue/Manager and call EventManager.execute(eventResponses...) from Clock (generator of a periodic event that can be used to update the world). Delete Timer.

@@ -325,6 +325,8 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             // This was added so Prototype Extension/Path would draw without Extension/Path components
             else if (entity.hasComponent(Model.class)) {
 
+                // Draw a gray line from the Host's start position and the destination, under it.
+
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Group<Entity> shapes = Model.getPrimitives(entity);

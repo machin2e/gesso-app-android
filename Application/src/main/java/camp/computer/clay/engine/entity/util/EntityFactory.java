@@ -45,6 +45,7 @@ import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.Widgets;
 import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.util.Color;
+import camp.computer.clay.util.Geometry;
 import camp.computer.clay.util.Random;
 
 public class EntityFactory {
@@ -913,7 +914,7 @@ public class EntityFactory {
                                         Path.setSource(path, dropTargetPort);
                                     }
 
-                                } else if (camp.computer.clay.util.Geometry.contains(Boundary.get(targetPortShape2), event.getPosition())) {
+                                } else if (Geometry.contains(Boundary.get(targetPortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable
                                     if (Path.getSource(path).getParent() == dropTargetPort.getParent()) {
@@ -939,6 +940,7 @@ public class EntityFactory {
                             // Remove the Path (and the Extension if the removed Path was the only one)
                             path.isActive = false;
                             world.entityManager.remove(path);
+//                            world.entityManager.destroyEntities();
 
 //                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable

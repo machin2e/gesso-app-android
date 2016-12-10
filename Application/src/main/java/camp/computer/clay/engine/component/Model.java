@@ -18,7 +18,7 @@ public class Model extends Component {
     public long meshIndex = 0;
 
     // <REFACTOR>
-    // TODO: Replace with AssetReference
+    // TODO: Replace with AssetReference. Consider using using multiple AssetReferences to replace meshIndex.
     public List<Long> primitives;
     // </REFACTOR>
 

@@ -22,6 +22,8 @@ public class EntityManager {
     // NOTE: This should be the only language reference to each Entity object.
     private HashMap<Long, Entity> entities;
 
+    private List<Group> subscribers = new ArrayList<>();
+
     public EntityManager() {
         setup();
     }
@@ -32,6 +34,8 @@ public class EntityManager {
 
     synchronized public long add(Entity entity) {
         entities.put(entity.uuid, entity);
+
+        entities.get(entity.uuid).isActive = true;
 
         // Update subscribers
         for (int i = 0; i < subscribers.size(); i++) {
@@ -44,7 +48,13 @@ public class EntityManager {
 
     synchronized public Group<Entity> get() {
         Group<Entity> entityGroup = new Group<>();
-        entityGroup.addAll(entities.values());
+        List<Entity> hashEntities = new ArrayList<>(entities.values());
+        for (int i = 0; i < hashEntities.size(); i++) {
+            if (hashEntities.get(i).isActive && !hashEntities.get(i).isDestroyable) {
+                entityGroup.add(hashEntities.get(i));
+            }
+        }
+//        entityGroup.addAll(entities.values());
         return entityGroup;
     }
 
@@ -54,12 +64,13 @@ public class EntityManager {
 
     // TODO: Return true or false depending on success or failure of removal
     synchronized public void remove(Entity entity) {
+        entity.isActive = false;
         entity.isDestroyable = true;
     }
 
     // <REFACTOR>
     public synchronized void destroyEntities() {
-        Group<Entity> entities2 = get();
+        Group<Entity> entities2 = new Group<>(entities.values());
         for (int i = 0; i < entities2.size(); i++) {
 
             if (entities2.get(i).isDestroyable) {
@@ -111,9 +122,6 @@ public class EntityManager {
         }
     }
     // </REFACTOR>
-
-
-    private List<Group> subscribers = new ArrayList<>();
 
     /*
     class SubscribeStrategy {
