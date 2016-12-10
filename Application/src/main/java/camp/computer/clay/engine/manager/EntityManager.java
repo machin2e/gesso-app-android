@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.entity.Entity;
 
 public class EntityManager {
@@ -49,40 +54,82 @@ public class EntityManager {
 
     // TODO: Return true or false depending on success or failure of removal
     synchronized public void remove(Entity entity) {
-        // TODO: 11/18/2016 Queue the removal operation and perform it at after the current render update completes.
-        entities.remove(entity.uuid);
+        entity.isDestroyable = true;
+    }
 
-        // Update subscribers
-        for (int i = 0; i < subscribers.size(); i++) {
-            Log.v("SUBGROUP_ADD", "Adding to subscriber...");
-            subscribers.get(i).remove(entity);
+    // <REFACTOR>
+    public synchronized void destroyEntities() {
+        Group<Entity> entities2 = get();
+        for (int i = 0; i < entities2.size(); i++) {
+
+            if (entities2.get(i).isDestroyable) {
+
+                Entity destroyableEntity = entities2.get(i);
+
+                // TODO: 11/18/2016 Queue the removal operation and perform it at after the current render update completes.
+
+                // Remove TransformConstraint components referencing the Entity being deleted
+                for (int j = 0; j < entities2.size(); j++) {
+                    if (entities2.get(j).hasComponent(TransformConstraint.class)) {
+                        Entity referenceEntity = entities2.get(j).getComponent(TransformConstraint.class).getReferenceEntity();
+                        if (referenceEntity == destroyableEntity) {
+                            entities2.get(j).removeComponent(TransformConstraint.class);
+                        }
+                    }
+                }
+
+                // Destroy Portable component
+                if (destroyableEntity.hasComponent(Host.class) || destroyableEntity.hasComponent(Extension.class)) {
+                    Portable portable = destroyableEntity.getComponent(Portable.class);
+                    for (int j = 0; j < portable.ports.size(); j++) {
+                        Entity port = portable.ports.get(j);
+                        port.isDestroyable = true;
+                    }
+                }
+
+                // Destroy Model component
+                if (destroyableEntity.hasComponent(Model.class)) {
+                    Model model = destroyableEntity.getComponent(Model.class);
+                    for (int j = 0; j < model.primitives.size(); j++) {
+                        long primitiveUid = model.primitives.get(j);
+                        Entity primitiveEntity = get(primitiveUid);
+                        primitiveEntity.isDestroyable = true;
+                    }
+                }
+
+                // Remove the Entity's components
+                destroyableEntity.removeComponents();
+
+                // Delete the Entity
+                entities.remove(destroyableEntity.uuid);
+
+                // Remove the Entity from the subscribers
+                for (int j = 0; j < subscribers.size(); j++) {
+                    subscribers.get(j).remove(destroyableEntity);
+                }
+            }
         }
     }
+    // </REFACTOR>
 
 
     private List<Group> subscribers = new ArrayList<>();
 
-    // <TODO>
-    public interface SubscriptionStrategy {
-        void onAdd(Entity entity);
+    /*
+    class SubscribeStrategy {
+        private Group.Filter filter;
+        private Object data;
+
+        public <D> SubscribeStrategy(Group.Filter filter, D... data) {
+            this.filter = filter;
+            this.data = data;
+        }
     }
 
-    public <D> Group<Entity> subscribe(SubscriptionStrategy subscriptionStrategy) {
+    public Group<Entity> subscribe(SubscribeStrategy... subscribeStrategies) {
         return null;
     }
-
-    public void EXAMPLE() {
-
-        subscribe(new SubscriptionStrategy() {
-            @Override
-            public void onAdd(Entity entity) {
-                // TODO: apply filters
-                // TODO: apply sort algorithm
-            }
-        });
-
-    }
-    // </TODO>
+    */
 
     /**
      * Creates subscribe that is automatically updated using the specified {@code filter} when
@@ -109,15 +156,4 @@ public class EntityManager {
     }
 
     // TODO: unsubscribe(...)
-
-//    public <D> Group filter(Group.Filter filter, D data) {
-//        Group<Entity> result = new Group<>();
-//        entityManager.
-//        for (int i = 0; i < entityManager.size(); i++) {
-//            if (filter.filter(entityManager.get(i), data) == true) {
-//                result.add(elements.get(i));
-//            }
-//        }
-//        return result;
-//    }
 }

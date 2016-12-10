@@ -12,7 +12,7 @@ public class Physics extends Component {
     public Vector velocity = new Vector(DEFAULT_VELOCITY_X, DEFAULT_VELOCITY_Y, DEFAULT_VELOCITY_Z);
 
     // <REFACTOR>
-    // TODO: Replace with "facing direction"
+    // TODO: Replace with "facing direction" and let acceleration cause things to stop? Add moveTo and pushToward functions for computing target trajectory velocity and acceleration, and applying a force in a direction with a vector.
     public Transform targetTransform = new Transform(0, 0);
     // </REFACTOR>
 

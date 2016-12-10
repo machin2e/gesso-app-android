@@ -95,7 +95,7 @@ public class Engine {
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
 //            world.createEntity(Host.class);
-            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
+//            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
         }
         // </VIRTUAL_HOSTS>
 

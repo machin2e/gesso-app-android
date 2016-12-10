@@ -33,7 +33,7 @@ public class Rectangle extends Shape {
         height = (bottom - top);
 
         setup();
-//        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionGeometry(this.position)
+//        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionModelDimensions(this.position)
     }
 
     protected void setup() {

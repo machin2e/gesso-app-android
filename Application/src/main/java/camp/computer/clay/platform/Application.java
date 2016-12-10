@@ -254,7 +254,8 @@ public class Application extends FragmentActivity {
                     World.getInstance().entityManager.remove(randomHost);
                 }
 
-                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+//                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+//                World.getInstance().getSystem(EventSystem.class).execute(new Event("DESTROY_HOST"));
                 return true;
             }
 

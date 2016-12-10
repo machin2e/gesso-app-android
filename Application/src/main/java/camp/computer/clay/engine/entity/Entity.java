@@ -16,6 +16,8 @@ public final class Entity {
 
     public boolean isActive = true;
 
+    public boolean isDestroyable = false;
+
     // TODO?: Move into World. Allows World-specific Entities.
 //    public static Group<Entity> entityManager = new Group<>();
 
@@ -55,6 +57,10 @@ public final class Entity {
             }
         }
         return true;
+    }
+
+    public void removeComponents() {
+        components.clear();
     }
 
     public <C extends Component> C removeComponent(Class<C> type) {

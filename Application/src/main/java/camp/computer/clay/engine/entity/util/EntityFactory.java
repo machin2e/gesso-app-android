@@ -41,9 +41,9 @@ import camp.computer.clay.lib.Geometry.ModelBuilder;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
 import camp.computer.clay.lib.Geometry.Text;
-import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.Widgets;
+import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.Random;
 
@@ -227,7 +227,7 @@ public class EntityFactory {
                             public void onComplete(Configuration configuration) {
 
                                 // Add Extension from Configuration
-                                Entity extension = world.getSystem(PortableLayoutSystem.class).createExtensionFromProfile(host, configuration, event.getPosition());
+                                Entity extension = createExtensionFromProfile(host, configuration, event.getPosition());
 
                                 // Camera
 //                            camera.getComponent(Camera.class).setFocus(extension);
@@ -514,6 +514,92 @@ public class EntityFactory {
 
         return extension;
     }
+
+
+    /**
+     * Creates a new {@code ExtensionEntity} connected to {@hostPort}.
+     *
+     * @param hostPort
+     */
+    public static Entity createCustomExtensionEntity(Entity hostPort, Transform initialPosition) {
+        // TODO: Remove initialPosition. Should be able to figure out the positioning since have the initial port (and thus a side of the board where the most ports are connected).
+
+        // IASM Message:
+        // (1) touch extensionEntity to select from store, or
+        // (2) drag signal to base, or
+        // (3) touch elsewhere to cancel
+
+        // TODO: Widgets to select Extension from repository then copy that Extension configuration!
+        // TODO: (...) Then use that profile to create and configure Ports for the Extension.
+
+        // Create Extension Entity
+        Entity extension = World.getInstance().createEntity(Extension.class); // HACK: Because Extension is a Component
+
+        // Set the initial position of the Extension
+        extension.getComponent(Transform.class).set(initialPosition); // TODO: Set Physics.targetPosition instead? Probs!
+
+        // Configure Host's Port (i.e., the Path's source Port)
+        if (Port.getType(hostPort) == Signal.Type.NONE || Port.getDirection(hostPort) == Signal.Direction.NONE) {
+            Port.setType(hostPort, Signal.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+            Port.setDirection(hostPort, Signal.Direction.BOTH);
+        }
+
+        // Configure Extension's Ports (i.e., the Path's target Port)
+        Entity extensionPort = Portable.getPorts(extension).get(0);
+
+        // Create Path from Host to Extension and configure the new Path
+        // TODO: Create the Path and then apply it. It should automatically configure the
+        // TODO: (...) Extension's Ports (so the previous segment of code can be removed and
+        // TODO: (...) automated!). The idea here is that a Path can be created given two Ports,
+        // TODO: (...) then a System will automatically configure the Ports based on the newly-
+        // TODO: (...) existing Path's Port dependencies.
+        if (!Port.hasPath(hostPort)) {
+            Entity path = World.getInstance().createEntity(Path.class);
+            Path.set(path, hostPort, extensionPort);
+        } else {
+            Entity path = Port.getPaths(hostPort).get(0);
+            Path.set(path, hostPort, extensionPort);
+            Path.setTarget(path, extensionPort);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Adds and existing {@code ExtensionEntity}.
+     *
+     * @param configuration
+     * @param initialPosition
+     * @return
+     */
+    public static Entity createExtensionFromProfile(Entity host, Configuration configuration, Transform initialPosition) {
+        // NOTE: Previously called fetchExtension(...)
+
+        // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+
+        // Create the Extension
+        Entity extension = World.getInstance().createEntity(Extension.class);
+
+        // <HACK>
+        // TODO: Remove references to Configuration in Portables. Remove Configuration altogether!?
+        World.getInstance().configureExtensionFromProfile(extension, configuration);
+        // </HACK>
+
+        Log.v("Configuration", "extension from profile # ports: " + Portable.getPorts(extension).size());
+
+        // Update ExtensionEntity Position
+        extension.getComponent(Transform.class).set(initialPosition);
+
+        // Automatically select and connect all Paths to HostEntity
+        World.getInstance().getSystem(PortableLayoutSystem.class).autoConnectToHost(host, extension);
+
+        // TODO: Start IASM based on automatically configured Paths to HostEntity.
+
+        World.getInstance().getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
+
+        return extension;
+    }
+    // </REFACTOR>
 
     public static Entity createPathEntity(final World world) {
         final Entity path = new Entity();
@@ -932,7 +1018,7 @@ public class EntityFactory {
                         Log.v("handlePathEvent", "hostPort: " + hostPort);
 
                         // Create new custom Extension. Custom Extension can be configured manually.
-                        Entity extension = world.getSystem(PortableLayoutSystem.class).createCustomExtension(hostPort, event.getPosition());
+                        Entity extension = createCustomExtensionEntity(hostPort, event.getPosition());
 
                         // Notification
                         world.createAndConfigureNotification("added extension", extension.getComponent(Transform.class), 1000);

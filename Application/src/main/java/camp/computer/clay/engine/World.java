@@ -30,17 +30,17 @@ import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.util.EntityFactory;
 import camp.computer.clay.engine.event.Event;
+import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.EventManager;
-import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Text;
-import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.Cache;
 import camp.computer.clay.platform.graphics.controls.Widgets;
+import camp.computer.clay.structure.configuration.Configuration;
 
 public class World {
 
@@ -129,6 +129,7 @@ public class World {
         eventManager.registerEvent("UNSELECT");
 
         eventManager.registerEvent("CREATE_HOST");
+        eventManager.registerEvent("DESTROY_HOST");
 
         entityManager = new EntityManager();
 
@@ -191,6 +192,10 @@ public class World {
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
     public void update(long dt) {
+
+        // <REFACTOR>
+        entityManager.destroyEntities();
+        // </REFACTOR>
 
         long updateStartTime = Clock.getTime(Clock.Unit.MILLISECONDS);
         for (int i = 0; i < systems.size(); i++) {

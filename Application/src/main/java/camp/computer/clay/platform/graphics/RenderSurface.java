@@ -356,6 +356,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     Group<Entity> portEntities;
     Group<Entity> extensionEntities;
     Group<Entity> pathEntities;
+    Group<Entity> primitiveEntities;
     Group<Entity> cameraEntities;
 
     Group<Entity> boundaryEntities;
@@ -370,6 +371,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Port.class);
             extensionEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class);
             pathEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Path.class);
+            primitiveEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Primitive.class);
             cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
 
             boundaryEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class, Boundary.class);
@@ -385,6 +387,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         int portCount = portEntities.size();
         int extensionCount = extensionEntities.size();
         int pathCount = pathEntities.size();
+        int primitiveCount = primitiveEntities.size();
         int cameraCount = cameraEntities.size();
 
         int worldUpdateTime = (int) world.updateTime;
@@ -521,6 +524,14 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         // Paths
         canvas.save();
         lineText = "Paths: " + pathCount;
+        paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
+        linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+
+        // Primitives
+        canvas.save();
+        lineText = "Primitives: " + primitiveCount;
         paint.getTextBounds(lineText, 0, lineText.length(), textBounds);
         linePosition += World.OVERLAY_LINE_SPACING + textBounds.height();
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
