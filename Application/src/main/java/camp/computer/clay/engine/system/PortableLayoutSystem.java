@@ -201,6 +201,7 @@ public class PortableLayoutSystem extends System {
         }
     }
 
+    /*
     public void setPortableSeparation(double distance) {
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
@@ -210,9 +211,11 @@ public class PortableLayoutSystem extends System {
             }
         }
     }
+    */
 
     // <REFACTOR>
 
+    /*
     // TODO: Make PortableLayoutSystem. Iterate through Hosts and lay out Extensions each PortableLayoutSystem.update().
     public boolean autoConnectToHost(Entity host, Entity extension) {
 
@@ -238,7 +241,9 @@ public class PortableLayoutSystem extends System {
 
         return true;
     }
+    */
 
+    /*
     private Entity autoSelectNearestAvailableHostPort(Entity host, Entity extension) {
 
         // Select an available Port on the Host
@@ -266,6 +271,7 @@ public class PortableLayoutSystem extends System {
         // TODO: selectedHostPortEntity = (PortEntity) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
         return nearestHostPort;
     }
+    */
 
     // TODO: Remove this?
     public int getHeaderIndex(Entity host, Entity extension) {
@@ -324,12 +330,15 @@ public class PortableLayoutSystem extends System {
         return segmentIndex;
     }
 
+    /*
     public void setExtensionDistance(Entity host, double distance) {
         // TODO: How is distanceToExtensions different from portableSeparation in setPortableSeparation()?
         host.getComponent(Host.class).distanceToExtensions = distance;
-        updateExtensionLayout(host);
+//        updateExtensionLayout(host);
     }
+    */
 
+    /*
     public void updateExtensionLayout(Entity host) {
 
         // Get Extensions connected to the Host
@@ -408,6 +417,7 @@ public class PortableLayoutSystem extends System {
         int segmentIndex = getHeaderIndex(host, extension);
         host.getComponent(Host.class).headerExtensions.get(segmentIndex).add(extension);
     }
+    */
 
     // <HOST_LAYOUT>
 

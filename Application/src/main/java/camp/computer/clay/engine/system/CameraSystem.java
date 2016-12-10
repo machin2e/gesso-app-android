@@ -183,7 +183,7 @@ public class CameraSystem extends System {
 
                 // Increase distance between Host and Extension
                 Entity host = Portable.getHosts(focusEntity).get(0);
-                world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
                 Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getPrimitives();
                 extensionPathPortShapes.addAll(Model.getPrimitives(focusEntity)); // HACK: Add Extension primitives

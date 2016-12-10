@@ -35,7 +35,6 @@ import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.lib.Geometry.Circle;
 import camp.computer.clay.lib.Geometry.ModelBuilder;
 import camp.computer.clay.lib.Geometry.Rectangle;
@@ -199,7 +198,7 @@ public class EntityFactory {
                     // TODO: Move this into PortableLayoutSystem
                     // TODO: Replace ASAP. This is shit.
                     // TODO: Use "rectangle" or "circular" extension layout algorithms
-                    world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                    world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
                     // </HACK>
                 }
 
@@ -291,7 +290,7 @@ public class EntityFactory {
 
 
                     // Update distance between Hosts and Extensions
-                    world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+//                    world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
                     // </MOVE_TO_WORLD_EVENT_HANDLER>
                 }
             }
@@ -592,11 +591,11 @@ public class EntityFactory {
         extension.getComponent(Transform.class).set(initialPosition);
 
         // Automatically select and connect all Paths to HostEntity
-        World.getInstance().getSystem(PortableLayoutSystem.class).autoConnectToHost(host, extension);
+//        World.getInstance().getSystem(PortableLayoutSystem.class).autoConnectToHost(host, extension);
 
         // TODO: Start IASM based on automatically configured Paths to HostEntity.
 
-        World.getInstance().getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
+//        World.getInstance().getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
 
         return extension;
     }
@@ -1040,9 +1039,9 @@ public class EntityFactory {
                         // Update layout
                         Entity host = hostPort.getParent(); // HACK
 
-                        world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                        world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-                        world.getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
+//                        world.getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
                         // <STYLE_AND_LAYOUT>
 
                         // Set Camera focus on the Extension
