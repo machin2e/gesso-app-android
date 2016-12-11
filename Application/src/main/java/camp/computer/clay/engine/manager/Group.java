@@ -101,11 +101,7 @@ public class Group<E> implements List<E> {
         public static Filter filterUuid = new Filter<Entity, Long>() {
             @Override
             public boolean filter(Entity entity, Long uuid) {
-                if (entity.uid == uuid) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return (entity.uid == uuid) ? true : false;
             }
         };
 
@@ -246,9 +242,9 @@ public class Group<E> implements List<E> {
         public static Sorter layerSorter = new Sorter<Entity, Entity>() {
             @Override
             public int sort(Entity entity, Entity otherEntity) {
-                if (entity.getComponent(Model.class).layerIndex < otherEntity.getComponent(Model.class).layerIndex) {
+                if (entity.getComponent(Transform.class).z < otherEntity.getComponent(Transform.class).z) {
                     return -1;
-                } else if (entity.getComponent(Model.class).layerIndex > otherEntity.getComponent(Model.class).layerIndex) {
+                } else if (entity.getComponent(Transform.class).z > otherEntity.getComponent(Transform.class).z) {
                     return 1;
                 } else {
                     return 0;

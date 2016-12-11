@@ -31,12 +31,6 @@ public class Model extends Component {
         primitives = new ArrayList<>();
     }
 
-    // <LAYER>
-    public static final int DEFAULT_LAYER_INDEX = 0;
-
-    public int layerIndex = DEFAULT_LAYER_INDEX;
-    // </LAYER>
-
     public static Entity addShape(Entity entity, Shape shape) {
 
         // Create Shape entity and assign shape to it

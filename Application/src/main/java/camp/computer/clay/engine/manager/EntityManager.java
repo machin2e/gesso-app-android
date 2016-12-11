@@ -107,30 +107,35 @@ public class EntityManager {
         return subgroup;
     }
 
-
     /**
-     * Creates subscribe that is automatically updated using the specified {@code filter} when
-     * elements are added or removed from the parent {@code Group}.
+     * Convenience method equivalent to {@code subscribe(null, null)}.
      *
-     * @param filter
      * @return
      */
-//    public <D> Group<Entity> subscribe(Filter filter, D... data) {
-//        Group<Entity> group = new Group<>();
-//        group.filter = filter;
-//        group.data = data;
-//
-//        List<Entity> elements = new ArrayList<>(entities.values());
-//        for (int i = 0; i < elements.size(); i++) {
-//            if (filter == null || filter.filter(elements.get(i), data) == true) {
-//                group.add(elements.get(i));
-//            }
-//        }
-//
-//        subscribers.add(group);
-//
-//        return group;
-//    }
+    public Group<Entity> subscribe() {
+        return subscribe(null, null);
+    }
+
+    /**
+     * Convenience method equivalent to {@code subscribe(filterStrategy, null)}.
+     *
+     * @param filterStrategy
+     * @return
+     */
+    public Group<Entity> subscribe(FilterStrategy filterStrategy) {
+        return subscribe(filterStrategy, null);
+    }
+
+    /**
+     * Convenience method equivalent to {@code subscribe(null, sorterStrategy)}.
+     *
+     * @param sorterStrategy
+     * @return
+     */
+    public Group<Entity> subscribe(SorterStrategy sorterStrategy) {
+        return subscribe(null, sorterStrategy);
+    }
+    
     public boolean unsubscribe(Group group) {
         return subscribers.remove(group);
     }

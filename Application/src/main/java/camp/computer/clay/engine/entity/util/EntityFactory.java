@@ -674,7 +674,7 @@ public class EntityFactory {
         // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
 //        path.getComponent(ModelBuilder.class).setImage(imageBuilder);
-        path.getComponent(Model.class).layerIndex = 10;
+        path.getComponent(Transform.class).z = 10;
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
@@ -1316,7 +1316,7 @@ public class EntityFactory {
 //        imageBuilder.addShape(text);
 
         // <HACK>
-        notification.getComponent(Model.class).layerIndex = 20;
+        notification.getComponent(Transform.class).z = 20;
         // </HACK>
 
 //        notification.getComponent(ModelBuilder.class).setImage(imageBuilder);
