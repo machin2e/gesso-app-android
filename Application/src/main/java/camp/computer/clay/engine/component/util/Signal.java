@@ -12,13 +12,13 @@ public abstract class Signal {
         POWER_CMOS,
         POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
 
-//        public static Type next(Type currentType) {
-//            Type[] values = Type.values();
-//            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
-//            return values[(currentIndex + 1) % values.length];
-//        }
-
         public static Type next(Type currentType) {
+            Type[] values = Type.values();
+            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
+            return values[(currentIndex + 1) % values.length];
+        }
+
+        public static Type previous(Type currentType) {
             Type[] values = Type.values();
             int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
             return values[((currentIndex - 1) >= 0 ? (currentIndex - 1) : values.length - 1)];
@@ -38,7 +38,7 @@ public abstract class Signal {
         NONE,
         ELECTRONIC,
         BLUETOOTH,
-        MESH,
-        INTERNET;
+        THREAD,
+        INTERNET
     }
 }

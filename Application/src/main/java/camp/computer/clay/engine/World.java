@@ -33,7 +33,7 @@ import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.event.EventResponse;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.EventManager;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
+import camp.computer.clay.engine.system.LayoutSystem;
 import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Text;
@@ -104,12 +104,8 @@ public class World {
     public Cache cache;
     // </TEMPORARY>
 
-    public Engine engine;
-
-    public World(Engine engine) {
+    public World() {
         super();
-
-        this.engine = engine;
         setup();
     }
 
@@ -131,13 +127,14 @@ public class World {
         eventManager.registerEvent("CREATE_HOST");
         eventManager.registerEvent("DESTROY_HOST");
 
+        // CREATE_NOTIFICATION
+        // SYNTHESIZE_SPEECH
+
         entityManager = new EntityManager();
 
         createPrototypeExtensionEntity();
 
         // <TEMPORARY>
-//        repository = new Repository();
-//        repository.populateTestData();
         cache = new Cache();
         // </TEMPORARY>
 
@@ -146,7 +143,7 @@ public class World {
             public void execute(Event event) {
                 Log.v("EVENT_QUEUE", "CREATE_HOST");
                 Entity host = World.getInstance().createEntity(Host.class);
-                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
 
 //                // Automatically focus on the first Host that appears in the workspace/world.
 //                if (World.getInstance().entityManager.get().size() == 1) {
@@ -193,15 +190,15 @@ public class World {
 
     public void update(long dt) {
 
-        // <REFACTOR>
-        entityManager.destroyEntities();
-        // </REFACTOR>
-
         long updateStartTime = Clock.getTime(Clock.Unit.MILLISECONDS);
         for (int i = 0; i < systems.size(); i++) {
             systems.get(i).update(dt);
         }
         updateTime = Clock.getTime(Clock.Unit.MILLISECONDS) - updateStartTime;
+
+        // <REFACTOR>
+        entityManager.destroyEntities();
+        // </REFACTOR>
     }
 
     public Entity createEntity(Class<?> entityType) {

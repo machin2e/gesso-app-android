@@ -28,6 +28,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
@@ -68,11 +69,11 @@ public class EntityFactory {
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
-        // <FUN>
-        host.getComponent(Physics.class).velocity.x = Random.getRandomGenerator().nextFloat() * 0.01;
-        host.getComponent(Physics.class).velocity.y = Random.getRandomGenerator().nextFloat() * 0.01;
-        host.getComponent(Physics.class).velocity.z = Random.getRandomGenerator().nextFloat() * 0.01;
-        // </FUN>
+//        // <FUN>
+//        host.getComponent(Physics.class).velocity.x = Random.getRandomGenerator().nextFloat() * 0.01;
+//        host.getComponent(Physics.class).velocity.y = Random.getRandomGenerator().nextFloat() * 0.01;
+//        host.getComponent(Physics.class).velocity.z = Random.getRandomGenerator().nextFloat() * 0.01;
+//        // </FUN>
 
         // Portable Component (ModelBuilder Component depends on this)
         final int PORT_COUNT = 12;
@@ -196,10 +197,10 @@ public class EntityFactory {
                 if (Portable.getExtensions(host).size() > 0) {
 
                     // <HACK>
-                    // TODO: Move this into PortableLayoutSystem
+                    // TODO: Move this into LayoutSystem
                     // TODO: Replace ASAP. This is shit.
                     // TODO: Use "rectangle" or "circular" extension layout algorithms
-//                    world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                    world.getSystem(LayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
                     // </HACK>
                 }
 
@@ -273,10 +274,16 @@ public class EntityFactory {
                     Group<Entity> pathAndPortEntities = null;
 
                     if (portEntities == null) {
-                        portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Port.class);
+                        portEntities = world.entityManager.subscribe(
+                                new FilterStrategy(Group.Filters.filterWithComponent, Port.class),
+                                null
+                        );
                     }
                     if (pathAndPortEntities == null) {
-                        pathAndPortEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+                        pathAndPortEntities = world.entityManager.subscribe(
+                                new FilterStrategy(Group.Filters.filterWithComponent, Path.class, Port.class),
+                                null
+                        );
                     }
                     // </HACK>
 
@@ -291,7 +298,7 @@ public class EntityFactory {
 
 
                     // Update distance between Hosts and Extensions
-//                    world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+//                    world.getSystem(LayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
                     // </MOVE_TO_WORLD_EVENT_HANDLER>
                 }
             }
@@ -592,11 +599,11 @@ public class EntityFactory {
         extension.getComponent(Transform.class).set(initialPosition);
 
         // Automatically select and connect all Paths to HostEntity
-//        World.getInstance().getSystem(PortableLayoutSystem.class).autoConnectToHost(host, extension);
+//        World.getInstance().getSystem(LayoutSystem.class).autoConnectToHost(host, extension);
 
         // TODO: Start IASM based on automatically configured Paths to HostEntity.
 
-//        World.getInstance().getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
+//        World.getInstance().getSystem(LayoutSystem.class).updateExtensionLayout(host);
 
         return extension;
     }
@@ -937,12 +944,7 @@ public class EntityFactory {
                         else if (dropTargetPorts.size() == 0) {
 
                             // Remove the Path (and the Extension if the removed Path was the only one)
-                            path.isActive = false;
                             world.entityManager.remove(path);
-//                            world.entityManager.destroyEntities();
-
-//                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
-//                    extensionPorts1.remove(extensionPort); // Remove from Portable
 
                             // Notification
                             world.createAndConfigureNotification("removed path", event.getPosition(), 1000);
@@ -970,8 +972,6 @@ public class EntityFactory {
                                 extension.isActive = false;
 
                                 // Remove Extension's Ports
-//                        Group<Entity> extensionPorts = extension.getComponent(Portable.class).getPorts();
-//                        for (int i = 0; i < extensionPorts.size(); i++) {
                                 while (extensionPorts.size() > 0) {
                                     Entity extensionPort = extensionPorts.get(0);
                                     world.entityManager.remove(extensionPort);
@@ -1038,9 +1038,9 @@ public class EntityFactory {
 
                         // Update layout
 //                        Entity host = hostPort.getParent(); // HACK
-//                        world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                        world.getSystem(LayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-//                        world.getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
+//                        world.getSystem(LayoutSystem.class).updateExtensionLayout(host);
                         // <STYLE_AND_LAYOUT>
 
                         // Set Camera focus on the Extension
@@ -1128,6 +1128,7 @@ public class EntityFactory {
         // Add Components
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
+        port.addComponent(new Structure());
         port.addComponent(new Model());
         port.addComponent(new Style());
         port.addComponent(new Physics());

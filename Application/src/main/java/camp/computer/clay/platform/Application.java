@@ -23,7 +23,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.system.EventSystem;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
+import camp.computer.clay.engine.system.LayoutSystem;
 import camp.computer.clay.platform.compute.JavaScriptEngine;
 import camp.computer.clay.platform.graphics.RenderSurface;
 import camp.computer.clay.platform.graphics.controls.Widgets;
@@ -226,7 +226,7 @@ public class Application extends FragmentActivity {
             case KeyEvent.KEYCODE_A: {
                 /*
                 Entity host = World.getInstance().createEntity(Host.class);
-                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
 
                 // Automatically focus on the first Host that appears in the workspace/world.
                 if (World.getInstance().entityManager.get().size() == 1) {
@@ -239,8 +239,8 @@ public class Application extends FragmentActivity {
                     camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
                 }
                 */
-                World.getInstance().getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
-                // TODO: World.getInstance().getSystem(EventSystem.class).queue(new Event("CREATE_HOST"));
+                World.getInstance().getSystem(EventSystem.class).enqueue(new Event("CREATE_HOST"));
+                // TODO: World.getInstance().getSystem(EventSystem.class).enqueue(new Event("CREATE_HOST"));
 
 
                 return true;
@@ -253,7 +253,7 @@ public class Application extends FragmentActivity {
                     World.getInstance().entityManager.remove(randomHost);
                 }
 
-//                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+//                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
 //                World.getInstance().getSystem(EventSystem.class).execute(new Event("DESTROY_HOST"));
                 return true;
             }
@@ -265,7 +265,7 @@ public class Application extends FragmentActivity {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getInstance().getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 

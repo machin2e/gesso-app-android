@@ -22,7 +22,7 @@ public class EventSystem extends System {
         }
     }
 
-    public void queue(Event event) {
+    public void enqueue(Event event) {
         world.eventQueue.add(event);
     }
 

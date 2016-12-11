@@ -7,6 +7,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Shape;
@@ -19,7 +20,10 @@ public class BoundarySystem extends System {
     public BoundarySystem(World world) {
         super(world);
 
-        entitiesWithBoundary = world.entityManager.subscribe(Group.Filters.filterWithComponents, Primitive.class, Boundary.class);
+        entitiesWithBoundary = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Primitive.class, Boundary.class),
+                null
+        );
     }
 
     @Override

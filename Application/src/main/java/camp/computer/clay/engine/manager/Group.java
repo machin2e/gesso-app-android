@@ -16,6 +16,9 @@ import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.util.Filter;
+import camp.computer.clay.engine.component.util.Mapper;
+import camp.computer.clay.engine.component.util.Sorter;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.lib.Geometry.Rectangle;
@@ -59,43 +62,18 @@ public class Group<E> implements List<E> {
         }
         return element;
     }
-
-//    public Group<E> remove(E entity) {
-//        int elementIndex = indexOf(entity);
-//        remove(elementIndex);
-//        return this;
-//    }
-
-//    private List<Group> subscribers = new ArrayList<>();
-//
-//    /**
-//     * Creates subscribe that is automatically updated using the specified {@code filter} when
-//     * elements are added or removed from the parent {@code Group}.
-//     *
-//     * @param filter
-//     * @return
-//     */
-//    public <D> Group<E> subscribe(Filter filter, D... data) {
-//        Group<E> subgroup = filter(filter, data);
-//        subgroup.filter = filter;
-//        subgroup.data = data;
-//
-//        subscribers.add(subgroup);
-//        return subgroup;
-//    }
-//
-//    // TODO: unsubscribe(...)
     // </GROUP>
 
-
-    public interface Sorter<V, D> {
-        int sort(V entity, D data);
-    }
-
-
     // <GROUP_LOOKUP>
-    public interface Filter<V, D> {
-        boolean filter(V entity, D data);
+    public <V, M, D> Group<M> map(Mapper mapper, D data) {
+        Group<M> group = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            M result = (M) mapper.map(elements.get(i), data);
+            if (result != null) {
+                group.add(result);
+            }
+        }
+        return group;
     }
 
     public <D> Group filter(Filter filter, D data) {
@@ -123,7 +101,7 @@ public class Group<E> implements List<E> {
         public static Filter filterUuid = new Filter<Entity, Long>() {
             @Override
             public boolean filter(Entity entity, Long uuid) {
-                if (entity.uuid == uuid) {
+                if (entity.uid == uuid) {
                     return true;
                 } else {
                     return false;
@@ -198,29 +176,6 @@ public class Group<E> implements List<E> {
         };
     }
 
-    /**
-     * Interface for custom map functions.
-     *
-     * @param <E> "Input" group element type.
-     * @param <M> "Result" group element type.
-     * @param <D> Type of data to pass to the {@code Mapper}. Set to {@code Void} if there's no
-     *            data.
-     */
-    public interface Mapper<E, M, D> {
-        M map(E value, D data);
-    }
-
-    public <V, M, D> Group<M> map(Mapper mapper, D data) {
-        Group<M> group = new Group<>();
-        for (int i = 0; i < elements.size(); i++) {
-            M result = (M) mapper.map(elements.get(i), data);
-            if (result != null) {
-                group.add(result);
-            }
-        }
-        return group;
-    }
-
     // "Mappers" namespace
     public static class Mappers {
 
@@ -286,67 +241,96 @@ public class Group<E> implements List<E> {
         };
     }
 
+    public static class Sorters {
+
+        public static Sorter layerSorter = new Sorter<Entity, Entity>() {
+            @Override
+            public int sort(Entity entity, Entity otherEntity) {
+                if (entity.getComponent(Model.class).layerIndex < otherEntity.getComponent(Model.class).layerIndex) {
+                    return -1;
+                } else if (entity.getComponent(Model.class).layerIndex > otherEntity.getComponent(Model.class).layerIndex) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+
+    }
+
     // Expects Group<Entity>
     public Group<Entity> filterWithComponent(Class<? extends Component>... componentTypes) {
-
-//        Group<Entity> group = new Group<>();
-//
-//        for (int i = 0; i < this.elements.size(); i++) {
-//            for (int j = 0; j < componentTypes.length; j++) {
-//                Class<? extends Component> type = componentTypes[j];
-//                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-//                if (entity.hasComponent(type)) {
-//                    group.add(entity);
-//                }
-//            }
-//        }
-//
-//        return group;
-
         return filter(Filters.filterWithComponent, componentTypes);
-
     }
 
     // Expects Group<Entity>
     public Group<Entity> filterWithComponents(Class<? extends Component>... componentTypes) {
-//        Group<Entity> group = new Group<>();
-//        for (int i = 0; i < this.elements.size(); i++) {
-//            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-//            if (entity.hasComponents(componentTypes)) {
-//                group.add(entity);
-//            }
-//        }
-//        return group;
-
         return filter(Filters.filterWithComponents, componentTypes);
     }
 
+    /**
+     * Performs in-place sort with the specified {@code Sorter}.
+     *
+     * @param sorter
+     * @return
+     */
     // Exepcts Group<Entity>
     // Requires components: ModelBuilder
-    public Group<Entity> sortByLayer() {
-        Group<Entity> group = new Group<>();
+    public Group<E> sort(Sorter sorter) { // TODO: sort(Sorter sorter): [e.g., entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex]
+
+        Group<E> sortedGroup = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
-            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-//            if (entity.hasComponents(componentTypes)) {
-//                group.add(entity);
-//            }
-            // Insertion sort by layers
-            boolean isEntityInserted = false;
-            for (int j = 0; j < group.size(); j++) {
-                Entity sortedEntity = (Entity) group.get(j); // HACK: Forcing typecast to Entity
-                if (entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex) {
-                    group.add(j, entity);
-                    isEntityInserted = true;
+            E entity = this.elements.get(i); // HACK: Forcing typecast to Entity
+
+            // Insertion sort using Sorter
+            boolean isInserted = false;
+            for (int j = 0; j < sortedGroup.size(); j++) {
+                if (sorter.sort(entity, sortedGroup.get(j)) == -1) {
+                    sortedGroup.add(j, entity);
+                    isInserted = true;
                     break;
                 }
             }
 
-            if (!isEntityInserted) {
+            if (!isInserted) {
+                sortedGroup.add(entity);
+            }
+        }
+
+        this.elements.clear();
+        for (int i = 0; i < sortedGroup.size(); i++) {
+            this.elements.add(sortedGroup.get(i));
+        }
+
+        return this;
+    }
+
+    /*
+    // Exepcts Group<Entity>
+    // Requires components: ModelBuilder
+    public Group<Entity> sort(Sorter sorter) { // TODO: sort(Sorter sorter): [e.g., entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex]
+
+        Group<Entity> group = new Group<>();
+        for (int i = 0; i < this.elements.size(); i++) {
+            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+
+            // Insertion sort using Sorter
+            boolean isInserted = false;
+            for (int j = 0; j < group.size(); j++) {
+                if (sorter.sort(entity, group.get(j)) == -1) {
+                    group.add(j, entity);
+                    isInserted = true;
+                    break;
+                }
+            }
+
+            if (!isInserted) {
                 group.add(entity);
             }
         }
         return group;
     }
+    */
 
     // Expects Group<Entity>
     public Group<E> filterUuid(long uuid) {
@@ -579,6 +563,11 @@ public class Group<E> implements List<E> {
 //        result.add(elements.get(i));
         if (this.filter == null || this.filter.filter(object, this.data) == true) {
             this.elements.add(object);
+        }
+
+        if (this.sorter != null) {
+            sort(this.sorter);
+            // TODO: Perform insertion to add object to the Group
         }
 
 //        // Update subscribers

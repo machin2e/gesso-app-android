@@ -118,6 +118,10 @@ public class Event {
     */
 
     // <CONTEXT>
+    class Context {
+        // TODO: Allow attachment of data in Context (e.g., dt, target parameter, type/mode/direction parameter)
+    }
+
     public long dt;
     // </CONTEXT>
 
@@ -145,15 +149,13 @@ public class Event {
     private Entity[] targets = new Entity[MAXIMUM_POINT_COUNT];
     private Entity[] secondaryTarget = new Entity[MAXIMUM_POINT_COUNT];
 
-//    private Entity[] backgroundTargets = new Entity[MAXIMUM_POINT_COUNT];
-
-//    private Type type = null;
-
     private long timestamp = DEFAULT_TIMESTAMP;
 
     public int pointerIndex = -1;
 
     private long eventTypeUid;
+
+    // TODO: eventTransactionUid
 
     public Event(String eventType) {
         this.eventTypeUid = World.getInstance().eventManager.getEventUid(eventType);
@@ -173,15 +175,9 @@ public class Event {
         }
     }
 
-//    public Type getType() {
-//        return this.type;
-//    }
-//
-//    public void setType(Type type) {
-//        this.type = type;
-//    }
-
-    // TODO: Return event type UID
+    /**
+     * Returns the {@code Event}'s type UID.
+     */
     public long getType() {
         return this.eventTypeUid;
     }
@@ -234,14 +230,7 @@ public class Event {
     public void setPreviousEvent(Event previousEvent) {
         this.previousEvent = previousEvent;
 
-//        this.offset.set(
-//                getPosition().x - getFirstEvent().getPosition().x,
-//                getPosition().y - getFirstEvent().getPosition().y
-//        );
-
         if (previousEvent != null) {
-//            this.xOffset = previousEvent.xOffset + (getPosition().x - previousEvent.getPosition().x);
-//            this.yOffset = previousEvent.yOffset + (getPosition().y - previousEvent.getPosition().x);
             this.xOffset = (getPosition().x - previousEvent.getPosition().x);
             this.yOffset = (getPosition().y - previousEvent.getPosition().y);
         } else {
@@ -250,10 +239,10 @@ public class Event {
         }
     }
 
-    // TODO: DELETE
-    public Event getPreviousEvent() {
-        return previousEvent;
-    }
+//    // TODO: DELETE
+//    public Event getPreviousEvent() {
+//        return previousEvent;
+//    }
 
     //    private Transform offset = new Transform();
     public double xOffset = 0;
@@ -268,16 +257,16 @@ public class Event {
         return firstEvent;
     }
 
-    // TODO: DELETE
-    public int getEventCount() {
-        int count = 1;
-        Event firstEvent = this;
-        while (firstEvent.previousEvent != null) {
-            count++;
-            firstEvent = firstEvent.previousEvent;
-        }
-        return count;
-    }
+//    // TODO: DELETE
+//    public int getEventCount() {
+//        int entityCounter = 1;
+//        Event firstEvent = this;
+//        while (firstEvent.previousEvent != null) {
+//            entityCounter++;
+//            firstEvent = firstEvent.previousEvent;
+//        }
+//        return entityCounter;
+//    }
 
     // TODO: DELETE
     public long getDuration() {
@@ -311,12 +300,12 @@ public class Event {
         return distance;
     }
 
-    public Transform getOffset() {
-//        this.offset.set(
-//                getPosition().x - getFirstEvent().getPosition().x,
-//                getPosition().y - getFirstEvent().getPosition().y
-//        );
-        return new Transform(xOffset, yOffset);
-    }
+//    public Transform getOffset() {
+////        this.offset.set(
+////                getPosition().x - getFirstEvent().getPosition().x,
+////                getPosition().y - getFirstEvent().getPosition().y
+////        );
+//        return new Transform(xOffset, yOffset);
+//    }
     // </INTEGRATE_WITH_ACTION>
 }

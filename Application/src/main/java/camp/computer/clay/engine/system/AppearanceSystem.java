@@ -10,6 +10,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 
@@ -26,7 +27,10 @@ public class AppearanceSystem extends System {
 
     private void setup() {
         // Setup subscriptions for needed Entity groups.
-        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class);
+        entities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class),
+                null
+        );
         // TODO: (if needed) entityManager = world.entityManager.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, ModelBuilder.class);
     }
 

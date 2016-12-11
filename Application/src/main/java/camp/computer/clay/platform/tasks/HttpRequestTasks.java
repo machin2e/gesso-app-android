@@ -100,7 +100,7 @@ public class HttpRequestTasks {
                             Log.v("HTTPResponse", "---");
 
                             // Cache_OLD Action and Script in Repository. Retrieve Actions and Scripts from Remote Server.
-                            // TODO: Create event in global event queue to fetch and cache this data when Builder loads! It shouldn't be happenin' in UI codez!!
+                            // TODO: Create event in global event enqueue to fetch and cache this data when Builder loads! It shouldn't be happenin' in UI codez!!
                             // <TODO>
                             /*
                             // World.getInstance().repository.createTestAction(actionTitle, actionScript);
@@ -142,7 +142,7 @@ public class HttpRequestTasks {
         }
     }
 
-    // TODO: 11/21/2016 Add HttpPostRequestTask to global TCP/UDP communications queue to server.
+    // TODO: 11/21/2016 Add HttpPostRequestTask to global TCP/UDP communications enqueue to server.
     public static class HttpPostRequestTask extends AsyncTask<HttpRequestTask, String, String> {
 
         //        String serverUri = "http://192.168.1.2:8001/jsonPost";

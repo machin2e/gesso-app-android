@@ -46,7 +46,7 @@ public class Model extends Component {
         primitiveEntity.getComponent(TransformConstraint.class).setReferenceEntity(entity);
 
         // Add Shape entity to ModelBuilder component
-        entity.getComponent(Model.class).primitives.add(primitiveEntity.getUuid());
+        entity.getComponent(Model.class).primitives.add(primitiveEntity.getUid());
 
         return primitiveEntity;
     }

@@ -5,6 +5,7 @@ import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.util.Geometry;
@@ -19,7 +20,10 @@ public class ModelSystem extends System {
     }
 
     private void setup() {
-        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
+        entities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class),
+                null
+        );
     }
 
     @Override

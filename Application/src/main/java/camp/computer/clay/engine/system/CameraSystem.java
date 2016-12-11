@@ -12,6 +12,7 @@ import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Rectangle;
@@ -31,10 +32,16 @@ public class CameraSystem extends System {
     }
 
     private void setup() {
-        cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
+        cameraEntities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class),
+                null
+        );
 //        portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Port.class);
 //        pathAndPortEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
-        hostAndExtensionEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Host.class, Extension.class);
+        hostAndExtensionEntities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponent, Host.class, Extension.class),
+                null
+        );
     }
 
     @Override
@@ -89,7 +96,7 @@ public class CameraSystem extends System {
 //
 //
 //                // Update distance between Hosts and Extensions
-//                world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+//                world.getSystem(LayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
 //                // </MOVE_TO_WORLD_EVENT_HANDLER>
 
                 // <REFACTOR>
@@ -183,7 +190,7 @@ public class CameraSystem extends System {
 
                 // Increase distance between Host and Extension
                 Entity host = Portable.getHosts(focusEntity).get(0);
-//                world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+//                world.getSystem(LayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
                 Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getPrimitives();
                 extensionPathPortShapes.addAll(Model.getPrimitives(focusEntity)); // HACK: Add Extension primitives

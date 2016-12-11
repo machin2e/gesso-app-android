@@ -1,34 +1,27 @@
 package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.Group;
 
 public final class Entity {
 
     // <HACK>
-    public long uuid = EntityManager.count++; // entityManager.INVALID_UID;
+    public long uid = EntityManager.INVALID_UUID; // = EntityManager.entityCounter++; // entityManager.INVALID_UID;
     // </HACK>
 
-    public long getUuid() {
-        return uuid;
+    public long getUid() {
+        return uid;
+    }
+
+    public void setUid(long uid) {
+        this.uid = uid;
     }
 
     public boolean isActive = false;
     public boolean isDestroyable = false;
 
-    private Group<Component> components = null;
-
-    public Entity() {
-        setup();
-    }
-
-    private void setup() {
-        components = new Group<>(); // Create list of Components
-
-        components.add(new Structure());
-    }
+    private Group<Component> components = new Group<>();
 
     public <C extends Component> void addComponent(C component) {
         component.setEntity(this); // Associate Component with Entity
@@ -42,6 +35,10 @@ public final class Entity {
             }
         }
         return null;
+    }
+
+    public Group<Component> getComponents() {
+        return new Group<>(components);
     }
 
     public boolean hasComponent(Class<? extends Component> type) {
@@ -68,19 +65,4 @@ public final class Entity {
         }
         return component;
     }
-
-
-    // TODO: <DELETE>
-//    private Entity parent;
-
-//    public void setParent(Entity parent) {
-////        this.parent = parent;
-//        getComponent(Structure.class).parentEntity = parent;
-//    }
-//
-//    public Entity getParent() {
-////        return this.parent;
-//        return getComponent(Structure.class).parentEntity;
-//    }
-    // TODO: </DELETE>
 }

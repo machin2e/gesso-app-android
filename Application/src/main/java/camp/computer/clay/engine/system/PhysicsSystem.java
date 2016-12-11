@@ -4,6 +4,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 
@@ -17,7 +18,10 @@ public class PhysicsSystem extends System {
     }
 
     private void setup() {
-        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class);
+        entities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class),
+                null
+        );
     }
 
     @Override

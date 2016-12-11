@@ -43,12 +43,12 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.structure.Action;
-import camp.computer.clay.structure.Script;
-import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.tasks.HttpRequestTasks;
 import camp.computer.clay.platform.util.ViewGroupHelper;
+import camp.computer.clay.structure.Action;
+import camp.computer.clay.structure.Script;
+import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.util.Random;
 
 public class Widgets {
@@ -391,7 +391,7 @@ public class Widgets {
         if (!reqeustedActions) {
             HttpRequestTasks.HttpRequestTask httpRequestTask = new HttpRequestTasks.HttpRequestTask();
             httpRequestTask.uri = HttpRequestTasks.DEFAULT_HTTP_GET_ACTIONS_URI;
-            new HttpRequestTasks.HttpGetRequestTask().execute(httpRequestTask); // TODO: Add GET request to queue in Application startup... in an Engine System
+            new HttpRequestTasks.HttpGetRequestTask().execute(httpRequestTask); // TODO: Add GET request to enqueue in Application startup... in an Engine System
             reqeustedActions = true;
         }
         // </REFACTOR>
@@ -656,7 +656,7 @@ public class Widgets {
                             }
 
                             // <REFACTOR>
-                            // TODO: Queue HTTP request on event queue.
+                            // TODO: Queue HTTP request on event enqueue.
                             // Send complete scripts to Hosts
                             HttpRequestTasks.HttpRequestTask httpRequestTask = new HttpRequestTasks.HttpRequestTask();
                             httpRequestTask.entity = extension;
@@ -2302,7 +2302,7 @@ public class Widgets {
                 final RelativeLayout relativeLayout = new RelativeLayout(context);
                 imageEditorId = generateViewId();
                 relativeLayout.setId(imageEditorId);
-                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                relativeLayout.setBackgroundColor(Color.parseColor("#00000000"));
                 // TODO: set layout_margin=20dp
 
                 // Background Event Handler
@@ -2334,6 +2334,7 @@ public class Widgets {
 
         // Drawing Canvas
         ImageView imageView = new ImageView(context);
+        imageView.setBackgroundColor(Color.parseColor("#00ffffff"));
 
         final int imageViewId = generateViewId();
         imageView.setId(imageViewId);
@@ -2365,7 +2366,7 @@ public class Widgets {
                 paint.setAntiAlias(true);
 
                 // Set background color
-                canvas.drawColor(Color.WHITE);
+                canvas.drawColor(Color.parseColor("#bbffffff")); // Color.WHITE
 
                 // Configure interaction handler for drawing editor
                 imageView.setOnTouchListener(new View.OnTouchListener() {

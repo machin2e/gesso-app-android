@@ -10,6 +10,8 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
+import camp.computer.clay.engine.component.util.SorterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 
@@ -58,9 +60,9 @@ public class Renderer extends Thread {
 
         // <REFACTOR>
         if (entities == null && World.getInstance() != null) {
-            // TODO: Group<Entity> entityManager = World.getInstance().entityManager.get().filterActive(true).filterWithComponent(ModelBuilder.class).sortByLayer();
-            entities = World.getInstance().entityManager.subscribe(Group.Filters.filterWithComponents, Model.class);
-            cameraEntities = World.getInstance().entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
+            // TODO: Group<Entity> entityManager = World.getInstance().entityManager.get().filterActive(true).filterWithComponent(ModelBuilder.class).sort();
+            entities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Model.class), new SorterStrategy(Group.Sorters.layerSorter));
+            cameraEntities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class), null);
         }
 
         if (entities == null) {
@@ -127,7 +129,7 @@ public class Renderer extends Thread {
                         // <UPDATE>
                         // TODO: Draw Renderables.
                         // TODO: This call is expensive. Make it way faster. Cache_OLD? Sublist?
-                        renderSurface.drawRenderables(entities.sortByLayer(), canvas, paint, palette);
+                        renderSurface.drawRenderables(entities, canvas, paint, palette);
                         // </UPDATE>
 
                         if (World.ENABLE_GEOMETRY_ANNOTATIONS) {

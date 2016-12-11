@@ -97,8 +97,8 @@ public class Path extends Component {
         }
         pathComponent.direction = Signal.Direction.BOTH; // Default to BOTH
 
-        pathComponent.sourcePortUuid = sourcePort.getUuid();
-        pathComponent.targetPortUuid = targetPort.getUuid();
+        pathComponent.sourcePortUuid = sourcePort.getUid();
+        pathComponent.targetPortUuid = targetPort.getUid();
 
         // Update sourcePortUuid PortEntity configuration
         if (Port.getDirection(sourcePort) == Signal.Direction.NONE) {
@@ -122,7 +122,7 @@ public class Path extends Component {
         if (source == null) {
             pathComponent.sourcePortUuid = -1;
         } else {
-            pathComponent.sourcePortUuid = source.getUuid();
+            pathComponent.sourcePortUuid = source.getUid();
         }
 
 //        // <REFACTOR_INTO_SYSTEM>
@@ -144,7 +144,7 @@ public class Path extends Component {
         if (target == null) {
             path.getComponent(Path.class).targetPortUuid = -1;
         } else {
-            path.getComponent(Path.class).targetPortUuid = target.getUuid();
+            path.getComponent(Path.class).targetPortUuid = target.getUid();
         }
 
 //        // <REFACTOR_INTO_SYSTEM>
@@ -207,7 +207,7 @@ public class Path extends Component {
 
     public static boolean contains(Entity path, Entity port) {
         Path pathComponent = path.getComponent(Path.class);
-        if (pathComponent.sourcePortUuid == port.getUuid() || pathComponent.targetPortUuid == port.getUuid()) {
+        if (pathComponent.sourcePortUuid == port.getUid() || pathComponent.targetPortUuid == port.getUid()) {
             return true;
         } else {
             return false;

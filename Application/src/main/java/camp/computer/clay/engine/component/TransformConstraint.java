@@ -1,6 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 
 public class TransformConstraint extends Component {
@@ -13,7 +12,7 @@ public class TransformConstraint extends Component {
      * The Entity with this component will be drawn relative to the reference Entity's Transform
      * component.
      */
-    private long referenceEntityUuid;
+    private Entity referenceEntity;
 
     public Transform relativeTransform;
 
@@ -26,10 +25,10 @@ public class TransformConstraint extends Component {
     }
 
     public Entity getReferenceEntity() {
-        return World.getInstance().entityManager.get(referenceEntityUuid);
+        return referenceEntity;
     }
 
     public void setReferenceEntity(Entity entity) {
-        this.referenceEntityUuid = entity.getUuid();
+        this.referenceEntity = entity;
     }
 }

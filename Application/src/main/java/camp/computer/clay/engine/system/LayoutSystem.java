@@ -13,6 +13,7 @@ import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
 import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.entity.Entity;
@@ -21,27 +22,42 @@ import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
 
-public class PortableLayoutSystem extends System {
+public class LayoutSystem extends System {
 
     Group<Entity> entities, hosts, extensions, ports, paths;
 
-    public PortableLayoutSystem(World world) {
+    public LayoutSystem(World world) {
         super(world);
 
-        entities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Model.class, Transform.class);
+        entities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class),
+                null
+        );
         // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(ModelBuilder.class, Transform.class);
 
         //paths = world.entitiesWithBoundary.get().filterActive(true).filterWithComponent(Path.class);
-        paths = world.entityManager.subscribe(Group.Filters.filterWithComponents, Path.class);
+        paths = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Path.class),
+                null
+        );
 
         //Group<Entity> hosts = world.entitiesWithBoundary.get().filterWithComponent(Host.class);
-        hosts = world.entityManager.subscribe(Group.Filters.filterWithComponents, Host.class);
+        hosts = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class),
+                null
+        );
 
         //extensions = world.entitiesWithBoundary.get().filterWithComponent(Extension.class);
-        extensions = world.entityManager.subscribe(Group.Filters.filterWithComponents, Extension.class);
+        extensions = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Extension.class),
+                null
+        );
 
 //        Group<Entity> ports = world.entitiesWithBoundary.get().filterWithComponent(Port.class);
-        ports = world.entityManager.subscribe(Group.Filters.filterWithComponents, Port.class);
+        ports = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Port.class),
+                null
+        );
     }
 
     @Override
@@ -204,14 +220,10 @@ public class PortableLayoutSystem extends System {
             Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
             Entity targetPortPrimitive = Model.getPrimitive(Path.getTargetPort(path), "Port");
 
-            // <REFACTOR>
             if (Path.getState(path) != Component.State.EDITING) {
-                // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
-                // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
                 Model.getPrimitive(path, "Source Port").getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
                 Model.getPrimitive(path, "Target Port").getComponent(Transform.class).set(targetPortPrimitive.getComponent(Transform.class));
             }
-            // </REFACTOR>
 
         } else {
 
@@ -219,22 +231,17 @@ public class PortableLayoutSystem extends System {
             Entity sourcePortPathPrimitive = Model.getPrimitive(path, "Source Port");
             Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
 
-            // <REFACTOR>
             path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
 
             if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortPathPrimitive.getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
             }
-            // </REFACTOR>
 
-            // <REFACTOR>
             Segment pathShape = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
             pathShape.setSource(sourcePortPathPrimitive.getComponent(Transform.class));
             if (Path.getState(path) != Component.State.EDITING) {
                 pathShape.setTarget(sourcePortPathPrimitive.getComponent(Transform.class));
             }
-            // </REFACTOR>
-
         }
     }
 
@@ -303,7 +310,7 @@ public class PortableLayoutSystem extends System {
     // <REFACTOR>
 
     /*
-    // TODO: Make PortableLayoutSystem. Iterate through Hosts and lay out Extensions each PortableLayoutSystem.update().
+    // TODO: Make LayoutSystem. Iterate through Hosts and lay out Extensions each LayoutSystem.update().
     public boolean autoConnectToHost(Entity host, Entity extension) {
 
         // Automatically select, connect paths to, and configure the HostEntity's Ports

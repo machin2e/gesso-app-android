@@ -9,6 +9,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
@@ -26,14 +27,17 @@ public class InputSystem extends System {
     }
 
     private void setup() {
-        cameraEntities = world.entityManager.subscribe(Group.Filters.filterWithComponents, Camera.class);
+        cameraEntities = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class),
+                null
+        );
     }
 
     private Event previousEvent = null;
 
     public void update(long dt) {
         while (eventQueue.size() > 0) {
-            world.getSystem(EventSystem.class).queue(process(dequeue()));
+            world.getSystem(EventSystem.class).enqueue(process(dequeue()));
         }
     }
 
@@ -56,9 +60,12 @@ public class InputSystem extends System {
         }
 
         if (event.getType() == world.eventManager.getEventUid("SELECT")) {
+
             // Set previous Event
             previousEvent = event;
+
         } else if (event.getType() == world.eventManager.getEventUid("HOLD")) {
+
             // Set previous Event
             if (previousEvent != null) {
                 event.setPreviousEvent(previousEvent);
@@ -91,55 +98,6 @@ public class InputSystem extends System {
 
         }
 
-//        switch (event.getType()) {
-//            case SELECT: {
-//                // Set previous Event
-//                previousEvent = event;
-//                break;
-//            }
-//
-//            case HOLD: {
-//
-//                // Set previous Event
-//                if (previousEvent != null) {
-//                    event.setPreviousEvent(previousEvent);
-//                } else {
-//                    event.setPreviousEvent(null);
-//                }
-//                previousEvent = event;
-//
-//                // <REFACTOR>
-//                // There might be a better way to do this. How can I assign reasonable coordinates to the synthetic HOLD event?
-//                // TODO: Set coordinates of hold... to first event?
-//                Event firstEvent = event.getFirstEvent();
-//                for (int i = 0; i < firstEvent.pointerCoordinates.length; i++) {
-//                    event.pointerCoordinates[i].x = firstEvent.pointerCoordinates[i].x;
-//                    event.pointerCoordinates[i].y = firstEvent.pointerCoordinates[i].y;
-//                }
-//                // </REFACTOR>
-//
-//                break;
-//            }
-//
-//            case MOVE: {
-//
-//                // Set previous Event
-//                event.setPreviousEvent(previousEvent);
-//                previousEvent = event;
-//
-//                break;
-//            }
-//
-//            case UNSELECT: {
-//
-//                // Set previous Event
-//                event.setPreviousEvent(previousEvent);
-//                previousEvent = event;
-//
-//                break;
-//            }
-//        }
-
         setTargets(event);
 
         return event;
@@ -160,7 +118,7 @@ public class InputSystem extends System {
 
             // Assign target Entities
             // <REFACTOR>
-            Group<Entity> primaryBoundaries = world.entityManager.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
+            Group<Entity> primaryBoundaries = world.entityManager.get().filterVisibility(true).filterWithComponents(Model.class, Boundary.class).sort(Group.Sorters.layerSorter).filterContains(event.getPosition());
             Group<Entity> secondaryBoundaries = world.entityManager.get().filterVisibility(true).filterWithComponents(Primitive.class, Boundary.class).filterContains(event.getPosition());
             // </REFACTOR>
 

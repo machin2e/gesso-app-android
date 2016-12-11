@@ -12,7 +12,7 @@ import camp.computer.clay.engine.system.EventSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.ModelSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
+import camp.computer.clay.engine.system.LayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.platform.Platform;
 import camp.computer.clay.util.Random;
@@ -63,13 +63,13 @@ public class Engine {
     private void setup() {
 
         // Create World
-        world = new World(this);
+        world = new World();
         world.addSystem(new InputSystem(world));
         world.addSystem(new EventSystem(world));
         world.addSystem(new ModelSystem(world));
         world.addSystem(new AppearanceSystem(world));
         world.addSystem(new PhysicsSystem(world));
-        world.addSystem(new PortableLayoutSystem(world));
+        world.addSystem(new LayoutSystem(world));
         world.addSystem(new BoundarySystem(world));
         world.addSystem(new CameraSystem(world));
         world.addSystem(new RenderSystem(world));
@@ -80,25 +80,18 @@ public class Engine {
         // Create Camera
         world.createEntity(Camera.class);
 
-        // <REFACTOR>
+        // <DELETE>
         Platform.getInstance().getRenderSurface().setWorld(world);
-        // </REFACTOR>
+        // </DELETE>
 
         // <VIRTUAL_HOSTS>
         int minHostCount = 5;
         int maxHostCount = 6;
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
-//            world.createEntity(Host.class);
-            world.getSystem(EventSystem.class).execute(new Event("CREATE_HOST"));
+            execute(new Event("CREATE_HOST"));
         }
         // </VIRTUAL_HOSTS>
-
-        addWorld(world);
-    }
-
-    // Decouples with EventQueue/Manager and call EventManager.execute(eventResponses...) from Clock (generator of a periodic event that can be used to update the world). Delete Timer.
-    public void addWorld(final World world) {
 
         World.getInstance().eventManager.subscribe("CLOCK_TICK", new EventResponse() {
             @Override
@@ -107,9 +100,17 @@ public class Engine {
             }
         });
 
-        // <HACK>
+        // <DELETE>
         // TODO: Place in a LayoutSystem
-        world.getSystem(PortableLayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
-        // </HACK>
+        world.getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+        // </DELETE>
+    }
+
+    public void enqueue(Event event) {
+        world.getSystem(EventSystem.class).enqueue(event);
+    }
+
+    public void execute(Event event) {
+        world.getSystem(EventSystem.class).execute(event);
     }
 }
