@@ -118,12 +118,12 @@ public class CameraSystem extends System {
                     Group<Entity> portPaths = Port.getPaths(port);
                     for (int j = 0; j < portPaths.size(); j++) {
                         Entity path = portPaths.get(j);
-                        if (!hostPathPorts.contains(Path.getSource(path))) {
-                            hostPathPorts.add(Path.getSource(path));
+                        if (!hostPathPorts.contains(Path.getSourcePort(path))) {
+                            hostPathPorts.add(Path.getSourcePort(path));
                         }
-                        if (Path.getTarget(path) != null // HACK: for case when singleton Path has no Target Port
-                                && !hostPathPorts.contains(Path.getTarget(path))) {
-                            hostPathPorts.add(Path.getTarget(path));
+                        if (Path.getTargetPort(path) != null // HACK: for case when singleton Path has no Target Port
+                                && !hostPathPorts.contains(Path.getTargetPort(path))) {
+                            hostPathPorts.add(Path.getTargetPort(path));
                         }
                     }
 
@@ -171,11 +171,11 @@ public class CameraSystem extends System {
                     Group<Entity> portPaths = Port.getPaths(port);
                     for (int j = 0; j < portPaths.size(); j++) {
                         Entity path = portPaths.get(j);
-                        if (!extensionPathPorts.contains(Path.getSource(path))) {
-                            extensionPathPorts.add(Path.getSource(path));
+                        if (!extensionPathPorts.contains(Path.getSourcePort(path))) {
+                            extensionPathPorts.add(Path.getSourcePort(path));
                         }
-                        if (!extensionPathPorts.contains(Path.getTarget(path))) {
-                            extensionPathPorts.add(Path.getTarget(path));
+                        if (!extensionPathPorts.contains(Path.getTargetPort(path))) {
+                            extensionPathPorts.add(Path.getTargetPort(path));
                         }
                     }
                 }

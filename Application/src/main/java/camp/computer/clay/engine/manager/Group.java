@@ -34,6 +34,8 @@ public class Group<E> implements List<E> {
     public Filter filter = null;
     public Object data = null;
 
+    public Sorter sorter = null;
+
     public Group() {
     }
 
@@ -84,6 +86,11 @@ public class Group<E> implements List<E> {
 //
 //    // TODO: unsubscribe(...)
     // </GROUP>
+
+
+    public interface Sorter<V, D> {
+        int sort(V entity, D data);
+    }
 
 
     // <GROUP_LOOKUP>

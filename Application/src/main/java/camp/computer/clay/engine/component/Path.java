@@ -9,49 +9,32 @@ import camp.computer.clay.engine.manager.Group;
 public class Path extends Component {
 
     // <COMPONENT_DATA>
-    public enum Mode {
-
-        NONE(0),
-        ELECTRONIC(1),
-        BLUETOOTH(2),
-        MESH(3),
-        INTERNET(4);
-
-        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
-        // TODO: TCP, UDP, HTTP, HTTPS
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Mode(int index) {
-            this.index = index;
-        }
-
-        public static Mode getNext(Mode currentType) {
-            return Mode.values()[(currentType.index + 1) % Mode.values().length];
-        }
-    }
-
-//    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
-//    public enum Type {
-//        NONE,
-//        SWITCH,
-//        PULSE,
-//        WAVE,
-//        POWER_REFERENCE,
-//        POWER_CMOS,
-//        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
+//    public enum Mode {
 //
-//        public static Path.Type getNext(Path.Type currentType) {
-//            Path.Type[] values = Path.Type.values();
-//            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
-//            return values[(currentIndex + 1) % values.length];
+//        NONE(0),
+//        ELECTRONIC(1),
+//        BLUETOOTH(2),
+//        MESH(3),
+//        INTERNET(4);
+//
+//        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
+//        // TODO: TCP, UDP, HTTP, HTTPS
+//
+//        // TODO: Change the index to a UUID?
+//        int index;
+//
+//        Mode(int index) {
+//            this.index = index;
+//        }
+//
+//        public static Mode next(Mode currentType) {
+//            return Mode.values()[(currentType.index + 1) % Mode.values().length];
 //        }
 //    }
 
     // TODO: public enum Protocol (i.e., BLUETOOTH, TCP, UDP, HTTP, HTTPS)
 
-    public Mode mode = Mode.NONE;
+    public Signal.Mode mode = Signal.Mode.NONE;
 
     public Signal.Type type = Signal.Type.NONE;
 
@@ -70,7 +53,7 @@ public class Path extends Component {
     }
 
     private void setup() {
-        this.mode = Mode.ELECTRONIC;
+        this.mode = Signal.Mode.ELECTRONIC;
         this.type = Signal.Type.NONE; // Default to ELECTRONIC
         this.direction = Signal.Direction.BOTH; // Default to BOTH
 
@@ -88,11 +71,11 @@ public class Path extends Component {
         path.getComponent(Path.class).type = type;
     }
 
-    public static Mode getMode(Entity path) {
+    public static Signal.Mode getMode(Entity path) {
         return path.getComponent(Path.class).mode;
     }
 
-    public static void setMode(Entity path, Mode mode) {
+    public static void setMode(Entity path, Signal.Mode mode) {
         path.getComponent(Path.class).mode = mode;
     }
 
@@ -108,9 +91,9 @@ public class Path extends Component {
 
         Path pathComponent = path.getComponent(Path.class);
 
-        pathComponent.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
+        pathComponent.mode = Signal.Mode.ELECTRONIC; // Default to ELECTRONIC
         if (pathComponent.type == Signal.Type.NONE) {
-            pathComponent.type = Signal.Type.getNext(pathComponent.type);
+            pathComponent.type = Signal.Type.next(pathComponent.type);
         }
         pathComponent.direction = Signal.Direction.BOTH; // Default to BOTH
 
@@ -122,7 +105,7 @@ public class Path extends Component {
             Port.setDirection(sourcePort, Signal.Direction.BOTH); // Default to BOTH
         }
         if (Port.getType(sourcePort) == Signal.Type.NONE) {
-            Port.setType(sourcePort, Signal.Type.getNext(Port.getType(sourcePort)));
+            Port.setType(sourcePort, Signal.Type.next(Port.getType(sourcePort)));
         }
 
         // Update targetPortUuid PortEntity configuration
@@ -152,7 +135,7 @@ public class Path extends Component {
 //        // </REFACTOR_INTO_SYSTEM>
     }
 
-    public static Entity getSource(Entity path) {
+    public static Entity getSourcePort(Entity path) {
         long sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
         return World.getInstance().entityManager.get(sourcePortUuid);
     }
@@ -174,48 +157,53 @@ public class Path extends Component {
 //        // </REFACTOR_INTO_SYSTEM>
     }
 
-    public static Entity getTarget(Entity path) {
+    public static Entity getTargetPort(Entity path) {
         long targetPortUuid = path.getComponent(Path.class).targetPortUuid;
         return World.getInstance().entityManager.get().get(targetPortUuid);
     }
 
     public static Group<Entity> getPorts(Entity path) {
         Group<Entity> ports = new Group<>();
-        if (getSource(path) != null) {
-            ports.add(getSource(path));
+        if (getSourcePort(path) != null) {
+            ports.add(getSourcePort(path));
         }
-        if (getTarget(path) != null) {
-            ports.add(getTarget(path));
+        if (getTargetPort(path) != null) {
+            ports.add(getTargetPort(path));
         }
         return ports;
     }
 
-    public static Entity getHost(Entity path) {
-        if (getSource(path).getParent().hasComponent(Host.class)) {
-            return getSource(path).getParent();
-        } else if (getTarget(path).getParent().hasComponent(Host.class)) {
-            return getTarget(path).getParent();
-        }
-        return null;
-    }
+//    public static Entity getHost(Entity path) {
+//        if (getSourcePort(path).getComponent(Structure.class).parentEntity.hasComponent(Host.class)) {
+//            return getSourcePort(path).getComponent(Structure.class).parentEntity;
+//        } else if (getTargetPort(path).getComponent(Structure.class).parentEntity.hasComponent(Host.class)) {
+//            return getTargetPort(path).getComponent(Structure.class).parentEntity;
+//        }
+//        return null;
+//    }
 
+    /**
+     * Returns the {@code Extension} connected to the specified {@code path}.
+     */
     public static Entity getExtension(Entity path) {
-        if (getSource(path).getParent().hasComponent(Extension.class)) {
-            return getSource(path).getParent();
-        } else if (getTarget(path).getParent().hasComponent(Extension.class)) {
-            return getTarget(path).getParent();
+        Entity sourcePortable = getSourcePort(path).getComponent(Structure.class).parentEntity;
+        Entity targetPortable = getTargetPort(path).getComponent(Structure.class).parentEntity;
+        if (sourcePortable.hasComponent(Extension.class)) {
+            return sourcePortable;
+        } else if (targetPortable.hasComponent(Extension.class)) {
+            return targetPortable;
         }
         return null;
     }
 
-    public static Entity getHostPort(Entity path) {
-        if (getSource(path).getParent().hasComponent(Host.class)) {
-            return getSource(path);
-        } else if (getTarget(path).getParent().hasComponent(Host.class)) {
-            return getTarget(path);
-        }
-        return null;
-    }
+//    public static Entity getHostPort(Entity path) {
+//        if (getSourcePort(path).getParent().hasComponent(Host.class)) {
+//            return getSourcePort(path);
+//        } else if (getTargetPort(path).getParent().hasComponent(Host.class)) {
+//            return getTargetPort(path);
+//        }
+//        return null;
+//    }
 
     public static boolean contains(Entity path, Entity port) {
         Path pathComponent = path.getComponent(Path.class);

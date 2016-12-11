@@ -12,6 +12,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
+import camp.computer.clay.platform.Platform;
 
 public class InputSystem extends System {
 
@@ -49,7 +50,7 @@ public class InputSystem extends System {
         // Set world position
         for (int i = 0; i < Event.MAXIMUM_POINT_COUNT; i++) {
             // TODO: Update equations so cameraScale is always the correct scale, the current scale, and computed as needed.
-            Transform origin = world.engine.platform.getRenderSurface().originTransform; // REFACTOR
+            Transform origin = Platform.getInstance().getRenderSurface().originTransform; // REFACTOR
             event.pointerCoordinates[i].x = (event.surfaceCoordinates[i].x - (origin.x + cameraEntities.get(0).getComponent(Transform.class).x)) / cameraEntities.get(0).getComponent(Transform.class).scale;
             event.pointerCoordinates[i].y = (event.surfaceCoordinates[i].y - (origin.y + cameraEntities.get(0).getComponent(Transform.class).y)) / cameraEntities.get(0).getComponent(Transform.class).scale;
         }

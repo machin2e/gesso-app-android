@@ -153,7 +153,6 @@ public class Event {
 
     public int pointerIndex = -1;
 
-    public static final String EVENT_TYPE_NONE = "NONE";
     private long eventTypeUid;
 
     public Event(String eventType) {

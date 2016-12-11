@@ -31,7 +31,7 @@ public class Portable extends Component {
         Portable portableComponent = portable.getComponent(Portable.class);
         if (!portableComponent.ports.contains(port)) {
             portableComponent.ports.add(port);
-            port.setParent(portable);
+            port.getComponent(Structure.class).parentEntity = portable;
         }
     }
 

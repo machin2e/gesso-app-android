@@ -1,6 +1,7 @@
 package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.manager.Group;
 
@@ -25,6 +26,8 @@ public final class Entity {
 
     private void setup() {
         components = new Group<>(); // Create list of Components
+
+        components.add(new Structure());
     }
 
     public <C extends Component> void addComponent(C component) {
@@ -68,14 +71,16 @@ public final class Entity {
 
 
     // TODO: <DELETE>
-    private Entity parent;
+//    private Entity parent;
 
-    public void setParent(Entity parent) {
-        this.parent = parent;
-    }
-
-    public Entity getParent() {
-        return this.parent;
-    }
+//    public void setParent(Entity parent) {
+////        this.parent = parent;
+//        getComponent(Structure.class).parentEntity = parent;
+//    }
+//
+//    public Entity getParent() {
+////        return this.parent;
+//        return getComponent(Structure.class).parentEntity;
+//    }
     // TODO: </DELETE>
 }

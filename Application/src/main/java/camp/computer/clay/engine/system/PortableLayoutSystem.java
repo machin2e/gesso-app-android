@@ -1,9 +1,6 @@
 package camp.computer.clay.engine.system;
 
-import java.util.List;
-
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -13,6 +10,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
+import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
@@ -22,7 +20,6 @@ import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
-import camp.computer.clay.util.Geometry;
 
 public class PortableLayoutSystem extends System {
 
@@ -64,6 +61,96 @@ public class PortableLayoutSystem extends System {
     }
 
     /**
+     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code ModelBuilder}s.
+     * <p>
+     * To enable layout algorithms to be changed at runtime, {@code updateWorldLayout()} adopts the
+     * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
+     */
+    public void updateWorldLayout(LayoutStrategy layoutStrategy) {
+        layoutStrategy.execute(hosts);
+    }
+
+    /**
+     * Update the {@code ModelBuilder} to match the state of the corresponding {@code Entity}.
+     */
+    public void updateExtensionModelDimensions(Entity extension) {
+
+        // TODO: Clean up/delete images/primitives for any removed ports...
+
+        updatePortToolPositions(extension);
+        updateHeaderDimensions(extension);
+    }
+
+    /**
+     * Updates the position of the {@code Port}'s circular control interfaces by updating the
+     * relative position of the shape defining the interface with respect to the PCB shape.
+     */
+    private void updatePortToolPositions(Entity extension) {
+
+        // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
+
+        if (extension.hasComponent(Extension.class)) {
+            // Update Port positions based on the index of Port
+            Group<Entity> ports = Portable.getPorts(extension);
+            double halfTotalPortsWidth = (((ports.size() - 1) * World.EXTENSION_PORT_SEPARATION_DISTANCE) / 2.0);
+            for (int i = 0; i < ports.size(); i++) {
+                ports.get(i).getComponent(TransformConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
+                ports.get(i).getComponent(TransformConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
+            }
+        }
+    }
+
+    // Header Dimensions
+    // References:
+    // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+    final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
+    final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
+    double contactSeparation = 2.54; // Measure in millimeters (mm)
+
+    private void updateHeaderDimensions(Entity extension) {
+
+        if (extension.hasComponent(Extension.class)) {
+            // <FACTOR_OUT>
+            final int contactCount = Portable.getPorts(extension).size();
+
+            double A = 2.54 * contactCount + errorToleranceA;
+            double B = 2.54 * (contactCount - 1) + errorToleranceB;
+
+            // final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
+            double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
+            double extensionHeaderWidth = World.PIXEL_PER_MILLIMETER * A;
+            // </FACTOR_OUT>
+
+            // Update Headers Primitive to match the corresponding ExtensionEntity Configuration
+            Entity extensionHeaderPrimitive = Model.getPrimitive(extension, "Header");
+            Rectangle extensionHeaderShape = (Rectangle) extensionHeaderPrimitive.getComponent(Primitive.class).shape;
+            extensionHeaderShape.setWidth(extensionHeaderWidth);
+
+            // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
+
+            // Update Contact Positions for Header
+            Group<Entity> extensionHeaderContactPrimitives = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+            for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
+                double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
+                if (i < extensionHeaderContactPrimitives.size()) {
+                    Entity headerContactPrimitive = extensionHeaderContactPrimitives.get(i);
+
+                    Entity boardPrimitive = Model.getPrimitive(extension, "Board");
+                    Rectangle boardShape = (Rectangle) boardPrimitive.getComponent(Primitive.class).shape;
+                    double headerContactOffset = boardShape.height / 2.0f + 7.0f;
+
+                    headerContactPrimitive.getComponent(TransformConstraint.class).relativeTransform.set(x, headerContactOffset); // was 107
+                } else {
+                    // Add header contact shape
+                    Point headerContactShape = new Point();
+                    Entity headerContactPrimitive = Model.addShape(extension, headerContactShape);
+                    headerContactPrimitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the mesh in the {@code Entity}'s {@code Model} to match the selected mesh
      * (in {@code meshIndex}).
      */
@@ -79,19 +166,19 @@ public class PortableLayoutSystem extends System {
 
     private void selectOverviewPathMesh(Entity path) {
 
-        if (Path.getMode(path) == Path.Mode.ELECTRONIC) {
+        if (Path.getMode(path) == Signal.Mode.ELECTRONIC) {
 
-            boolean isSingletonPath = (Path.getTarget(path) == null);
+            boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
             if (!isSingletonPath) {
 
                 // Get Host and Extension Ports
-                Entity hostPort = Path.getSource(path);
-                Entity host = hostPort.getParent();
+                Entity hostPort = Path.getSourcePort(path);
+                Entity host = hostPort.getComponent(Structure.class).parentEntity;
                 int hostPortIndex = Port.getIndex(hostPort);
 
-                Entity extensionPort = Path.getTarget(path);
-                Entity extension = extensionPort.getParent();
+                Entity extensionPort = Path.getTargetPort(path);
+                Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
                 int extensionPortIndex = Port.getIndex(extensionPort);
 
                 // <REFACTOR>
@@ -109,13 +196,13 @@ public class PortableLayoutSystem extends System {
 
     private void selectEditablePathMesh(Entity path) {
 
-        boolean isSingletonPath = (Path.getTarget(path) == null);
+        boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
         if (!isSingletonPath) {
 
-            Entity sourcePort = Path.getSource(path);
+            Entity sourcePort = Path.getSourcePort(path);
             Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
-            Entity targetPortPrimitive = Model.getPrimitive(Path.getTarget(path), "Port");
+            Entity targetPortPrimitive = Model.getPrimitive(Path.getTargetPort(path), "Port");
 
             // <REFACTOR>
             if (Path.getState(path) != Component.State.EDITING) {
@@ -128,7 +215,7 @@ public class PortableLayoutSystem extends System {
 
         } else {
 
-            Entity sourcePort = Path.getSource(path);
+            Entity sourcePort = Path.getSourcePort(path);
             Entity sourcePortPathPrimitive = Model.getPrimitive(path, "Source Port");
             Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
 
@@ -161,11 +248,11 @@ public class PortableLayoutSystem extends System {
             Entity path = paths.get(i);
 
             // Update the source port configuration to reflect the path configuration.
-            Entity sourcePort = Path.getSource(path);
+            Entity sourcePort = Path.getSourcePort(path);
             Port.setType(sourcePort, Path.getType(path));
 
             // Update the target port (if any) configuration to reflect the path configuration.
-            Entity targetPort = Path.getTarget(path);
+            Entity targetPort = Path.getTargetPort(path);
             if (targetPort != null) {
                 Port.setType(targetPort, Path.getType(path));
             }
@@ -273,6 +360,7 @@ public class PortableLayoutSystem extends System {
     }
     */
 
+    /*
     // TODO: Remove this?
     public int getHeaderIndex(Entity host, Entity extension) {
 
@@ -329,6 +417,7 @@ public class PortableLayoutSystem extends System {
 
         return segmentIndex;
     }
+    */
 
     /*
     public void setExtensionDistance(Entity host, double distance) {
@@ -417,104 +506,9 @@ public class PortableLayoutSystem extends System {
         int segmentIndex = getHeaderIndex(host, extension);
         host.getComponent(Host.class).headerExtensions.get(segmentIndex).add(extension);
     }
-    */
-
-    // <HOST_LAYOUT>
-
-    /**
-     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code ModelBuilder}s.
-     * <p>
-     * To enable layout algorithms to be changed at runtime, {@code updateWorldLayout()} adopts the
-     * <em>strategy design pattern</em> (see https://en.wikipedia.org/wiki/Strategy_pattern).
-     */
-    public void updateWorldLayout(LayoutStrategy layoutStrategy) {
-
-        layoutStrategy.execute(hosts);
-    }
-    // <HOST_LAYOUT>
 
     private void updateExtensionPathRoutes(Entity extension) {
         // TODO: Create routes between extension and host.
     }
-
-    /**
-     * Update the {@code ModelBuilder} to match the state of the corresponding {@code Entity}.
-     */
-    public void updateExtensionModelDimensions(Entity extension) {
-
-        // TODO: Clean up/delete images/primitives for any removed ports...
-
-        updatePortToolPositions(extension);
-        updateHeaderDimensions(extension);
-    }
-
-    /**
-     * Updates the position of the {@code Port}'s circular control interfaces by updating the
-     * relative position of the shape defining the interface with respect to the PCB shape.
-     */
-    private void updatePortToolPositions(Entity extension) {
-
-        // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
-
-        if (extension.hasComponent(Extension.class)) {
-            // Update Port positions based on the index of Port
-            Group<Entity> ports = Portable.getPorts(extension);
-            double halfTotalPortsWidth = (((ports.size() - 1) * World.EXTENSION_PORT_SEPARATION_DISTANCE) / 2.0);
-            for (int i = 0; i < ports.size(); i++) {
-                ports.get(i).getComponent(TransformConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
-                ports.get(i).getComponent(TransformConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
-            }
-        }
-    }
-
-    // Header Dimensions
-    // References:
-    // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-    final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
-    final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
-    double contactSeparation = 2.54; // Measure in millimeters (mm)
-
-    private void updateHeaderDimensions(Entity extension) {
-
-        if (extension.hasComponent(Extension.class)) {
-            // <FACTOR_OUT>
-            final int contactCount = Portable.getPorts(extension).size();
-
-            double A = 2.54 * contactCount + errorToleranceA;
-            double B = 2.54 * (contactCount - 1) + errorToleranceB;
-
-            // final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
-            double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
-            double extensionHeaderWidth = World.PIXEL_PER_MILLIMETER * A;
-            // </FACTOR_OUT>
-
-            // Update Headers Primitive to match the corresponding ExtensionEntity Configuration
-            Entity extensionHeaderPrimitive = Model.getPrimitive(extension, "Header");
-            Rectangle extensionHeaderShape = (Rectangle) extensionHeaderPrimitive.getComponent(Primitive.class).shape;
-            extensionHeaderShape.setWidth(extensionHeaderWidth);
-
-            // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
-
-            // Update Contact Positions for Header
-            Group<Entity> extensionHeaderContactPrimitives = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
-            for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
-                double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                if (i < extensionHeaderContactPrimitives.size()) {
-                    Entity headerContactPrimitive = extensionHeaderContactPrimitives.get(i);
-
-                    Entity boardPrimitive = Model.getPrimitive(extension, "Board");
-                    Rectangle boardShape = (Rectangle) boardPrimitive.getComponent(Primitive.class).shape;
-                    double headerContactOffset = boardShape.height / 2.0f + 7.0f;
-
-                    headerContactPrimitive.getComponent(TransformConstraint.class).relativeTransform.set(x, headerContactOffset); // was 107
-                } else {
-                    // Add header contact shape
-                    Point headerContactShape = new Point();
-                    Entity headerContactPrimitive = Model.addShape(extension, headerContactShape);
-                    headerContactPrimitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
-                }
-            }
-        }
-    }
-    // </EXTENSION>
+    */
 }

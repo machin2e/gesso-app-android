@@ -175,8 +175,7 @@ public class Application extends FragmentActivity {
         */
 
         // <TIMER_THREAD>
-        //final Engine engine = new Engine(new Platform());
-        new Engine(new Platform());
+        Engine.getInstance();
         // </TIMER_THREAD>
     }
 

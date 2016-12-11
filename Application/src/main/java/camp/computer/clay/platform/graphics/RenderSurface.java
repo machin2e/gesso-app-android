@@ -30,6 +30,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Primitive;
+import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Signal;
@@ -313,7 +314,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                     if (entity.getComponent(Model.class).meshIndex == 1) {
                         drawEditablePath(entity, canvas, paint, palette);
                     } else if (entity.getComponent(Model.class).meshIndex == 0) {
-                        if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
+                        if (Path.getMode(entity) == Signal.Mode.ELECTRONIC) {
                             drawOverviewPath(entity, canvas, paint, palette);
                         }
                     }
@@ -773,11 +774,11 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     // TODO: 11/16/2016 Optimize! Big and slow! Should be fast!
     public void drawEditablePath(Entity path, Canvas canvas, Paint paint, Palette palette) {
 
-        Entity sourcePort = Path.getSource(path);
+        Entity sourcePort = Path.getSourcePort(path);
         Entity sourcePortShapeE = Model.getPrimitive(sourcePort, "Port");
         Shape hostSourcePortShape = sourcePortShapeE.getComponent(Primitive.class).shape;
 
-        boolean isSingletonPath = (Path.getTarget(path) == null);
+        boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
         if (isSingletonPath) {
 
@@ -833,10 +834,10 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawOverviewPath(Entity path, Canvas canvas, Paint paint, Palette palette) {
 
         // Get Host and Extension Ports
-        Entity hostPort = Path.getSource(path);
-        Entity extensionPort = Path.getTarget(path);
+        Entity hostPort = Path.getSourcePort(path);
+        Entity extensionPort = Path.getTargetPort(path);
 
-        boolean isSingletonPath = (Path.getTarget(path) == null);
+        boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
         if (isSingletonPath) {
 
@@ -845,8 +846,8 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         } else {
 
             // Draw the connection between the Host's Port and the Extension's Port
-            Entity host = hostPort.getParent();
-            Entity extension = extensionPort.getParent();
+            Entity host = hostPort.getComponent(Structure.class).parentEntity;
+            Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
 
             Group<Entity> pinContactPoints = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
             Group<Entity> extensionPinContactPoints = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");

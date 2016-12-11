@@ -21,6 +21,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.Scriptable;
+import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
@@ -261,7 +262,7 @@ public class EntityFactory {
             @Override
             public void execute(Event event) {
 
-//                if (event.getTarget() != workspace) {
+//                if (event.getTargetPort() != workspace) {
 //                    return;
 //                }
 
@@ -491,8 +492,8 @@ public class EntityFactory {
                         Entity path = paths.get(j);
 
                         // Show Ports
-                        Entity sourcePort = Path.getSource(path);
-                        Entity targetPort = Path.getTarget(path);
+                        Entity sourcePort = Path.getSourcePort(path);
+                        Entity targetPort = Path.getTargetPort(path);
                         sourcePort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                         targetPort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
@@ -603,7 +604,6 @@ public class EntityFactory {
 
     public static Entity createPathEntity(final World world) {
         final Entity path = new Entity();
-        path.isActive = false;
 
         // Add Path Component (for type identification)
         path.addComponent(new Path()); // Unique to Path
@@ -615,7 +615,7 @@ public class EntityFactory {
         path.addComponent(new Visibility());
 
         // <SETUP_PATH_IMAGE_GEOMETRY>
-//        ModelBuilder imageBuilder = new ModelBuilder();
+        // TODO: DO NOT POPULATE GEOMETRY HERE. GENERATE IT IN THE PATH SYSTEM.
 
         // Board
         Segment segment = new Segment();
@@ -683,7 +683,7 @@ public class EntityFactory {
                     return;
                 }
 
-                boolean isSingletonPath = (Path.getTarget(path) == null);
+                boolean isSingletonPath = (Path.getTargetPort(path) == null);
                 if (isSingletonPath) {
 
                     // Singleton Path
@@ -723,7 +723,7 @@ public class EntityFactory {
 
                         // Set Event Angle (angle from first Event to current Event)
                         double eventAngle = camp.computer.clay.util.Geometry.getAngle(
-                                event.getSecondaryTarget().getComponent(Transform.class), // event.getFirstEvent().getTarget().getComponent(Transform.class),
+                                event.getSecondaryTarget().getComponent(Transform.class), // event.getFirstEvent().getTargetPort().getComponent(Transform.class),
                                 event.getPosition()
                         );
                         // Set prototype Extension transform
@@ -815,7 +815,7 @@ public class EntityFactory {
 
                 Log.v("handlePathEvent", "UNSELECT PATH.");
 
-                if (Path.getTarget(path) != null) {
+                if (Path.getTargetPort(path) != null) {
 
                     Log.v("handlePathEvent", "NON SINGLETON.");
 
@@ -825,9 +825,9 @@ public class EntityFactory {
 
                         // <PATH>
                         // Set next Path type
-                        Signal.Type nextType = Signal.Type.getNext(Path.getType(path));
+                        Signal.Type nextType = Signal.Type.next(Path.getType(path));
                         while ((nextType == Signal.Type.NONE) || (nextType == Path.getType(path))) {
-                            nextType = Signal.Type.getNext(nextType);
+                            nextType = Signal.Type.next(nextType);
                         }
                         Path.setType(path, nextType);
                         // <PATH>
@@ -851,8 +851,8 @@ public class EntityFactory {
 
                                 // Swap the Path's Ports in the SAME path (swap Ports/flip direction)
                                 Log.v("handlePathEvent", "flipping the path");
-                                Entity sourcePort = Path.getSource(path);
-                                Path.setSource(path, Path.getTarget(path));
+                                Entity sourcePort = Path.getSourcePort(path);
+                                Path.setSource(path, Path.getTargetPort(path));
                                 Path.setTarget(path, sourcePort);
 
                                 // TODO: path.getComponent(Path.class).setDirection();
@@ -867,24 +867,24 @@ public class EntityFactory {
                                 // Swap ports ACROSS different paths (swap Paths)
                                 if (camp.computer.clay.util.Geometry.contains(Boundary.get(sourcePortShape), event.getPosition())) {
                                     // Swapping path A source port shape...
-                                    if (dropTargetPort == Path.getSource(targetPaths.get(0))) {
-                                        Entity sourcePort = Path.getSource(path);
-                                        Path.setSource(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
+                                    if (dropTargetPort == Path.getSourcePort(targetPaths.get(0))) {
+                                        Entity sourcePort = Path.getSourcePort(path);
+                                        Path.setSource(path, Path.getSourcePort(targetPaths.get(0))); // Path.getTargetPort(path));
                                         Path.setSource(targetPaths.get(0), sourcePort);
-                                    } else if (dropTargetPort == Path.getTarget(targetPaths.get(0))) {
-                                        Entity sourcePort = Path.getSource(path);
-                                        Path.setSource(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
+                                    } else if (dropTargetPort == Path.getTargetPort(targetPaths.get(0))) {
+                                        Entity sourcePort = Path.getSourcePort(path);
+                                        Path.setSource(path, Path.getTargetPort(targetPaths.get(0))); // Path.getTargetPort(path));
                                         Path.setTarget(targetPaths.get(0), sourcePort);
                                     }
                                 } else if (camp.computer.clay.util.Geometry.contains(Boundary.get(targetPortShape), event.getPosition())) {
                                     // Swapping path A target port shape...
-                                    if (dropTargetPort == Path.getSource(targetPaths.get(0))) {
-                                        Entity targetPath = Path.getTarget(path);
-                                        Path.setTarget(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
+                                    if (dropTargetPort == Path.getSourcePort(targetPaths.get(0))) {
+                                        Entity targetPath = Path.getTargetPort(path);
+                                        Path.setTarget(path, Path.getSourcePort(targetPaths.get(0))); // Path.getTargetPort(path));
                                         Path.setSource(targetPaths.get(0), targetPath);
-                                    } else if (dropTargetPort == Path.getTarget(targetPaths.get(0))) {
-                                        Entity targetPath = Path.getTarget(path);
-                                        Path.setTarget(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
+                                    } else if (dropTargetPort == Path.getTargetPort(targetPaths.get(0))) {
+                                        Entity targetPath = Path.getTargetPort(path);
+                                        Path.setTarget(path, Path.getTargetPort(targetPaths.get(0))); // Path.getTargetPort(path));
                                         Path.setTarget(targetPaths.get(0), targetPath);
                                     }
                                 }
@@ -904,9 +904,9 @@ public class EntityFactory {
                                 if (camp.computer.clay.util.Geometry.contains(Boundary.get(sourcePortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable
-                                    if (Path.getTarget(path).getParent() == dropTargetPort.getParent()) {
+                                    if (Path.getTargetPort(path).getComponent(Structure.class).parentEntity == dropTargetPort.getComponent(Structure.class).parentEntity) {
                                         // Prevent the Path from moving onto the Extension with both Ports
-                                        if (!Path.getTarget(path).getParent().hasComponent(Extension.class)) {
+                                        if (!Path.getTargetPort(path).getComponent(Structure.class).parentEntity.hasComponent(Extension.class)) {
                                             Path.setSource(path, dropTargetPort);
                                         }
                                     } else {
@@ -916,9 +916,9 @@ public class EntityFactory {
                                 } else if (Geometry.contains(Boundary.get(targetPortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable
-                                    if (Path.getSource(path).getParent() == dropTargetPort.getParent()) {
+                                    if (Path.getSourcePort(path).getComponent(Structure.class).parentEntity == dropTargetPort.getComponent(Structure.class).parentEntity) {
                                         // Prevent the Path from moving onto the Extension with both Ports
-                                        if (!Path.getSource(path).getParent().hasComponent(Extension.class)) {
+                                        if (!Path.getSourcePort(path).getComponent(Structure.class).parentEntity.hasComponent(Extension.class)) {
                                             Path.setTarget(path, dropTargetPort);
                                         }
                                     } else {
@@ -948,9 +948,9 @@ public class EntityFactory {
                             world.createAndConfigureNotification("removed path", event.getPosition(), 1000);
 
                             // Reset Ports that were in removed Path
-                            Entity sourcePort = Path.getSource(path);
+                            Entity sourcePort = Path.getSourcePort(path);
                             Port.setType(sourcePort, Signal.Type.NONE);
-                            Entity targetPort = Path.getTarget(path);
+                            Entity targetPort = Path.getTargetPort(path);
                             Port.setType(targetPort, Signal.Type.NONE);
 
                             // Update the Path
@@ -1013,8 +1013,8 @@ public class EntityFactory {
                         Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                         extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
-//                    Entity hostPort = event.getFirstEvent().getTarget();
-                        Entity hostPort = Path.getSource(path);
+//                    Entity hostPort = event.getFirstEvent().getTargetPort();
+                        Entity hostPort = Path.getSourcePort(path);
 
                         Log.v("handlePathEvent", "hostPort: " + hostPort);
 
@@ -1037,8 +1037,7 @@ public class EntityFactory {
                         hostPorts.setVisibility(Visible.VISIBLE);
 
                         // Update layout
-                        Entity host = hostPort.getParent(); // HACK
-
+//                        Entity host = hostPort.getParent(); // HACK
 //                        world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
 //                        world.getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
@@ -1046,22 +1045,25 @@ public class EntityFactory {
 
                         // Set Camera focus on the Extension
                         // camera.setFocus(extension);
-                    } else if (event.isTap()) { // } else if (event.getFirstEvent().getTarget() == event.getTarget()) {
+                    } else if (event.isTap()) { // } else if (event.getFirstEvent().getTargetPort() == event.getTargetPort()) {
 
                         // Change Singleton Path Type
 
                         // <PATH>
                         // Set next Path type
                         Path pathComponent = path.getComponent(Path.class);
-                        Signal.Type nextType = Signal.Type.getNext(Path.getType(path));
+                        Signal.Type nextType = Signal.Type.next(Path.getType(path));
                         while ((nextType == Signal.Type.NONE) || (nextType == Path.getType(path))) {
-                            nextType = Signal.Type.getNext(nextType);
+                            nextType = Signal.Type.next(nextType);
                         }
                         Path.setType(path, nextType);
 //                Log.v("EventHandlerSystem", "Setting path type to: " + nextType);
+
+                        // Notification
+                        world.createAndConfigureNotification("" + nextType, event.getPosition(), 800);
                         // <PATH>
 
-                    } else if (targetAreaPorts.size() > 0) { //} else if (event.getFirstEvent().getTarget() != event.getTarget()) {
+                    } else if (targetAreaPorts.size() > 0) { //} else if (event.getFirstEvent().getTargetPort() != event.getTargetPort()) {
 
                         Entity dropTargetEntity = targetAreaPorts.get(0);
 
@@ -1083,7 +1085,7 @@ public class EntityFactory {
                                 // <CLEANUP_ENTITY_DELETE_CODE>
                                 dropTargetPath.isActive = false;
                                 Path.setState(dropTargetPath, Component.State.EDITING);
-                                Entity tempSourcePort = Path.getSource(dropTargetPath);
+                                Entity tempSourcePort = Path.getSourcePort(dropTargetPath);
                                 Path.setSource(dropTargetPath, null); // Reset path
                                 Path.setTarget(dropTargetPath, null); // Reset path
                                 world.entityManager.remove(dropTargetPath); // Delete path!
@@ -1096,11 +1098,11 @@ public class EntityFactory {
                         }
 
                         // Update the Path's target Port
-                        if (!dropTargetEntity.hasComponent(Port.class)) { // if (!event.getTarget().hasComponent(Port.class)) {
+                        if (!dropTargetEntity.hasComponent(Port.class)) { // if (!event.getTargetPort().hasComponent(Port.class)) {
                             return;
                         }
 
-                        Entity dropTargetPort = dropTargetEntity; // event.getTarget();
+                        Entity dropTargetPort = dropTargetEntity; // event.getTargetPort();
 
                         Path.setTarget(path, dropTargetPort);
 
@@ -1243,14 +1245,14 @@ public class EntityFactory {
 
                 } else if (event.getTarget().hasComponent(Host.class)) {
 
-//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTarget());
+//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTargetPort());
                     Camera cameraComponent = camera.getComponent(Camera.class);
                     cameraComponent.focus = event.getTarget();
                     cameraComponent.mode = Camera.Mode.FOCUS;
 
                 } else if (event.getTarget().hasComponent(Extension.class)) {
 
-//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTarget());
+//                    world.getSystem(CameraSystem.class).setFocus(camera, event.getTargetPort());
                     // TODO: Create CameraEvent.SetFocus(target)
                     Camera cameraComponent = camera.getComponent(Camera.class);
                     cameraComponent.focus = event.getTarget();

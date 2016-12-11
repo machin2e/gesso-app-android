@@ -98,11 +98,15 @@ public class Port extends Component {
         Group<Entity> paths = Port.getPaths(port);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            if (Path.getSource(path) == port || Path.getTarget(path) == port) {
-                if (Path.getSource(path).getParent().hasComponent(Extension.class)) {
-                    return Path.getSource(path).getParent();
-                } else if (Path.getTarget(path) != null && Path.getTarget(path).getParent().hasComponent(Extension.class)) {
-                    return Path.getTarget(path).getParent();
+            if (Path.getSourcePort(path) == port || Path.getTargetPort(path) == port) {
+                Entity sourcePortable = Path.getSourcePort(path).getComponent(Structure.class).parentEntity;
+                if (sourcePortable.hasComponent(Extension.class)) {
+                    return sourcePortable;
+                } else if (Path.getTargetPort(path) != null) {
+                    Entity targetPortable = Path.getTargetPort(path).getComponent(Structure.class).parentEntity;
+                    if (targetPortable.hasComponent(Extension.class)) {
+                        return targetPortable;
+                    }
                 }
             }
         }

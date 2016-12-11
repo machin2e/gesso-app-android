@@ -25,12 +25,9 @@ public class Engine {
 
     public long tickCount = 0;
 
-    public Platform platform;
-
     public World world;
 
-    public Engine(Platform platform) {
-        this.platform = platform;
+    protected Engine() {
 
         setup();
 
@@ -56,16 +53,14 @@ public class Engine {
         */
     }
 
-//    public static Engine getInstance() {
-//        if (instance == null) {
-//            instance = new Engine();
-//        }
-//        return instance;
-//    }
+    public static Engine getInstance() {
+        if (instance == null) {
+            instance = new Engine();
+        }
+        return instance;
+    }
 
     private void setup() {
-
-        // final World world;
 
         // Create World
         world = new World(this);
@@ -86,7 +81,7 @@ public class Engine {
         world.createEntity(Camera.class);
 
         // <REFACTOR>
-        platform.getRenderSurface().setWorld(world);
+        Platform.getInstance().getRenderSurface().setWorld(world);
         // </REFACTOR>
 
         // <VIRTUAL_HOSTS>

@@ -45,7 +45,7 @@ public class EventSystem extends System {
      * @param event
      */
     private void dispatch(Event event) {
-//        Entity eventTarget = event.getTarget();
+//        Entity eventTarget = event.getTargetPort();
 //        if (eventTarget != null) {
         world.eventManager.dispatch(event);
 //        }
