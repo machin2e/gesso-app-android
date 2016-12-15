@@ -9,10 +9,6 @@ import camp.computer.clay.util.Geometry;
 
 public class Boundary extends Component {
 
-    // public HashMap<String, Long> boundaryUids = new HashMap<>();
-    // public HashMap<String, Boundary> boundaryUids = new HashMap<>();
-//    public HashMap<Long, ArrayList<Transform>> boundaries = new HashMap<>();
-
     public List<Transform> boundary = new ArrayList<>();
 
     public static List<Transform> get(Entity entity) {
@@ -34,10 +30,9 @@ public class Boundary extends Component {
 
         // <HACK>
         if (entity.hasComponent(Model.class)) {
-            Group<Entity> shapes = Model.getPrimitives(entity);
-            for (int i = 0; i < shapes.size(); i++) {
-                if (/*primitives.get(i).getComponent(Primitive.class).shape.isBoundary // HACK
-                    &&*/ Geometry.contains(Boundary.get(shapes.get(i)), point)) { // HACK
+            Group<Entity> primitives = Model.getPrimitives(entity);
+            for (int i = 0; i < primitives.size(); i++) {
+                if (Geometry.contains(Boundary.get(primitives.get(i)), point)) {
                     return true;
                 }
             }
@@ -49,9 +44,5 @@ public class Boundary extends Component {
             return true;
         }
         return false;
-
-        // TODO: return Primitive.contains(entity.getComponent(Boundary.class).boundary, point);
-
-        // TODO?: return Primitive.contains(this.boundary, point);
     }
 }
