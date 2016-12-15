@@ -152,8 +152,10 @@ public class LayoutSystem extends System {
                 } else {
                     // Add header contact shape
                     Point headerContactShape = new Point();
-                    Entity headerContactPrimitive = Model.addShape(extension, headerContactShape);
-                    headerContactPrimitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK?
+                    headerContactShape.setTag("Pin " + (i + 1));
+                    Entity primitive = Model.createPrimitiveFromShape(headerContactShape);
+                    Model.addPrimitive(extension, primitive);
+                    primitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK? // TODO: Remove!
                 }
             }
         }

@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Engine;
@@ -27,7 +26,6 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
@@ -310,22 +308,26 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
             Visibility visibility = entity.getComponent(Visibility.class);
             if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                Group<Entity> shapes = Model.getPrimitives(entity);
-                for (int j = 0; j < shapes.size(); j++) {
-                    drawShape(shapes.get(j), canvas, paint, palette);
-                }
+//                Group<Entity> shapes = Model.getPrimitives(entity);
+//                for (int j = 0; j < shapes.size(); j++) {
+                drawPrimitive(entity, canvas, paint, palette);
+//                }
             }
 
             // <DRAW_BOUNDARY>
             if (entity.hasComponent(Boundary.class)) {
-                ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
-                for (int j = 0; j < boundaryVertices.size(); j++) {
-                    ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setStrokeWidth(5.0f);
-                    paint.setColor(Color.CYAN);
-                    drawPolygon(boundaryVertz, canvas, paint, palette);
-                }
+//                ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
+//                for (int j = 0; j < boundaryVertices.size(); j++) {
+//                    ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
+//                    paint.setStyle(Paint.Style.STROKE);
+//                    paint.setStrokeWidth(5.0f);
+//                    paint.setColor(Color.CYAN);
+//                    drawPolygon(boundaryVertz, canvas, paint, palette);
+//                }
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(5.0f);
+                paint.setColor(Color.CYAN);
+                drawPolygon(entity.getComponent(Boundary.class).boundary, canvas, paint, palette);
             }
             // </DRAW_BOUNDARY>
         }
@@ -758,11 +760,22 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         // </DISPLAY_SURFACE_AXES>
     }
 
-    public void drawShape(Entity primitive, Canvas canvas, Paint paint, Palette palette) {
+    public void drawPrimitive(Entity primitive, Canvas canvas, Paint paint, Palette palette) {
 
         if (primitive.getComponent(Visibility.class).visible == Visible.INVISIBLE) {
             return;
         }
+
+        // <HACK>
+        int emptyPrimitives = 0;
+        if (primitive.getComponent(Primitive.class).shape == null) {
+            emptyPrimitives++;
+        }
+        if (emptyPrimitives > 0) {
+            Log.v("EMPTY_PRIMITIVES", "count: " + emptyPrimitives);
+            return;
+        }
+        // </HACK>
 
         // <HACK>
         Shape shape = primitive.getComponent(Primitive.class).shape;
@@ -773,7 +786,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         palette.outlineThickness = shape.outlineThickness;
 
         canvas.save();
-        // TODO: drawShape(shape, palette);
+        // TODO: drawPrimitive(shape, palette);
         if (shape.getClass() == Segment.class) {
             Segment segment = (Segment) shape;
             drawSegment(segment.getSource(), segment.getTarget(), canvas, paint, palette);

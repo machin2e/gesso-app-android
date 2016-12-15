@@ -8,7 +8,7 @@ import android.view.SurfaceHolder;
 import camp.computer.clay.engine.Clock;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.component.util.SorterStrategy;
@@ -60,7 +60,7 @@ public class Renderer extends Thread {
 
         // <REFACTOR>
         if (entities == null && World.getInstance() != null) {
-            entities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Model.class), new SorterStrategy(Group.Sorters.layerSorter));
+            entities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Primitive.class), new SorterStrategy(Group.Sorters.layerSorter));
             cameraEntities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class));
         }
 

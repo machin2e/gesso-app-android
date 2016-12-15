@@ -59,11 +59,11 @@ public class ModelSystem extends System {
         if (entity.hasComponent(Path.class)) {
             // TODO: Refactor so a special case isn't needed for Path.
         } else {
-            Group<Entity> shapes = Model.getPrimitives(entity);
-            for (int i = 0; i < shapes.size(); i++) {
+            Group<Entity> primitives = Model.getPrimitives(entity);
+            for (int i = 0; i < primitives.size(); i++) {
                 if (absoluteReferenceTransform != null) {
                     // TODO: if (shape.hasComponent(TransformConstraint.class)) {
-                    updateRelativeTransform(shapes.get(i), absoluteReferenceTransform);
+                    updateRelativeTransform(primitives.get(i), absoluteReferenceTransform);
                 }
             }
         }
@@ -80,18 +80,18 @@ public class ModelSystem extends System {
      * @param referenceTransform Position of the containing {@code ModelBuilder} relative to which the
      *                           {@code Shape} will be drawn.
      */
-    private void updateRelativeTransform(Entity shape, Transform referenceTransform) { // previously updateShapeRelativeTransform
+    private void updateRelativeTransform(Entity primitive, Transform referenceTransform) { // previously updateShapeRelativeTransform
 
-        TransformConstraint transformConstraint = shape.getComponent(TransformConstraint.class);
+        TransformConstraint transformConstraint = primitive.getComponent(TransformConstraint.class);
 
         // Position
         double distanceToRelativeTransform = Geometry.distance(0, 0, transformConstraint.relativeTransform.x, transformConstraint.relativeTransform.y);
         double angle = Geometry.getAngle(0, 0, transformConstraint.relativeTransform.x, transformConstraint.relativeTransform.y);
 
-        shape.getComponent(Transform.class).x = referenceTransform.x + distanceToRelativeTransform * Math.cos(Math.toRadians(referenceTransform.rotation + angle));
-        shape.getComponent(Transform.class).y = referenceTransform.y + distanceToRelativeTransform * Math.sin(Math.toRadians(referenceTransform.rotation + angle));
+        primitive.getComponent(Transform.class).x = referenceTransform.x + distanceToRelativeTransform * Math.cos(Math.toRadians(referenceTransform.rotation + angle));
+        primitive.getComponent(Transform.class).y = referenceTransform.y + distanceToRelativeTransform * Math.sin(Math.toRadians(referenceTransform.rotation + angle));
 
         // Rotation
-        shape.getComponent(Transform.class).rotation = referenceTransform.rotation + transformConstraint.relativeTransform.rotation;
+        primitive.getComponent(Transform.class).rotation = referenceTransform.rotation + transformConstraint.relativeTransform.rotation;
     }
 }

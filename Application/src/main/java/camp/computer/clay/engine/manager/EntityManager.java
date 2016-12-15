@@ -174,9 +174,7 @@ public class EntityManager {
                 if (destroyableEntity.hasComponent(Model.class)) {
                     Model model = destroyableEntity.getComponent(Model.class);
                     for (int j = 0; j < model.primitives.size(); j++) {
-                        long primitiveUid = model.primitives.get(j);
-                        Entity primitiveEntity = get(primitiveUid);
-                        primitiveEntity.isDestroyable = true;
+                        model.primitives.get(j).isDestroyable = true;
                     }
                 }
 

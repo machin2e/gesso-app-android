@@ -277,7 +277,9 @@ public class World {
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        Model.addShape(prototypeExtension, rectangle);
+
+        Entity primitive = Model.createPrimitiveFromShape(rectangle);
+        Model.addPrimitive(prototypeExtension, primitive);
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 

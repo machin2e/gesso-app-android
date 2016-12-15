@@ -14,6 +14,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Model;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.Application;
@@ -300,10 +301,12 @@ public class ModelBuilder {
             // <ENTITY>
             // <HACK>
             // Set Label
-            Entity shapeEntity = Model.addShape(entity, shapes.get(i)); // HACK
-            shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
-            shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
-            Label.setLabel(shapeEntity, shapes.get(i).getTag());
+            Entity primitive = Model.createPrimitiveFromShape(shapes.get(i));
+            primitive.getComponent(Transform.class).z = shapes.get(i).getPosition().z;
+            Model.addPrimitive(entity, primitive); // HACK
+            primitive.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
+            primitive.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
+            Label.setLabel(primitive, shapes.get(i).getTag()); // TODO: Remove?
             // </HACK>
             // </ENTITY>
         }
@@ -320,7 +323,7 @@ public class ModelBuilder {
             // <HACK>
             // Set Label
             model.
-            Entity shapeEntity = Model.addShape(entity, shapes.get(i)); // HACK
+            Entity shapeEntity = Model.addPrimitive(entity, shapes.get(i)); // HACK
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
             Label.setTag(shapeEntity, shapes.get(i).getTag());

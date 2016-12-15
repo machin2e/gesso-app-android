@@ -2,7 +2,6 @@ package camp.computer.clay.engine.entity.util;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Engine;
@@ -184,16 +183,16 @@ public class EntityFactory {
             @Override
             public void execute(final Event event) {
 
-                // <REFACTOR>
-                List<Long> boundaryUids = new ArrayList<>(host.getComponent(Boundary.class).boundaries.keySet());
-                for (int j = 0; j < boundaryUids.size(); j++) {
-                    ArrayList<Transform> boundaryVertices = host.getComponent(Boundary.class).boundaries.get(boundaryUids.get(j));
-                    if (Geometry.contains(boundaryVertices, event.getPosition())) {
-                        // TODO: Make function getBoundaryTag(shapeUid) that returns tag string for comparison in EventResponders (for touch interaction)
-//                        Log.v("BOUNDARY_CHECK", "Clicked in boundary: " + host.getComponent(Model.class).assetReference.getShape(boundaryUids.get(j)).getTag());
-                    }
-                }
-                // </REFACTOR>
+//                // <REFACTOR>
+//                List<Long> boundaryUids = new ArrayList<>(host.getComponent(Boundary.class).boundaries.keySet());
+//                for (int j = 0; j < boundaryUids.size(); j++) {
+//                    ArrayList<Transform> boundaryVertices = host.getComponent(Boundary.class).boundaries.get(boundaryUids.get(j));
+//                    if (Geometry.contains(boundaryVertices, event.getPosition())) {
+//                        // TODO: Make function getBoundaryTag(shapeUid) that returns tag string for comparison in EventResponders (for touch interaction)
+////                        Log.v("BOUNDARY_CHECK", "Clicked in boundary: " + host.getComponent(Model.class).assetReference.getShape(boundaryUids.get(j)).getTag());
+//                    }
+//                }
+//                // </REFACTOR>
 
                 if (event.getTarget() != host) {
                     return;
@@ -402,9 +401,9 @@ public class EntityFactory {
 //        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
 //        rectangle.setOutlineThickness(0);
 //        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-////        extension.getComponent(ModelBuilder.class).addShape(rectangle);
+////        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
 //        rectangle.isBoundary = true;
-//        imageBuilder.addShape(rectangle);
+//        imageBuilder.addPrimitive(rectangle);
 //
 //        // Headers
 //        rectangle = new Rectangle(50, 14);
@@ -413,8 +412,8 @@ public class EntityFactory {
 //        rectangle.setRotation(0);
 //        rectangle.setColor("#3b3b3b");
 //        rectangle.setOutlineThickness(0);
-////        extension.getComponent(ModelBuilder.class).addShape(rectangle);
-//        imageBuilder.addShape(rectangle);
+////        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
+//        imageBuilder.addPrimitive(rectangle);
 //
 //        extension.getComponent(ModelBuilder.class).setImage(imageBuilder);
 //        // </LOAD_GEOMETRY_FROM_FILE>
@@ -430,29 +429,33 @@ public class EntityFactory {
         int randomHeight = Random.generateRandomInteger(50, 200); // was 125, 200
         rectangle.setHeight(randomHeight); // was 200
         rectangle.setWidth(Random.generateRandomInteger(50, 200)); // was 125, 200
-//        rectangle.setTag("Board");
+        rectangle.setTag("Board");
         rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-//        extension.getComponent(ModelBuilder.class).addShape(rectangle);
+//        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
 //        rectangle.isBoundary = true;
-//        imageBuilder.addShape(rectangle);
-        shape = Model.addShape(extension, rectangle);
-        Label.setLabel(shape, "Board");
+//        imageBuilder.addPrimitive(rectangle);
+
+        Entity primitive = Model.createPrimitiveFromShape(rectangle);
+//        Label.setLabel(primitive, "Board");
+        Model.addPrimitive(extension, primitive);
 
 
         // Headers
         rectangle = new Rectangle(50, 14);
-        // rectangle.setTag("Header");
+        rectangle.setTag("Header");
         // rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-//        extension.getComponent(ModelBuilder.class).addShape(rectangle);
-//        imageBuilder.addShape(rectangle);
-        shape = Model.addShape(extension, rectangle);
-        shape.getComponent(TransformConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
-        Label.setLabel(shape, "Header");
+//        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
+//        imageBuilder.addPrimitive(rectangle);
+
+        primitive = Model.createPrimitiveFromShape(rectangle);
+        Model.addPrimitive(extension, primitive);
+//        Label.setLabel(shape, "Header");
+        primitive.getComponent(TransformConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
 
 //        extension.getComponent(ModelBuilder.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
@@ -660,22 +663,26 @@ public class EntityFactory {
         segment.setTag("Path");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
-//        imageBuilder.addShape(segment);
-        Entity pathShapeEntity = Model.addShape(path, segment);
+//        imageBuilder.addPrimitive(segment);
+        Entity primitive = Model.createPrimitiveFromShape(segment);
+        Model.addPrimitive(path, primitive);
 
         // <HACK>
         // Set Label
-        pathShapeEntity.getComponent(Label.class).label = "Path";
+//        pathShapeEntity.getComponent(Label.class).label = "Path";
         // </HACK>
 
         Circle circle = new Circle();
+        circle.getPosition().z = 50;
         circle.setRadius(50.0);
         circle.setTag("Source Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-//        circle.isBoundary = true;
-//        imageBuilder.addShape(circle);
-        pathShapeEntity = Model.addShape(path, circle);
+        circle.isBoundary = true;
+//        imageBuilder.addPrimitive(circle);
+
+        primitive = Model.createPrimitiveFromShape(circle);
+        Model.addPrimitive(path, primitive);
 //        Entity shapeEntity = world.entityManager.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set();
@@ -683,21 +690,24 @@ public class EntityFactory {
 
         // <HACK>
         // Set Label
-        pathShapeEntity.getComponent(Label.class).label = "Source Port";
+//        pathShapeEntity.getComponent(Label.class).label = "Source Port";
         // </HACK>
 
         circle = new Circle();
+        circle.getPosition().z = 50;
         circle.setRadius(50.0);
         circle.setTag("Target Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-//        circle.isBoundary = true;
-//        imageBuilder.addShape(circle);
-        pathShapeEntity = Model.addShape(path, circle);
+        circle.isBoundary = true;
+//        imageBuilder.addPrimitive(circle);
+
+        primitive = Model.createPrimitiveFromShape(circle);
+        Model.addPrimitive(path, primitive);
 
         // <HACK>
         // Set Label
-        pathShapeEntity.getComponent(Label.class).label = "Target Port";
+//        pathShapeEntity.getComponent(Label.class).label = "Target Port";
         // </HACK>
 
         // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
@@ -1175,14 +1185,16 @@ public class EntityFactory {
         circle.setTag("Port"); // TODO: Give proper name...
         circle.setColor("#ffe7e7e7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-//        circle.isBoundary = true;
-//        imageBuilder.addShape(circle);
-        Entity portShape = Model.addShape(port, circle);
+        circle.isBoundary = true;
+//        imageBuilder.addPrimitive(circle);
 
-        // <HACK>
-        // Set Label
-        portShape.getComponent(Label.class).label = "Port";
-        // </HACK>
+        Entity primitive = Model.createPrimitiveFromShape(circle);
+        Model.addPrimitive(port, primitive);
+
+//        // <HACK>
+//        // Set Label
+//        portShape.getComponent(Label.class).label = "Port";
+//        // </HACK>
 
 //        port.getComponent(ModelBuilder.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
@@ -1341,9 +1353,11 @@ public class EntityFactory {
         text.setColor("#ff000000");
         text.setPosition(0, 0);
         text.font = World.NOTIFICATION_FONT;
-        Model.addShape(notification, text);
 
-//        imageBuilder.addShape(text);
+        Entity primitive = Model.createPrimitiveFromShape(text);
+        Model.addPrimitive(notification, primitive);
+
+//        imageBuilder.addPrimitive(text);
 
         // <HACK>
         notification.getComponent(Transform.class).z = 20;

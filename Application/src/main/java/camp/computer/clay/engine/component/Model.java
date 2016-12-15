@@ -19,7 +19,7 @@ public class Model extends Component {
 
     // <REFACTOR>
     // TODO: Replace with AssetReference. Consider using using multiple AssetReferences to replace meshIndex.
-    public List<Long> primitives;
+    public List<Entity> primitives = new ArrayList<>();
     // </REFACTOR>
 
     // public ModelBuilder assetReference;
@@ -27,34 +27,39 @@ public class Model extends Component {
 
     public Model() {
         super();
-        setup();
     }
 
-    private void setup() {
-        primitives = new ArrayList<>();
-    }
+    // <REFACTOR>
+    // TODO: Move a more semantically reasonable file
+    // Create Shape entity and assign shape to it
+    public static Entity createPrimitiveFromShape(Shape shape) {
 
-    public static Entity addShape(Entity entity, Shape shape) {
-
-        // Create Shape entity and assign shape to it
         Entity primitiveEntity = World.getInstance().createEntity(Primitive.class);
+
         primitiveEntity.getComponent(Primitive.class).shape = shape;
-
-        primitiveEntity.getComponent(TransformConstraint.class).setReferenceEntity(entity);
-
-        // Add Shape entity to ModelBuilder component
-        entity.getComponent(Model.class).primitives.add(primitiveEntity.getUid());
+        primitiveEntity.getComponent(Label.class).label = shape.getTag();
+        primitiveEntity.getComponent(Transform.class).z = shape.getPosition().z;
 
         return primitiveEntity;
+    }
+    // </REFACTOR>
+
+    public static void addPrimitive(Entity entity, Entity primitive) {
+
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(entity);
+
+        // Add Shape entity to ModelBuilder component
+        entity.getComponent(Model.class).primitives.add(primitive);
+
+//        return primitive;
     }
 
     // HACK: This is ridiculously expensive if you unpack it...
     public static Entity getPrimitive(Entity entity, String label) {
-        List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
-        for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getInstance().entityManager.get(shapeUuids.get(i));
-            if (Label.getLabel(shape).equals(label)) {
-                return shape;
+        List<Entity> primitives = entity.getComponent(Model.class).primitives;
+        for (int i = 0; i < primitives.size(); i++) {
+            if (Label.getLabel(primitives.get(i)).equals(label)) {
+                return primitives.get(i);
             }
         }
         return null;
@@ -64,11 +69,10 @@ public class Model extends Component {
         if (entity.getComponent(Model.class) == null) {
             Log.v("Gotcha", "Gotcha");
         }
-        List<Long> shapeUuids = entity.getComponent(Model.class).primitives;
+        List<Entity> primitives = entity.getComponent(Model.class).primitives;
         Group<Entity> shapes = new Group<>();
-        for (int i = 0; i < shapeUuids.size(); i++) {
-            Entity shape = World.getInstance().entityManager.get(shapeUuids.get(i));
-            shapes.add(shape);
+        for (int i = 0; i < primitives.size(); i++) {
+            shapes.add(primitives.get(i));
         }
         return shapes;
     }
