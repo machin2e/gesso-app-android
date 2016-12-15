@@ -7,7 +7,7 @@ import camp.computer.clay.engine.entity.Entity;
 
 public class Host extends Component {
 
-    // TODO: Move this into LayoutComponent for use by PortableLayoutSystem
+    // TODO: Move this into LayoutComponent for use by LayoutSystem
     public double distanceToExtensions = 500;
 
     public List<List<Entity>> headerExtensions = new ArrayList<>();

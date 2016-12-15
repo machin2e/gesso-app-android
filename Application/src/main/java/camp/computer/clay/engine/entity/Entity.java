@@ -1,34 +1,27 @@
 package camp.computer.clay.engine.entity;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.manager.Manager;
+import camp.computer.clay.engine.manager.EntityManager;
+import camp.computer.clay.engine.manager.Group;
 
 public final class Entity {
 
     // <HACK>
-    public long uuid = Manager.count++; // Manager.INVALID_UUID;
+    public long uid = EntityManager.INVALID_UUID; // = EntityManager.entityCounter++; // entityManager.INVALID_UID;
     // </HACK>
 
-    public long getUuid() {
-        return uuid;
+    public long getUid() {
+        return uid;
     }
 
-    public boolean isActive = true;
-
-    // TODO?: Move into World. Allows World-specific Entities.
-//    public static Group<Entity> Manager = new Group<>();
-
-    private Group<Component> components = null;
-
-    public Entity() {
-        super();
-        setup();
+    public void setUid(long uid) {
+        this.uid = uid;
     }
 
-    private void setup() {
-        components = new Group<>(); // Create list of Components
-    }
+    public boolean isActive = false;
+    public boolean isDestroyable = false;
+
+    private Group<Component> components = new Group<>();
 
     public <C extends Component> void addComponent(C component) {
         component.setEntity(this); // Associate Component with Entity
@@ -44,6 +37,10 @@ public final class Entity {
         return null;
     }
 
+    public Group<Component> getComponents() {
+        return new Group<>(components);
+    }
+
     public boolean hasComponent(Class<? extends Component> type) {
         return getComponent(type) != null;
     }
@@ -57,6 +54,10 @@ public final class Entity {
         return true;
     }
 
+    public void removeComponents() {
+        components.clear();
+    }
+
     public <C extends Component> C removeComponent(Class<C> type) {
         C component = getComponent(type);
         if (component != null) {
@@ -64,17 +65,4 @@ public final class Entity {
         }
         return component;
     }
-
-
-    // TODO: <DELETE>
-    private Entity parent;
-
-    public void setParent(Entity parent) {
-        this.parent = parent;
-    }
-
-    public Entity getParent() {
-        return this.parent;
-    }
-    // TODO: </DELETE>
 }

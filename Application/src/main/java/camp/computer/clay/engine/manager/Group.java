@@ -12,25 +12,31 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Geometry;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Style;
+import camp.computer.clay.engine.component.Model;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.util.Filter;
+import camp.computer.clay.engine.component.util.Mapper;
+import camp.computer.clay.engine.component.util.Sorter;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class Group<E> implements List<E> {
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
-    // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
+    // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entityManager.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
 
     // <GROUP>
     private List<E> elements = new ArrayList<>();
+
+    // Used by registerResponse to filter elements that will be added to it.
+    public Filter filter = null;
+    public Object data = null;
+
+    public Sorter sorter = null;
 
     public Group() {
     }
@@ -55,18 +61,18 @@ public class Group<E> implements List<E> {
         }
         return element;
     }
-
-//    public Group<E> remove(E entity) {
-//        int elementIndex = indexOf(entity);
-//        remove(elementIndex);
-//        return this;
-//    }
     // </GROUP>
 
-
     // <GROUP_LOOKUP>
-    public interface Filter<V, D> {
-        boolean filter(V entity, D data);
+    public <V, M, D> Group<M> map(Mapper mapper, D data) {
+        Group<M> group = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            M result = (M) mapper.map(elements.get(i), data);
+            if (result != null) {
+                group.add(result);
+            }
+        }
+        return group;
     }
 
     public <D> Group filter(Filter filter, D data) {
@@ -94,11 +100,7 @@ public class Group<E> implements List<E> {
         public static Filter filterUuid = new Filter<Entity, Long>() {
             @Override
             public boolean filter(Entity entity, Long uuid) {
-                if (entity.uuid == uuid) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return (entity.uid == uuid) ? true : false;
             }
         };
 
@@ -111,6 +113,38 @@ public class Group<E> implements List<E> {
                 } else {
                     return false;
                 }
+            }
+        };
+
+        /**
+         * Returns {@code true} if the {@code Entity} contains <em>any</em> of {@code Component}s
+         * in {@code componentTypes}.
+         */
+        public static Filter filterWithComponent = new Filter<Entity, Class<? extends Component>[]>() {
+            @Override
+            public boolean filter(Entity entity, Class<? extends Component>[] componentTypes) {
+                for (int j = 0; j < componentTypes.length; j++) {
+                    if (entity.hasComponent(componentTypes[j])) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        /**
+         * Returns {@code true} if the {@code Entity} contains <em>all</em> of {@code Component}s
+         * in {@code componentTypes}.
+         */
+        public static Filter filterWithComponents = new Filter<Entity, Class<? extends Component>[]>() {
+            @Override
+            public boolean filter(Entity entity, Class<? extends Component>[] componentTypes) {
+                for (int j = 0; j < componentTypes.length; j++) {
+                    if (entity.hasComponents(componentTypes)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         };
 
@@ -137,29 +171,6 @@ public class Group<E> implements List<E> {
         };
     }
 
-    /**
-     * Interface for custom map functions.
-     *
-     * @param <E> "Input" group element type.
-     * @param <M> "Result" group element type.
-     * @param <D> Type of data to pass to the {@code Mapper}. Set to {@code Void} if there's no
-     *            data.
-     */
-    public interface Mapper<E, M, D> {
-        M map(E value, D data);
-    }
-
-    public <V, M, D> Group<M> map(Mapper mapper, D data) {
-        Group<M> group = new Group<>();
-        for (int i = 0; i < elements.size(); i++) {
-            M result = (M) mapper.map(elements.get(i), data);
-            if (result != null) {
-                group.add(result);
-            }
-        }
-        return group;
-    }
-
     // "Mappers" namespace
     public static class Mappers {
 
@@ -180,8 +191,9 @@ public class Group<E> implements List<E> {
             @Override
             public Entity map(Entity entity, Double transparency) {
 //                if (entity instanceof HostEntity) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == HostEntity.getTypeUuid()
-                if (entity.getComponent(Image.class) != null) {
-                    entity.getComponent(Style.class).setTransparency(entity, transparency);
+                if (entity.getComponent(Model.class) != null) {
+                    // TODO: Set transparency
+                    // e.g., entity.getComponent(Style.class).setTransparency(entity, transparency);
                 }
                 return entity;
             }
@@ -199,12 +211,24 @@ public class Group<E> implements List<E> {
             }
         };
 
-        // Assumes Group<Entity>
-        public static Mapper getImage = new Mapper<Entity, Image, Void>() {
+        // Assumes Group<Entity>. Returns the Positions of the contained Entities.
+        public static Mapper getComponent = new Mapper<Entity, Component, Class<? extends Component>>() {
             @Override
-            public Image map(Entity entity, Void data) {
-                if (entity.getComponent(Image.class) != null) {
-                    return entity.getComponent(Image.class);
+            public Component map(Entity entity, Class<? extends Component> componentType) {
+                if (entity != null && entity.hasComponent(componentType)) {
+                    return entity.getComponent(componentType);
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        // Assumes Group<Entity>
+        public static Mapper getModel = new Mapper<Entity, Model, Void>() {
+            @Override
+            public Model map(Entity entity, Void data) {
+                if (entity.getComponent(Model.class) != null) {
+                    return entity.getComponent(Model.class);
                 } else {
                     return null;
                 }
@@ -212,62 +236,96 @@ public class Group<E> implements List<E> {
         };
     }
 
-    // Expects Group<Entity>
-    public Group<Entity> filterWithComponent(Class<? extends Component>... componentTypes) {
+    public static class Sorters {
 
-        Group<Entity> group = new Group<>();
-
-        for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < componentTypes.length; j++) {
-                Class<? extends Component> type = componentTypes[j];
-                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-                if (entity.hasComponent(type)) {
-                    group.add(entity);
+        public static Sorter layerSorter = new Sorter<Entity, Entity>() {
+            @Override
+            public int sort(Entity entity, Entity otherEntity) {
+                if (entity.getComponent(Transform.class).z < otherEntity.getComponent(Transform.class).z) {
+                    return -1;
+                } else if (entity.getComponent(Transform.class).z > otherEntity.getComponent(Transform.class).z) {
+                    return 1;
+                } else {
+                    return 0;
                 }
             }
-        }
+        };
 
-        return group;
+    }
+
+    // Expects Group<Entity>
+    public Group<Entity> filterWithComponent(Class<? extends Component>... componentTypes) {
+        return filter(Filters.filterWithComponent, componentTypes);
     }
 
     // Expects Group<Entity>
     public Group<Entity> filterWithComponents(Class<? extends Component>... componentTypes) {
-        Group<Entity> group = new Group<>();
-        for (int i = 0; i < this.elements.size(); i++) {
-            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-            if (entity.hasComponents(componentTypes)) {
-                group.add(entity);
-            }
-        }
-        return group;
+        return filter(Filters.filterWithComponents, componentTypes);
     }
 
+    /**
+     * Performs in-place sort with the specified {@code Sorter}.
+     *
+     * @param sorter
+     * @return
+     */
     // Exepcts Group<Entity>
-    // Requires components: Image
-    public Group<Entity> sortByLayer() {
-        Group<Entity> group = new Group<>();
+    // Requires components: ModelBuilder
+    public Group<E> sort(Sorter sorter) { // TODO: sort(Sorter sorter): [e.g., entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex]
+
+        Group<E> sortedGroup = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
-            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-//            if (entity.hasComponents(componentTypes)) {
-//                group.add(entity);
-//            }
-            // Insertion sort by layers
-            boolean isEntityInserted = false;
-            for (int j = 0; j < group.size(); j++) {
-                Entity sortedEntity = (Entity) group.get(j); // HACK: Forcing typecast to Entity
-                if (entity.getComponent(Image.class).layerIndex < sortedEntity.getComponent(Image.class).layerIndex) {
-                    group.add(j, entity);
-                    isEntityInserted = true;
+            E entity = this.elements.get(i); // HACK: Forcing typecast to Entity
+
+            // Insertion sort using Sorter
+            boolean isInserted = false;
+            for (int j = 0; j < sortedGroup.size(); j++) {
+                if (sorter.sort(entity, sortedGroup.get(j)) == -1) {
+                    sortedGroup.add(j, entity);
+                    isInserted = true;
                     break;
                 }
             }
 
-            if (!isEntityInserted) {
+            if (!isInserted) {
+                sortedGroup.add(entity);
+            }
+        }
+
+        this.elements.clear();
+        for (int i = 0; i < sortedGroup.size(); i++) {
+            this.elements.add(sortedGroup.get(i));
+        }
+
+        return this;
+    }
+
+    /*
+    // Exepcts Group<Entity>
+    // Requires components: ModelBuilder
+    public Group<Entity> sort(Sorter sorter) { // TODO: sort(Sorter sorter): [e.g., entity.getComponent(Model.class).layerIndex < sortedEntity.getComponent(Model.class).layerIndex]
+
+        Group<Entity> group = new Group<>();
+        for (int i = 0; i < this.elements.size(); i++) {
+            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+
+            // Insertion sort using Sorter
+            boolean isInserted = false;
+            for (int j = 0; j < group.size(); j++) {
+                if (sorter.sort(entity, group.get(j)) == -1) {
+                    group.add(j, entity);
+                    isInserted = true;
+                    break;
+                }
+            }
+
+            if (!isInserted) {
                 group.add(entity);
             }
         }
         return group;
     }
+    */
 
     // Expects Group<Entity>
     public Group<E> filterUuid(long uuid) {
@@ -290,7 +348,7 @@ public class Group<E> implements List<E> {
     }
 
     // Expects Group<Entity>
-    // Requires components: Image
+    // Requires components: ModelBuilder
     public void setTransparency(double transparency) {
         map(Mappers.setTransparency, transparency);
     }
@@ -300,29 +358,38 @@ public class Group<E> implements List<E> {
         map(Mappers.setVisibility, visible);
     }
 
+    // <REFACTOR>
     // Assumes Group<Entity>
-    public Group<Image> getImages() {
-        return map(Mappers.getImage, null);
+    public Group<Model> getModels() {
+        return map(Mappers.getModel, null);
     }
 
-    // Assumes Group<Image>
-    public Group<Shape> getShapes() {
-        Group<Shape> shapes = new Group<>();
+    // Assumes Group<ModelBuilder>
+    public Group<Entity> getPrimitives() {
+        Group<Entity> primitives = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
-            Image image = (Image) elements.get(i);
-//            shapes.addAll(image.getImage().getShapes());
-            Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
-            for (int j = 0; j < shapeEntities.size(); j++) {
-                shapes.add(shapeEntities.get(j).getComponent(Geometry.class).shape);
+            Model model = (Model) elements.get(i);
+            Group<Entity> modelPrimitives = Model.getPrimitives(model.getEntity());
+            for (int j = 0; j < modelPrimitives.size(); j++) {
+                primitives.add(modelPrimitives.get(j));
             }
         }
-        return shapes;
+        return primitives;
     }
+    // <REFACTOR>
 
+    // TODO: <REPLACE_WITH_GET_TRANSFORM>
     // Expects Group<Entity>
     // Requires components: Transform
     public Group<Transform> getPositions() {
         return map(Mappers.getPosition, null);
+    }
+    // TODO: </REPLACE_WITH_GET_TRANSFORM>
+
+    // Expects Group<Entity>
+    // Requires components: Passed in as argument
+    public <C extends Component> Group<C> getComponent(Class<C> componentType) {
+        return map(Mappers.getComponent, componentType);
     }
 
     /**
@@ -379,20 +446,20 @@ public class Group<E> implements List<E> {
     }
 
     /**
-     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     * Finds and returns the nearest <em>visible</em> <code>ModelBuilder</code>.
      *
      * @return
      */
-//    // HACK: Expects Group<Image>
-//    public Image getNearestImage(Transform position) {
+//    // HACK: Expects Group<ModelBuilder>
+//    public ModelBuilder getNearestImage(Transform position) {
 //
 //        double shortestDistance = Float.MAX_VALUE;
-//        Image nearestImage = null;
+//        ModelBuilder nearestImage = null;
 //
 //        for (int i = 0; i < elements.size(); i++) {
-//            Image image = (Image) elements.get(i);
+//            ModelBuilder image = (ModelBuilder) elements.get(i);
 //
-//            double currentDistance = Geometry.distance(position, image.getPosition());
+//            double currentDistance = Primitive.distance(position, image.getPosition());
 //
 //            if (currentDistance < shortestDistance) {
 //                shortestDistance = currentDistance;
@@ -403,12 +470,13 @@ public class Group<E> implements List<E> {
 //        return nearestImage;
 //    }
 
-    // HACK: Expects Group<Image>
+    // HACK: Expects Group<ModelBuilder>
     // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
     public Transform getCenterPoint() {
         return camp.computer.clay.util.Geometry.getCenterPoint(getPositions());
     }
 
+    // TODO: <MERGE_WITH_GET_BOUNDARY_VERTICES>
     // Expects Group<Shape>
     public Group<Transform> getVertices() {
         Group<Transform> positions = new Group<>();
@@ -419,21 +487,35 @@ public class Group<E> implements List<E> {
         }
         return positions;
     }
+    // TODO: </MERGE_WITH_GET_BOUNDARY_VERTICES>
 
     // Expects Group<Entity>
-    public Rectangle getBoundingBox() {
-
-        List<Transform> imageBoundaries = new ArrayList<>();
+    public Group<Transform> getBoundaryVertices() {
+        Group<Transform> boundaryVertices = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
-            Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
-//            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
-            //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
-            imageBoundaries.add(entity.getComponent(Transform.class));
+            Entity entity = (Entity) elements.get(i);
+            boundaryVertices.addAll(entity.getComponent(Boundary.class).boundary); // HACK: (shouldn't get Boundary if asking for Vertices. DISTINGUISH THESE SOMEHOW!)
+            // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.get(shape));
         }
-
-        return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
+        return boundaryVertices;
     }
+
+//    // Expects Group<Entity>
+//    public Rectangle getBoundingBox() {
+//
+//        List<Transform> imageBoundaries = new ArrayList<>();
+//        for (int i = 0; i < elements.size(); i++) {
+//            Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
+//            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
+////            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
+//            //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
+////            imageBoundaries.addAll(entity.getComponent(Boundary.class).boundary);
+//
+//            imageBoundaries.add(entity.getComponent(Transform.class));
+//        }
+//
+//        return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
+//    }
     // </GROUP_LOOKUP>
 
 
@@ -472,7 +554,23 @@ public class Group<E> implements List<E> {
      */
     @Override
     public boolean add(E object) {
-        this.elements.add(object);
+//        Log.v("SUBGROUP_ADD", "Adding to Group");
+//        result.add(elements.get(i));
+        if (this.filter == null || this.filter.filter(object, this.data) == true) {
+            this.elements.add(object);
+        }
+
+        if (this.sorter != null) {
+            sort(this.sorter);
+            // TODO: Perform insertion to add object to the Group
+        }
+
+//        // Update subscribers
+//        for (int i = 0; i < subscribers.size(); i++) {
+//            Log.v("SUBGROUP_ADD", "Adding to subscriber...");
+//            subscribers.get(i).add(object);
+//        }
+
         return true;
     }
 

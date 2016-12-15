@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.Geometry.Rectangle;
 
 public abstract class Geometry {
 

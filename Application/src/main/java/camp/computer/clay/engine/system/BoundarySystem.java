@@ -3,41 +3,47 @@ package camp.computer.clay.engine.system;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
-import camp.computer.clay.engine.component.Geometry;
+import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.engine.manager.Group;
+import camp.computer.clay.lib.Geometry.Shape;
+import camp.computer.clay.util.Geometry;
 
 public class BoundarySystem extends System {
 
+    // TODO: Load Model as asset in Cache. Separate style (unique per Entity) and geometry (same for all Entities)
+    // TODO: In Model component, Reference Model Asset in Cache with Asset UID
+    // TODO: Store the "group" from model file
+    // TODO: Consider caching the boundary and only update when it has been invalidated!
+
+    Group<Entity> entitiesWithBoundary;
+
     public BoundarySystem(World world) {
         super(world);
+
+        entitiesWithBoundary = world.entityManager.subscribe(
+                new FilterStrategy(Group.Filters.filterWithComponents, Primitive.class, Boundary.class)
+        );
     }
 
     @Override
-    public void update() {
-
-        // Update Boundaries
-        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Geometry.class, Boundary.class);
-        for (int i = 0; i < entities.size(); i++) {
-            updateBoundary(entities.get(i));
+    public void update(long dt) {
+        for (int i = 0; i < entitiesWithBoundary.size(); i++) {
+            generateBoundary(entitiesWithBoundary.get(i));
         }
-
-//        // Update Image Boundaries
-//        Group<Entity> imageEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Geometry.class, Boundary.class);
-//        for (int i = 0; i < imageEntities.size(); i++) {
-//            updateBoundary(imageEntities.get(i));
-//        }
     }
 
-    private void updateBoundary(Entity entity) {
-        // TODO: Cache the boundary and only update when it has been invalidated!
+    private void generateBoundary(Entity entity) {
 
-//        if (entity.hasComponent(Geometry.class)) {
-        Shape shape = entity.getComponent(Geometry.class).shape;
+        Shape shape = entity.getComponent(Primitive.class).shape;
+
+        if (!shape.isBoundary) {
+            return;
+        }
 
         if (shape.getVertices() != null && shape.getVertices().size() > 0) {
             List<Transform> vertices = shape.getVertices();
@@ -46,30 +52,16 @@ public class BoundarySystem extends System {
             // Translate and rotate the boundary about the updated position
             for (int i = 0; i < vertices.size(); i++) {
                 boundary.get(i).set(vertices.get(i));
-//                Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
-//                Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
-                camp.computer.clay.util.Geometry.rotatePoint(boundary.get(i), entity.getComponent(Transform.class).rotation); // Rotate Shape boundary about Image position
-                camp.computer.clay.util.Geometry.translatePoint(boundary.get(i), entity.getComponent(Transform.class).x, entity.getComponent(Transform.class).y); // Translate Shape
+                Geometry.rotatePoint(boundary.get(i), entity.getComponent(Transform.class).rotation); // Rotate Shape boundary about ModelBuilder position
+                Geometry.translatePoint(boundary.get(i), entity.getComponent(Transform.class).x, entity.getComponent(Transform.class).y); // Translate Shape
             }
 
-            Boundary.util.set(entity, boundary);
+            // Set the Boundary
+            /*
+            entity.getComponent(Boundary.class).boundary.clear();
+            entity.getComponent(Boundary.class).boundary.addAll(vertices);
+            */
+            entity.getComponent(Boundary.class).boundary = vertices;
         }
-//        } else if (entity.hasComponent(Image.class)) {
-//
-//            List<Transform> boundary = new ArrayList<>();
-//
-//            Group<Entity> shapes = Image.getShapes(entity);
-//            for (int i = 0; i < shapes.size(); i++) {
-////                if (/*shapes.get(i).getComponent(Geometry.class).shape.isBoundary // HACK
-////                    &&*/ Geometry.contains(Boundary.get(shapes.get(i)), point)) { // HACK
-////                    return true;
-////                }
-//
-//                shapes.get(i).getComponent(Boundary.class).boundary;
-//            }
-//
-//            Boundary.set(entity, boundary);
-//
-//        }
     }
 }

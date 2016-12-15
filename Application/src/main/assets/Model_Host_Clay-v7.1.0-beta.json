@@ -1,0 +1,513 @@
+{
+  "type": "model",
+  "label": "Clay",
+  "version": "7.1.0-beta",
+  "geometry": [
+    {
+      "label": "Board",
+      "type": "Rectangle",
+      "width": 50.8,
+      "height": 50.8,
+      "cornerRadius": 4.064,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#1f1f1e",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 1",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": 0.0,
+        "y": -26.5,
+        "z": -1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 2",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": 26.5,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "rotation": 90.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 3",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": 0.0,
+        "y": 26.5,
+        "z": -1.0
+      },
+      "rotation": 180.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 4",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": -26.5,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "rotation": 270.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Pin 1",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": -2.54,
+        "y": 26.5,
+        "z": -2.0
+      },
+      "rotation": 0.0
+    },
+    {
+      "label": "Pin 2",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 0.0,
+        "y": 26.5,
+        "z": -2.0
+      },
+      "rotation": 0.0
+    },
+    {
+      "label": "Pin 3",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 2.54,
+        "y": 26.5,
+        "z": -2.0
+      },
+      "rotation": 0.0
+    },
+    {
+      "label": "Pin 4",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 26.5,
+        "y": 2.54,
+        "z": -2.0
+      },
+      "rotation": 90.0
+    },
+    {
+      "label": "Pin 5",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 26.5,
+        "y": 0.0,
+        "z": -2.0
+      },
+      "rotation": 90.0
+    },
+    {
+      "label": "Pin 6",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 26.5,
+        "y": -2.54,
+        "z": -2.0
+      },
+      "rotation": 90.0
+    },
+    {
+      "label": "Pin 7",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 2.54,
+        "y": -26.5,
+        "z": -2.0
+      },
+      "rotation": 180.0
+    },
+    {
+      "label": "Pin 8",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": 0.0,
+        "y": -26.5,
+        "z": -2.0
+      },
+      "rotation": 180.0
+    },
+    {
+      "label": "Pin 9",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": -2.54,
+        "y": -26.5,
+        "z": -2.0
+      },
+      "rotation": 180.0
+    },
+    {
+      "label": "Pin 10",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": -26.5,
+        "y": -2.54,
+        "z": -2.0
+      },
+      "rotation": 270.0
+    },
+    {
+      "label": "Pin 11",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": -26.5,
+        "y": 0.0,
+        "z": -2.0
+      },
+      "rotation": 270.0
+    },
+    {
+      "label": "Pin 12",
+      "group": "Pins",
+      "type": "Point",
+      "position": {
+        "x": -26.5,
+        "y": 2.54,
+        "z": -2.0
+      },
+      "rotation": 270.0
+    },
+    {
+      "label": "LED 1",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": -3.33,
+        "y": 21.0,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 2",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 0.0,
+        "y": 21.0,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 3",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 3.33,
+        "y": 21.0,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 4",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 21.0,
+        "y": 3.33,
+        "z": 1.0
+      },
+      "rotation": 90.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 5",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 21.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "rotation": 90.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 6",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 21.0,
+        "y": -3.33,
+        "z": 1.0
+      },
+      "rotation": 90.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 7",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 3.33,
+        "y": -21.0,
+        "z": 1.0
+      },
+      "rotation": 180.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 8",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": 0.00,
+        "y": -21.0,
+        "z": 1.0
+      },
+      "rotation": 180.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 9",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": -3.33,
+        "y": -21.0,
+        "z": 1.0
+      },
+      "rotation": 180.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 10",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": -21.0,
+        "y": -3.33,
+        "z": 1.0
+      },
+      "rotation": 270.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 11",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": -21.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "rotation": 270.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "LED 12",
+      "group": "LEDs",
+      "type": "Rectangle",
+      "width": 2.0,
+      "height": 3.33,
+      "cornerRadius": 0.5,
+      "position": {
+        "x": -21.0,
+        "y": 3.33,
+        "z": 1.0
+      },
+      "rotation": 270.0,
+      "style": {
+        "color": "#efefef",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "Mount 1",
+      "group": "Mounts",
+      "type": "Circle",
+      "radius": 1.45,
+      "position": {
+        "x": -21.9,
+        "y": -21.9,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#ffffff",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "Mount 2",
+      "group": "Mounts",
+      "type": "Circle",
+      "radius": 1.45,
+      "position": {
+        "x": 21.9,
+        "y": -21.9,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#ffffff",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "Mount 3",
+      "group": "Mounts",
+      "type": "Circle",
+      "radius": 1.45,
+      "position": {
+        "x": 21.9,
+        "y": 21.9,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#ffffff",
+        "outlineThickness": 0.0
+      }
+    },
+    {
+      "label": "Mount 4",
+      "group": "Mounts",
+      "type": "Circle",
+      "radius": 1.45,
+      "position": {
+        "x": -21.9,
+        "y": 21.9,
+        "z": 1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#ffffff",
+        "outlineThickness": 0.0
+      }
+    }
+  ]
+}

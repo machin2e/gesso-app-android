@@ -1,22 +1,17 @@
 package camp.computer.clay.engine.component;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Group;
 
 public class Portable extends Component {
 
     // <COMPONENT_DATA>
     // TODO: Change to Group<Long>
+    // TODO: REMOVE (ignore previous TODO). Replace with ParentReferenceComponent. Then remove Portable altogether?
     public Group<Entity> ports = new Group<>();
-
-    // <DELETE>
-    // TODO: Look up in the Image geometry?
-    public List<Entity> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
-    // </DELETE>
     // </COMPONENT_DATA>
 
 
@@ -36,7 +31,7 @@ public class Portable extends Component {
         Portable portableComponent = portable.getComponent(Portable.class);
         if (!portableComponent.ports.contains(port)) {
             portableComponent.ports.add(port);
-            port.setParent(portable);
+            port.getComponent(Structure.class).parentEntity = portable;
         }
     }
 
@@ -70,7 +65,7 @@ public class Portable extends Component {
     // Expects Extension
     // Requires components: Portable, Extension
     public static Group<Entity> getHosts(Entity portable) {
-        List<Entity> hosts = World.getWorld().Manager.getEntities().filterWithComponent(Host.class);
+        List<Entity> hosts = World.getInstance().entityManager.get().filterWithComponent(Host.class);
 
         Group<Entity> portableHosts = new Group<>();
         for (int i = 0; i < hosts.size(); i++) {

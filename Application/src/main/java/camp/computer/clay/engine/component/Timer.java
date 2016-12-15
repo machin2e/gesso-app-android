@@ -29,8 +29,8 @@ public class Timer extends Component {
                 notification.getComponent(Timer.class).state = State.COMPLETE;
                 notification.isActive = false;
 
-                // TODO: Manager.requestDelete(...)
-                World.getWorld().Manager.remove(notification);
+                // TODO: entityManager.requestDelete(...)
+                World.getInstance().entityManager.remove(notification);
             }
         }, notification.getComponent(Timer.class).timeout);
     }

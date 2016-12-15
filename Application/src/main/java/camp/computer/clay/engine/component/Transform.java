@@ -17,6 +17,12 @@ public class Transform extends Component {
     public double y = 0;
 
     /**
+     * The z coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
+     * {@code null} then this is equivalent to an absolute position.
+     */
+    public double z = 0;
+
+    /**
      * Relative rotation of the coordinate with which endpoints referencing this one will be
      * rotated.
      */
@@ -38,16 +44,16 @@ public class Transform extends Component {
      * Copy constructor. Creates a new {@code Transform} object with properties identical to those of
      * {@code otherPoint}.
      *
-     * @param otherPoint The {@code Transform} to set.
+     * @param otherTransform The {@code Transform} to set.
      */
-    public Transform(Transform otherPoint) {
+    public Transform(Transform otherTransform) {
 
         // <HACK>
         super();
         // </HACK>
 
-        this.x = otherPoint.x;
-        this.y = otherPoint.y;
+        this.x = otherTransform.x;
+        this.y = otherTransform.y;
     }
 
     public Transform(double x, double y) {

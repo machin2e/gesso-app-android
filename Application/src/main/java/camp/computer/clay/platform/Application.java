@@ -1,116 +1,90 @@
 package camp.computer.clay.platform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.liquidplayer.webkit.javascriptcore.JSContext;
-import org.liquidplayer.webkit.javascriptcore.JSValue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import camp.computer.clay.Clay;
+import camp.computer.clay.engine.Engine;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
+import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Physics;
+import camp.computer.clay.engine.component.util.HostLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.manager.Event;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.platform.communication.Internet;
-import camp.computer.clay.platform.communication.UDPHost;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
-import camp.computer.clay.platform.sound.SpeechOutput;
-import camp.computer.clay.platform.sound.ToneOutput;
-import camp.computer.clay.platform.spatial.OrientationInput;
+import camp.computer.clay.engine.event.Event;
+import camp.computer.clay.engine.manager.Group;
+import camp.computer.clay.engine.system.EventSystem;
+import camp.computer.clay.engine.system.LayoutSystem;
+import camp.computer.clay.platform.compute.JavaScriptEngine;
+import camp.computer.clay.platform.graphics.RenderSurface;
+import camp.computer.clay.platform.graphics.controls.Widgets;
+import camp.computer.clay.platform.io.OrientationInput;
+import camp.computer.clay.platform.io.SpeechSynthesizer;
+import camp.computer.clay.platform.util.DeviceDimensionsHelper;
+import camp.computer.clay.platform.util.ViewGroupHelper;
+import camp.computer.clay.util.Random;
 
-public class Application extends FragmentActivity implements PlatformInterface {
+public class Application extends FragmentActivity {
 
     // <SETTINGS>
-    private static final boolean ENABLE_TONE_OUTPUT = false;
-    private static final boolean ENABLE_SPEECH_OUTPUT = false;
-    private static final boolean ENABLE_MOTION_INPUT = true;
+    public static class Settings {
+        public static final boolean ENABLE_SPEECH_OUTPUT = false;
+        public static final boolean ENABLE_MOTION_INPUT = true;
 
-    private static final long MESSAGE_SEND_FREQUENCY = 5000; // 500;
+        /**
+         * Hides the operating system's status and navigation bars. Setting this to false is helpful
+         * during debugging.
+         */
+        public static final boolean ENABLE_FULLSCREEN = true;
+        public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
 
-    public static boolean ENABLE_GEOMETRY_LABELS = false;
+        public static boolean ENABLE_HARDWARE_ACCELERATION = false;
 
-    /**
-     * Hides the operating system's status and navigation bars. Setting this to false is helpful
-     * during debugging.
-     */
-    private static final boolean ENABLE_FULLSCREEN = true;
+        public static boolean ENABLE_JAVASCRIPT_ENGINE = true;
+    }
     // </SETTINGS>
-
-    public PlatformRenderSurface platformRenderSurface;
-
-    private SpeechOutput speechOutput;
-
-    private ToneOutput toneOutput;
-
-    private OrientationInput orientationInput;
 
     private static Context context;
 
-    private static Application applicationView;
+    private static Application application;
 
-    private Clay clay;
+    private Widgets widgets;
 
-    private UDPHost UDPHost;
+    public RenderSurface renderSurface;
 
-    private Internet networkResource;
+    private SpeechSynthesizer speechSynthesizer;
 
-    NativeUi nativeUi;
+    private OrientationInput orientationInput;
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
+    private JavaScriptEngine javaScriptEngine;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SpeechOutput.CHECK_CODE) {
-            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                speechOutput = new SpeechOutput(this);
-            } else {
-                Intent install = new Intent();
-                install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(install);
+
+        if (Settings.ENABLE_SPEECH_OUTPUT) {
+            if (requestCode == SpeechSynthesizer.CHECK_CODE) {
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    speechSynthesizer = new SpeechSynthesizer(this);
+                } else {
+                    Intent install = new Intent();
+                    install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(install);
+                }
             }
         }
     }
 
-    public NativeUi getNativeUi() {
-        return this.nativeUi;
-    }
+    public static int applicationViewId;
 
     /**
      * Called when the activity is getFirstEvent created.
@@ -119,315 +93,184 @@ public class Application extends FragmentActivity implements PlatformInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // <PLATFORM>
+
+        // Store reference to the application.
+        Application.application = this;
+
         // "Return the context of the single, global Application object of the current process.
         // This generally should only be used if you need a Context whose lifecycle is separate
         // from the current context, that is tied to the lifetime of the process rather than the
         // current component." (Android Documentation)
         Application.context = getApplicationContext();
 
-        // Lock screen orientation
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        // Sensor Interface
-        if (ENABLE_MOTION_INPUT) {
-            orientationInput = new OrientationInput(getApplicationContext());
-        }
-
-        if (ENABLE_FULLSCREEN) {
+        if (Settings.ENABLE_FULLSCREEN) {
             startFullscreenService();
         }
 
-        // Display Interface
-        Application.applicationView = this;
+        // Set up Platform Helpers
+        ViewGroupHelper.setContext(getApplicationContext());
 
-        nativeUi = new NativeUi(getApplicationContext());
+        // Generate Application View ID
+        applicationViewId = Widgets.generateViewId();
 
-//        for (int i = 0; i < 100; i++) {
-//            String outgoingMessage = "announce device " + UUID.randomUUID();
-//            CRC16 CRC16 = new CRC16();
-//            int seed = 0;
-//            byte[] outgoingMessageBytes = outgoingMessage.getBytes();
-//            int check = CRC16.calculate(outgoingMessageBytes, seed);
-//            String outmsg =
-//                    "\f" +
-//                            String.valueOf(outgoingMessage.length()) + "\t" +
-//                            String.valueOf(check) + "\t" +
-//                            "text" + "\t" +
-//                            outgoingMessage;
-//            Log.v("CRC_Demo", "" + outmsg);
-//        }
+        // Create Application Layout View
+        FrameLayout applicationView = new FrameLayout(getApplicationContext());
+        applicationView.setId(applicationViewId);
+        setContentView(applicationView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        setContentView(R.layout.activity_main);
+        // Lock screen orientation to vertical orientation.
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // World Surface
-        platformRenderSurface = (PlatformRenderSurface) findViewById(R.id.app_surface_view);
-        platformRenderSurface.onResume();
+        // Prevent on-screen keyboard from pushing up content. Instead it will overlay content.
+        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
-        // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
-        //setContentView(visualizationSurface);
-
-        // PathEntity Editor
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
-        pathEditor.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                pathEditor.setVisibility(View.GONE);
-                return true;
-            }
-        });
-
-        final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
-        pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                int pointerId = motionEvent.getPointerId(pointerIndex);
-                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-                int pointCount = motionEvent.getPointerCount();
-
-                // Update the state of the touched object based on the current pointerCoordinates interaction state.
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    addPathExtensionAction();
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        // <Cache>
-        // </Cache>
-
-        // Clay
-        clay = new Clay();
-
-        clay.addPlatform(this); // Add the view provided by the host device.
-
-        // UDP Datagram Server
-        if (UDPHost == null) {
-            UDPHost = new UDPHost("udp");
-            clay.addHost(this.UDPHost);
-            UDPHost.startServer();
+        // Sensor Interface
+        if (Settings.ENABLE_MOTION_INPUT) {
+            orientationInput = new OrientationInput(getApplicationContext());
         }
-
-        // Internet Network Interface
-        if (networkResource == null) {
-            networkResource = new Internet();
-            clay.addResource(this.networkResource);
-        }
-
-        /*
-        // Descriptor Database
-        SQLiteStoreHost sqliteStoreHost = new SQLiteStoreHost(getClay(), "sqlite");
-        getClay().setStore(sqliteStoreHost);
-
-        // Initialize content store
-        getClay().getStore().erase();
-        getClay().getCache().populate(); // alt. syntax: useClay().useCache().toPopulate();
-        getClay().getStore().generate();
-        getClay().getCache().populate();
-        // getClay().simulateSession(true, 10, false);
-        */
-
-        // Prevent on-screen keyboard from pushing up content
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-
-        // <CHAT_AND_CONTEXT_SCOPE>
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final TextView messageContentHint = (TextView) findViewById(R.id.message_content_hint);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        // </CHAT_AND_CONTEXT_SCOPE>
-
-        // <CHAT>
-
-        messageContentHint.setOnTouchListener(new View.OnTouchListener()
-
-                                              {
-
-                                                  @Override
-                                                  public boolean onTouch(View v, MotionEvent event) {
-                                                      messageContentHint.setVisibility(View.GONE);
-                                                      showMessageKeyboard();
-                                                      return false;
-                                                  }
-                                              }
-
-        );
-
-        // Hide scrollbars in keyboard
-        messageKeyboardLayoutPerspective.setVerticalScrollBarEnabled(false);
-        messageKeyboardLayoutPerspective.setHorizontalScrollBarEnabled(false);
-
-        // Hide scrollbars in message content
-        messageContentLayoutPerspective.setVerticalScrollBarEnabled(false);
-        messageContentLayoutPerspective.setHorizontalScrollBarEnabled(false);
-
-        generateKeyboard();
-
-        // Set up interactivity
-        messageContentLayout.setOnTouchListener(new View.OnTouchListener()
-
-                                                {
-                                                    @Override
-                                                    public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                                                        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                                                        int pointerId = motionEvent.getPointerId(pointerIndex);
-                                                        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                                                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-                                                        int pointCount = motionEvent.getPointerCount();
-
-                                                        // Update the state of the touched object based on the current pointerCoordinates interaction state.
-                                                        if (touchActionType == MotionEvent.ACTION_DOWN) {
-                                                            // TODO:
-                                                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                                                            // TODO:
-                                                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                                                            // TODO:
-                                                        } else if (touchActionType == MotionEvent.ACTION_UP) {
-                                                            showMessageKeyboard();
-                                                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                                                            // TODO:
-                                                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                                                            // TODO:
-                                                        } else {
-                                                            // TODO:
-                                                        }
-
-                                                        return true;
-                                                    }
-
-//            @Override
-//            public boolean onTouch(CameraEntity v, MotionEvent event) {
-//                int inType = timelineButton.getInputType(); // backup the input type
-//                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
-//                timelineButton.onTouchEvent(event); // call native messagingThreadHandler
-//                timelineButton.setInputType(inType); // restore input type
-//                return true; // consume pointerCoordinates even
-//            }
-                                                }
-
-        );
-
-        messageContentLayout.setOnClickListener(new View.OnClickListener()
-
-                                                {
-                                                    @Override
-                                                    public void onClick(View v) {
-
-
-                                                    }
-                                                }
-
-        );
-        // </CHAT>
-
-        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
-        messagingThreadHandler.post(messaingThread);
 
         // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_OUTPUT) {
-            SpeechOutput.checkAvailability(this);
+        if (Settings.ENABLE_SPEECH_OUTPUT) {
+            SpeechSynthesizer.checkAvailability(this);
         }
 
-        if (ENABLE_TONE_OUTPUT) {
-            toneOutput = new ToneOutput();
+        // <HARDWARE_ACCELERATION>
+        if (Settings.ENABLE_HARDWARE_ACCELERATION) {
+            View view = findViewById(applicationViewId);
+            boolean isHardwareAccelerated = view.isHardwareAccelerated();
+            Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
         }
+        // </HARDWARE_ACCELERATION>
 
-        hideChat();
+        // </PLATFORM>
 
-        // <REDIS>
-//        new JedisConnectToDatabaseTask().execute("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com:14268");
+        // <PLATFORM_ADAPTER>
+        widgets = new Widgets(getApplicationContext());
 
-//        while (this.jedis == null) {
-//            // Waiting for connection...
-//        }
+        // Create Platform Rendering Surface and add it to the application view.
+        renderSurface = new RenderSurface(getContext());
+        FrameLayout frameLayout = (FrameLayout) Application.getInstance().findViewById(applicationViewId);
+        frameLayout.setPadding(0, 0, 0, 0);
+        FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(
+                DeviceDimensionsHelper.getDisplayWidth(context), // FrameLayout.LayoutParams.MATCH_PARENT
+                DeviceDimensionsHelper.getDisplayHeight(context) // FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        frameLayoutParams.setMargins(0, 0, 0, 0);
+        frameLayout.addView(renderSurface, frameLayoutParams);
 
-//        new Thread(
-//                new RedisSubThread(this.jedis)
-//        ).start();
-        // </REDIS>
-
-
-        // <REDIS>
-//        RedisDBThread redisDB = new RedisDBThread();
-//        redisDB.start();
-        // </REDIS>
-
-//        openFile("Host.json");
+        renderSurface.onResume();
+        // </PLATFORM_ADAPTER>
 
         // <JAVASCRIPT_ENGINE>
-        // Reference: https://github.com/ericwlange/AndroidJSCore
-        JSContext context = new JSContext();
-
-        // Test 1
-        context.property("a", 5);
-        JSValue aValue = context.property("a");
-        double a = aValue.toNumber();
-        DecimalFormat df = new DecimalFormat(".#");
-        Log.v("AndroidJSCore", (df.format(a))); // 5.0
-
-        // Test 2
-        context.evaluateScript("a = 10");
-        JSValue newAValue = context.property("a");
-        Log.v("AndroidJSCore", df.format(newAValue.toNumber())); // 10.0
-        String script =
-                "function factorial(x) { var f = 1; for(; x > 1; x--) f *= x; return f; }\n" +
-                        "var fact_a = factorial(a);\n";
-        context.evaluateScript(script);
-        JSValue fact_a = context.property("fact_a");
-        Log.v("AndroidJSCore", df.format(fact_a.toNumber())); // 3628800.0
+        if (Settings.ENABLE_JAVASCRIPT_ENGINE) {
+            javaScriptEngine = new JavaScriptEngine();
+        }
         // </JAVASCRIPT_ENGINE>
 
-
-        // <CHECK_HARDWARE_ACCELERATION>
-        View view = findViewById(R.id.application_view);
-        boolean isHardwareAccelerated = view.isHardwareAccelerated();
-        Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
-        // </CHECK_HARDWARE_ACCELERATION>
-
+        /*
         // <SHOW_MAIN_MENU>
-        nativeUi.openMainMenu();
+        widgets.openMainMenu();
         // </SHOW_MAIN_MENU>
+        */
+
+        // <TIMER_THREAD>
+        Engine.getInstance();
+        // </TIMER_THREAD>
     }
 
-    // TODO: Queue key events in inputSystem
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Rendering Surface
+        renderSurface.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Rendering Surface
+        renderSurface.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Speech Synthesis Engine. Stop.
+        if (speechSynthesizer != null) {
+            speechSynthesizer.destroy();
+        }
+    }
+
+    /**
+     * Configure platform keyboard input handler.
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
+        // TODO: Queue key eventManager in inputSystem
+
         switch (keyCode) {
+            case KeyEvent.KEYCODE_A: {
+                /*
+                Entity host = World.getInstance().createEntity(Host.class);
+                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+
+                // Automatically focus on the first Host that appears in the workspace/world.
+                if (World.getInstance().entityManager.get().size() == 1) {
+                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+                    camera.getComponent(Camera.class).focus = host;
+                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+                } else {
+                    Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+                    camera.getComponent(Camera.class).focus = null;
+                    camera.getComponent(Camera.class).mode = Camera.Mode.FOCUS;
+                }
+                */
+                World.getInstance().getSystem(EventSystem.class).enqueue(new Event("CREATE_HOST"));
+                // TODO: World.getInstance().getSystem(EventSystem.class).enqueue(new Event("CREATE_HOST"));
+
+
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_D: {
+                Group<Entity> hosts = World.getInstance().entityManager.get().filterWithComponent(Host.class);
+                if (hosts.size() > 0) {
+                    Entity randomHost = hosts.get(Random.generateRandomInteger(0, hosts.size()));
+                    World.getInstance().entityManager.remove(randomHost);
+                }
+
+//                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
+//                World.getInstance().getSystem(EventSystem.class).execute(new Event("DESTROY_HOST"));
+                return true;
+            }
+
             case KeyEvent.KEYCODE_S: {
-                nativeUi.openSettings();
+                widgets.openSettings();
                 //your Action code
                 return true;
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
+                World.getInstance().getSystem(LayoutSystem.class).updateWorldLayout(new HostLayoutStrategy());
                 return true;
             }
 
             case KeyEvent.KEYCODE_M: {
-                nativeUi.openMainMenu();
+                widgets.openMainMenu();
                 return true;
             }
 
@@ -436,525 +279,57 @@ public class Application extends FragmentActivity implements PlatformInterface {
                 return true;
             }
 
-            case KeyEvent.KEYCODE_O: {
+            case KeyEvent.KEYCODE_C: {
                 // Monitor
-                if (World.ENABLE_DRAW_OVERLAY) {
-                    World.ENABLE_DRAW_OVERLAY = false;
+                if (World.ENABLE_OVERLAY) {
+                    World.ENABLE_OVERLAY = false;
                 } else {
-                    World.ENABLE_DRAW_OVERLAY = true;
+                    World.ENABLE_OVERLAY = true;
                 }
                 return true;
             }
+
+            case KeyEvent.KEYCODE_G: {
+                // Monitor
+                if (World.ENABLE_GEOMETRY_OVERLAY) {
+                    World.ENABLE_GEOMETRY_OVERLAY = false;
+                    World.ENABLE_GEOMETRY_ANNOTATIONS = false;
+                } else {
+                    World.ENABLE_GEOMETRY_OVERLAY = true;
+                    World.ENABLE_GEOMETRY_ANNOTATIONS = true;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_1: {
+                // Monitor
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale -= 0.10;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_2: {
+                // Monitor
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale = 1.0;
+                }
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_3: {
+                // Monitor
+                Entity camera = World.getInstance().entityManager.get().filterWithComponent(Camera.class).get(0);
+                if (camera != null) {
+                    camera.getComponent(Physics.class).targetTransform.scale += 0.10;
+                }
+                return true;
+            }
+
         }
         return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // <VISUALIZATION>
-        platformRenderSurface.onPause();
-        // </VISUALIZATION>
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (UDPHost == null) {
-            UDPHost = new UDPHost("udp");
-        }
-        if (!UDPHost.isActive()) {
-            UDPHost.startServer();
-        }
-
-        // <VISUALIZATION>
-        platformRenderSurface.onResume();
-        // </VISUALIZATION>
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Stop speech generator
-        if (speechOutput != null) {
-            speechOutput.destroy();
-        }
-    }
-
-    public static Context getContext() {
-        return Application.context;
-    }
-
-
-    //----------------------------------------------------------------------------------------------
-
-    // References:
-    // - http://stackoverflow.com/questions/4165414/how-to-hide-soft-keyboard-on-android-after-clicking-outside-edittext
-    boolean isTitleEditorInitialized = false;
-
-    public void openTitleEditor(String title) {
-        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
-
-        // Initialize Text
-        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
-        titleText.setText(title);
-
-        // Configure Text Editor
-        if (isTitleEditorInitialized == false) {
-
-            /*
-            // Set the font face
-            Typeface type = Typeface.createFromAsset(getAssets(), "fonts/Dosis-Light.ttf");
-            titleText.setTypeface(type);
-            */
-
-            // Configure to hide keyboard when a touch occurs anywhere except the text
-            titleText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (!hasFocus) {
-                        hideKeyboard(v);
-                    }
-                }
-            });
-
-            // Configure touch interaction
-            titleText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (v.getId() == titleText.getId()) {
-
-                        // Move the cursor to the end of the line
-                        titleText.setSelection(titleText.getText().length());
-
-                        // Show the cursor
-                        titleText.setCursorVisible(true);
-                    }
-                }
-            });
-
-            isTitleEditorInitialized = true;
-        }
-
-        titleText.setCursorVisible(false);
-
-        titleEditor.setVisibility(View.VISIBLE);
-
-        /*
-        // Now Set your animation
-        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
-        titleText.startAnimation(fadeInAnimation);
-
-        // Callback to hide editor
-        startTitleEditorService();
-        */
-    }
-
-    public void setTitleEditor(String title) {
-        // Update the Text
-        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
-        titleText.setText(title);
-
-        /*
-        // Callback to hide editor
-        startTitleEditorService();
-        */
-    }
-
-    public void closeTitleEditor() {
-        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
-
-        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
-
-        titleEditor.setVisibility(View.INVISIBLE);
-
-        /*
-        // Now Set your animation
-        Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
-
-        fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                titleEditor.setImageVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        titleText.startAnimation(fadeOutAnimation);
-        */
-    }
-
-    private Handler titleEditorServiceHandler = new Handler();
-    private Runnable titleEditorServiceRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // Do what you need to do.
-            // e.g., foobar();
-            closeTitleEditor();
-
-//            // Uncomment this for periodic callback
-//            if (enableFullscreenService) {
-//                fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
-//            }
-        }
-    };
-
-    private void startTitleEditorService() {
-        titleEditorServiceHandler.postDelayed(titleEditorServiceRunnable, 5000);
-    }
-
-    public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    // TODO: <BUILDER_SYSTEMS_HDL>
-    public List<Entity> restoreHosts(String filename) {
-
-        // e.g., filename = "HostHDL.json"
-
-        List<Entity> hostEntities = new ArrayList<>();
-
-        // Open specified file HostEntity profiles
-        String jsonString = null;
-        try {
-            InputStream inputStream = getContext().getAssets().open(filename);
-            int fileSize = inputStream.available();
-            byte[] fileBuffer = new byte[fileSize];
-            inputStream.read(fileBuffer);
-            inputStream.close();
-            jsonString = new String(fileBuffer, "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Create JSON object from file contents
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject hostObject = jsonObject.getJSONObject("host");
-            String hostTitle = hostObject.getString("title");
-
-            // HostEntity host = new HostEntity();
-
-            Log.v("Configuration", "reading JSON name: " + hostTitle);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return hostEntities;
-    }
-    // TODO: </BUILDER_SYSTEMS_HDL>
-
-    public void hideChat() {
-        // <CHAT_AND_CONTEXT_SCOPE>
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final TextView messageContentHint = (TextView) findViewById(R.id.message_content_hint);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        // </CHAT_AND_CONTEXT_SCOPE>
-
-        messageContentLayout.setVisibility(View.GONE);
-    }
-
-    private void showMessageKeyboard() {
-
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-
-        ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
-
-        ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) messageKeyboardLayout.getLayoutParams();
-
-        Resources r = getResources();
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
-        //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
-
-        // Reposition chat layout
-        chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + messageContentLayout.getLayoutParams().height + 20; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-
-        if (messageKeyboardLayout.getVisibility() == View.GONE) {
-            messageKeyboardLayout.setVisibility(View.VISIBLE);
-        } else if (messageKeyboardLayout.getVisibility() == View.VISIBLE) {
-            messageKeyboardLayout.setVisibility(View.GONE);
-        }
-
-        messageKeyboardLayout.requestLayout();
-        messageKeyboardLayout.invalidate();
-    }
-
-    public Transform convertToVisiblePosition(android.graphics.Point point) {
-        Transform visiblePosition = new Transform();
-        return visiblePosition;
-    }
-
-    public float convertDipToPx(float dip) {
-        Resources r = getResources();
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.getDisplayMetrics());
-        return px;
-    }
-
-    private void generateKeyboard() {
-        generateKeyboardKeys();
-    }
-
-    private void generateKeyboardKeys() {
-
-        //final EditText messageContent = (EditText) findViewById(R.id.message_content);
-
-        generateKeyboardKey("settings");
-        generateKeyboardKey("\uD83D\uDD0D");
-//        generateKeyboardKey("zoom/in");
-//        generateKeyboardKey("zoom/out");
-        generateKeyboardKey("camera");
-        generateKeyboardKey("vibrate");
-        generateKeyboardKey("timeline");
-        generateKeyboardKey("help");
-        generateKeyboardKey("chat");
-    }
-
-    private void generateKeyboardKey(String settings) {
-
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-
-        // <CHAT>
-
-        // Add keys to keyboard
-        final Button messageKey = new Button(getContext());
-        messageKey.setText(settings);
-        messageKey.setTextSize(12.0f);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(5, 0, 5, 0);
-        messageKey.setPadding(0, 0, 0, 0);
-        messageKey.setLayoutParams(layoutParams);
-        messageKey.getLayoutParams().height = 100;
-        messageKey.setBackgroundResource(R.drawable.chat_message_key);
-
-        messageKey.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-                appendToChatMessage(messageKey.getText().toString());
-
-                validateChatMessage();
-            }
-        });
-
-        messageKeyboard.addView(messageKey);
-    }
-
-    private void validateChatMessage() {
-
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-    }
-
-    private void appendToChatMessage(String text) {
-        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
-        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
-        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
-        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
-        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
-        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        // </CHAT_AND_CONTEXT_SCOPE>
-
-        // <CHAT>
-
-        // Add keys to keyboard
-        final Button messageWord = new Button(getContext());
-        messageWord.setText(text);
-        messageWord.setTextSize(12.0f);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(10, 0, 10, 0);
-        messageWord.setPadding(0, 0, 0, 0);
-        messageWord.setLayoutParams(layoutParams);
-        messageWord.getLayoutParams().height = 100;
-        messageWord.setBackgroundResource(R.drawable.chat_message_key);
-
-        messageWord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                messageContent.removeView(messageWord);
-
-                // Unicode arrow symbols: https://en.wikipedia.org/wiki/Template:Unicode_chart_Arrows
-
-                // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-//                messageContent.addPlatform(messageKey);
-//                contextScope.setText("✓");
-//                contextScope.setText("☉");
-                //contextScope.setText("☌"); // When dragging to connect path
-            }
-        });
-
-        messageContent.addView(messageWord);
-
-        messageContentLayoutPerspective.postDelayed(new Runnable() {
-            public void run() {
-                messageContentLayoutPerspective.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-            }
-        }, 100L);
-    }
-
-    private void addPathExtensionAction() {
-
-        final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
-        int horizontalPadding = (int) convertDipToPx(20);
-        int verticalPadding = (int) convertDipToPx(10);
-        actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
-        actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
-
-        final LinearLayout pathPatchActionList = (LinearLayout) findViewById(R.id.path_editor_action_list);
-
-        actionConstruct.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                    pathPatchActionList.removeView(actionConstruct);
-
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-
-                return true;
-            }
-        });
-
-        pathPatchActionList.addView(actionConstruct);
-    }
-
-    // <FULLSCREEN_SERVICE>
-    public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
-
-    private boolean enableFullscreenService = false;
-
-    private Handler fullscreenServiceHandler = new Handler();
-    private Runnable fullscreenServiceRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // Do what you need to do.
-            // e.g., foobar();
-            hideNativeUiControls();
-
-            // Uncomment this for periodic callback
-            if (enableFullscreenService) {
-                fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
-            }
-        }
-    };
-
-    private void startFullscreenService() {
-        enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Event.MINIMUM_HOLD_DURATION);
-    }
-
-    public void stopFullscreenService() {
-        enableFullscreenService = false;
-    }
-
-    /**
-     * References:
-     * - http://stackoverflow.com/questions/9926767/is-there-a-way-to-hide-the-system-navigation-bar-in-android-ics
-     */
-    private void hideNativeUiControls() {
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_IMMERSIVE);
-    }
-    // </FULLSCREEN_SERVICE>
-
-    // Create the Handler object. This will be run on the main thread by default.
-    private Handler messagingThreadHandler = new Handler();
-
-    // Define the code block to be executed
-    private Runnable messaingThread = new Runnable() {
-        @Override
-        public void run() {
-            // Action the outgoing messages
-            clay.update();
-
-            // Repeat this the same runnable code block again another 2 seconds
-            messagingThreadHandler.postDelayed(messaingThread, MESSAGE_SEND_FREQUENCY);
-        }
-    };
-
-    @Override
-    public void setClay(Clay clay) {
-        this.clay = clay;
-    }
-
-    @Override
-    public Clay getClay() {
-        return this.clay;
-    }
-
-    // TODO: Rename to something else and make a getPlatform() function specific to the
-    // TODO: (cont'd) display interface.
-    public static Application getView() {
-        return Application.applicationView;
-    }
-
-    public PlatformRenderSurface getPlatformRenderSurface() {
-        return this.platformRenderSurface;
-    }
-
-    // TODO: Delete!
-    public double getFramesPerSecond() {
-        return getPlatformRenderSurface().getPlatformRenderer().getFramesPerSecond();
-    }
-
-    public SpeechOutput getSpeechOutput() {
-        return this.speechOutput;
-    }
-
-    public ToneOutput getToneOutput() {
-        return this.toneOutput;
-    }
-
-    public OrientationInput getOrientationInput() {
-        return this.orientationInput;
     }
 
     @Override
@@ -967,5 +342,113 @@ public class Application extends FragmentActivity implements PlatformInterface {
         return super.dispatchKeyEvent(keyEvent);
     }
 
-    ;
+    //----------------------------------------------------------------------------------------------
+
+    public static Context getContext() {
+        return Application.context;
+    }
+
+    // TODO: Rename to something else and make a getPlatform() function specific to the
+    // TODO: (cont'd) display interface.
+    public static Application getInstance() {
+        return Application.application;
+    }
+
+    public Widgets getWidgets() {
+        return this.widgets;
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    // <FULLSCREEN_SERVICE>
+    private boolean enableFullscreenService = false;
+
+    private void startFullscreenService() {
+        enableFullscreenService = true;
+        final Handler fullscreenServiceHandler = new Handler();
+        fullscreenServiceHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do what you need to do.
+                // e.g., foobar();
+                hidePlatformUi();
+
+                // Uncomment this for periodic callback
+                if (enableFullscreenService) {
+                    fullscreenServiceHandler.postDelayed(this, Settings.FULLSCREEN_SERVICE_PERIOD);
+                }
+            }
+        }, Event.MINIMUM_HOLD_DURATION);
+    }
+
+    public void stopFullscreenService() {
+        enableFullscreenService = false;
+    }
+
+    /**
+     * References:
+     * - http://stackoverflow.com/questions/9926767/is-there-a-way-to-hide-the-system-navigation-bar-in-android-ics
+     */
+    private void hidePlatformUi() {
+        View decorView = getWindow().getDecorView();
+        //decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_IMMERSIVE);
+//        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+    // </FULLSCREEN_SERVICE>
+
+
+//    // <MESSAGING_THREAD>
+//    // Create the Handler object. This will be run on the main thread by default.
+//    public void startMessagingService() {
+//        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
+//        final Handler messagingThreadHandler = new Handler();
+//        messagingThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                // Action the outgoing messages
+//                clay.update();
+//
+//                // Repeat this the same runnable code block again another 2 seconds
+//                messagingThreadHandler.postDelayed(this, Settings.MESSAGE_SEND_FREQUENCY);
+//            }
+//        });
+//    }
+//    // </MESSAGING_THREAD>
+
+    // <PLATFORM_THREAD_ADAPTER>
+    /*
+    public abstract class PlatformThread {
+        long delay = 1000L;
+
+        public abstract void execute();
+    }
+
+    private List<PlatformThread> platformThreads = new ArrayList<>(); // TODO: Add to manager.
+
+    public void addPlatformThread(final PlatformThread platformThread) {
+        // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                // Execute thread code
+                platformThread.execute();
+
+                // Repeat this the same runnable code block again another 2 seconds
+                handler.postDelayed(this, platformThread.delay);
+            }
+        });
+    }
+    */
+    // </PLATFORM_THREAD_ADAPTER>
 }
