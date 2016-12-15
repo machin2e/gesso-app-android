@@ -108,7 +108,7 @@ public class Group<E> implements List<E> {
             @Override
             public boolean filter(Entity entity, Boolean data) {
                 Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+                if (visibility != null && visibility.visible == Visible.VISIBLE) {
                     return true;
                 } else {
                     return false;
@@ -181,7 +181,7 @@ public class Group<E> implements List<E> {
             public Entity map(Entity entity, Visible visible) {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null) {
-                    visibility.setVisible(visible);
+                    visibility.visible = visible;
                 }
                 return null;
             }

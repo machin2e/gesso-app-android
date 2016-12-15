@@ -307,7 +307,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             // Draw a gray line from the Host's start position and the destination, under it, to show animation path for moving entities.
 
             Visibility visibility = entity.getComponent(Visibility.class);
-            if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+            if (visibility != null && visibility.visible == Visible.VISIBLE) {
 //                Group<Entity> shapes = Model.getPrimitives(entity);
 //                for (int j = 0; j < shapes.size(); j++) {
                 drawPrimitive(entity, canvas, paint, palette);

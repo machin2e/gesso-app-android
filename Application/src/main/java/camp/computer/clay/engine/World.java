@@ -283,7 +283,7 @@ public class World {
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 
-        prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
 
         // <HACK>
         // TODO: Add to common createEntity method.

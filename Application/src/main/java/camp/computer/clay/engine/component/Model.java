@@ -46,6 +46,12 @@ public class Model extends Component {
 
     public static void addPrimitive(Entity entity, Entity primitive) {
 
+        // <REFACTOR>
+        // Set Structure (for managing hierarchical state, such as visibility)
+//        primitive.getComponent(Structure.class).parentEntity = entity;
+        // </REFACTOR>
+
+        // Set TransformConstraint for relative positioning
         primitive.getComponent(TransformConstraint.class).setReferenceEntity(entity);
 
         // Add Shape entity to ModelBuilder component

@@ -92,18 +92,11 @@ public class EntityFactory {
 
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
-            port.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+            port.getComponent(Visibility.class).visible = Visible.INVISIBLE;
             // </HACK>
 
             Portable.addPort(host, port);
         }
-
-//        // <GEOMETRY_LOADER>
-//        // Load geometry from file into ModelBuilder Component
-//        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
-//        ModelBuilder modelBuilder = ModelBuilder.openFile("Model_Host_Clay-v7.1.0-beta.json");
-//        modelBuilder.getModelComponent(host);
-//        // </GEOMETRY_LOADER>
 
         // <DELETE>
         for (int i = 0; i < modelBuilder.getShapes().size(); i++) {
@@ -125,7 +118,6 @@ public class EntityFactory {
             port.addComponent(new TransformConstraint());
             port.getComponent(TransformConstraint.class).setReferenceEntity(host);
         }
-
 
         // Relative Position Port Images
         Portable.getPort(host, 0).getComponent(TransformConstraint.class).relativeTransform.set(-19.0, 40.0);
@@ -174,7 +166,7 @@ public class EntityFactory {
                     extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
 
                     // Show the prototype Extension
-                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                    extensionPrototype.getComponent(Visibility.class).visible = Visible.VISIBLE;
                 }
             }
         });
@@ -182,17 +174,6 @@ public class EntityFactory {
         world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(final Event event) {
-
-//                // <REFACTOR>
-//                List<Long> boundaryUids = new ArrayList<>(host.getComponent(Boundary.class).boundaries.keySet());
-//                for (int j = 0; j < boundaryUids.size(); j++) {
-//                    ArrayList<Transform> boundaryVertices = host.getComponent(Boundary.class).boundaries.get(boundaryUids.get(j));
-//                    if (Geometry.contains(boundaryVertices, event.getPosition())) {
-//                        // TODO: Make function getBoundaryTag(shapeUid) that returns tag string for comparison in EventResponders (for touch interaction)
-////                        Log.v("BOUNDARY_CHECK", "Clicked in boundary: " + host.getComponent(Model.class).assetReference.getShape(boundaryUids.get(j)).getTag());
-//                    }
-//                }
-//                // </REFACTOR>
 
                 if (event.getTarget() != host) {
                     return;
@@ -221,7 +202,7 @@ public class EntityFactory {
                         Path.getPorts(path).setVisibility(Visible.VISIBLE);
 
                         // Show Path connection
-                        path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        path.getComponent(Visibility.class).visible = Visible.VISIBLE;
                     }
                 }
 
@@ -239,10 +220,10 @@ public class EntityFactory {
 
                 // Check if connecting to a Extension
                 Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-                if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
+                if (prototypeExtension.getComponent(Visibility.class).visible == Visible.VISIBLE) {
 
                     Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                    extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
 
                     // Get cached extension configurations (and retrieve additional from Internet2 store)
                     List<Configuration> configurations = world.cache.getObjects(Configuration.class);
@@ -534,12 +515,12 @@ public class EntityFactory {
                         // Show Ports
                         Entity sourcePort = Path.getSourcePort(path);
                         Entity targetPort = Path.getTargetPort(path);
-                        sourcePort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
-                        targetPort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        sourcePort.getComponent(Visibility.class).visible = Visible.VISIBLE;
+                        targetPort.getComponent(Visibility.class).visible = Visible.VISIBLE;
 
 
                         // Show Path
-                        path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        path.getComponent(Visibility.class).visible = Visible.VISIBLE;
                     }
                 }
                 // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getModels().setVisibility(Visible.VISIBLE);
@@ -766,7 +747,7 @@ public class EntityFactory {
                     // Update position of prototype Path and Extension
                     Entity extensionPrototype = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     if (isCreateExtensionAction) {
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        extensionPrototype.getComponent(Visibility.class).visible = Visible.VISIBLE;
 
                         // Set Event Angle (angle from first Event to current Event)
                         double eventAngle = camp.computer.clay.util.Geometry.getAngle(
@@ -777,7 +758,7 @@ public class EntityFactory {
                         extensionPrototype.getComponent(Transform.class).set(event.getPosition());
                         extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
                     } else {
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                        extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
                     }
 
                     // Ports of nearby Hosts and Extensions
@@ -1043,7 +1024,7 @@ public class EntityFactory {
                     // If prototype Extension is visible, create Extension
 //                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
                     Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
+                    if (prototypeExtension.getComponent(Visibility.class).visible == Visible.VISIBLE) {
 
                         Log.v("handlePathEvent", "creating extension");
 
@@ -1051,7 +1032,7 @@ public class EntityFactory {
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
 //                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                         Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                        extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
 
 //                    Entity hostPort = event.getFirstEvent().getTargetPort();
                         Entity hostPort = Path.getSourcePort(path);
@@ -1317,6 +1298,7 @@ public class EntityFactory {
         shape.addComponent(new Label());
         shape.addComponent(new Primitive()); // Unique to Shape Entity
         shape.addComponent(new Transform());
+        shape.addComponent(new Structure());
         shape.addComponent(new Physics());
         shape.addComponent(new Style());
         shape.addComponent(new Boundary());
