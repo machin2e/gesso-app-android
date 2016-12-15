@@ -32,11 +32,9 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Primitive;
-import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.FilterStrategy;
-import camp.computer.clay.engine.component.util.Signal;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
@@ -308,52 +306,28 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
 
-            if (entity.hasComponent(Path.class)) {
+            // Draw a gray line from the Host's start position and the destination, under it, to show animation path for moving entities.
 
-                // <REFACTOR>
-                // TODO: Make the rendering state/configuration automatic... enable or disable geometry sets in the image?
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    if (entity.getComponent(Model.class).meshIndex == 1) {
-                        drawEditablePath(entity, canvas, paint, palette);
-                    } else if (entity.getComponent(Model.class).meshIndex == 0) {
-                        if (Path.getMode(entity) == Signal.Mode.ELECTRONIC) {
-                            drawOverviewPath(entity, canvas, paint, palette);
-                        }
-                    }
+            Visibility visibility = entity.getComponent(Visibility.class);
+            if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+                Group<Entity> shapes = Model.getPrimitives(entity);
+                for (int j = 0; j < shapes.size(); j++) {
+                    drawShape(shapes.get(j), canvas, paint, palette);
                 }
-                // </REFACTOR>
-
             }
-            // <REFACTOR>
-            // This was added so Prototype Extension/Path would draw without Extension/Path components
-            else if (entity.hasComponent(Model.class)) {
 
-                // Draw a gray line from the Host's start position and the destination, under it.
-
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    Group<Entity> shapes = Model.getPrimitives(entity);
-                    canvas.save();
-                    for (int j = 0; j < shapes.size(); j++) {
-                        drawShape(shapes.get(j), canvas, paint, palette);
-                    }
-                    canvas.restore();
+            // <DRAW_BOUNDARY>
+            if (entity.hasComponent(Boundary.class)) {
+                ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
+                for (int j = 0; j < boundaryVertices.size(); j++) {
+                    ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(5.0f);
+                    paint.setColor(Color.CYAN);
+                    drawPolygon(boundaryVertz, canvas, paint, palette);
                 }
-
-                if (entity.hasComponent(Boundary.class)) {
-                    ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
-                    for (int j = 0; j < boundaryVertices.size(); j++) {
-                        ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
-                        paint.setStyle(Paint.Style.STROKE);
-                        paint.setStrokeWidth(5.0f);
-                        paint.setColor(Color.CYAN);
-                        drawPolygon(boundaryVertz, canvas, paint, palette);
-                    }
-                }
-
             }
-            // </REFACTOR>
+            // </DRAW_BOUNDARY>
         }
     }
 
@@ -784,114 +758,11 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         // </DISPLAY_SURFACE_AXES>
     }
 
-    // <REFACTOR>
-    // TODO: 11/16/2016 Optimize! Big and slow! Should be fast!
-    public void drawEditablePath(Entity path, Canvas canvas, Paint paint, Palette palette) {
-
-        Entity sourcePort = Path.getSourcePort(path);
-        Entity sourcePortShapeE = Model.getPrimitive(sourcePort, "Port");
-        Shape hostSourcePortShape = sourcePortShapeE.getComponent(Primitive.class).shape;
-
-        boolean isSingletonPath = (Path.getTargetPort(path) == null);
-
-        if (isSingletonPath) {
-
-            // Singleton Path
-
-            Entity sourcePortPathShape = Model.getPrimitive(path, "Source Port");
-            Shape sourcePortShape = sourcePortPathShape.getComponent(Primitive.class).shape;
-
-            // Color. Update color of mPort shape based on its type.
-            Signal.Type pathType = Path.getType(path);
-            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-            sourcePortShape.setColor(pathColor);
-
-            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment pathShape = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
-            pathShape.setOutlineThickness(15.0);
-            pathShape.setOutlineColor(sourcePortShape.getColor());
-
-            // <REFACTOR>
-            palette.outlineThickness = World.PATH_OVERVIEW_THICKNESS;
-            palette.outlineColor = pathColor;
-            // </REFACTOR>
-
-            // Draw primitives in Path
-            drawShape(Model.getPrimitive(path, "Path"), canvas, paint, palette); // drawSegment(segment, palette);
-            drawShape(sourcePortPathShape, canvas, paint, palette); // drawCircle((Circle) sourcePortShape, palette); // drawShape(sourcePortShape, palette);
-
-        } else {
-
-            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
-            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
-
-            sourcePortShape.setColor(hostSourcePortShape.getColor());
-
-            // Update color of Port shape based on its type
-            Signal.Type pathType = Path.getType(path);
-            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-            sourcePortShape.setColor(pathColor);
-            targetPortShape.setColor(pathColor);
-
-            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-
-            palette.outlineColor = sourcePortShape.getColor();
-            palette.outlineThickness = World.PATH_EDITVIEW_THICKNESS;
-
-            // Draw primitives in Path
-            drawSegment(Model.getPrimitive(path, "Source Port").getComponent(Transform.class), Model.getPrimitive(path, "Target Port").getComponent(Transform.class), canvas, paint, palette);
-            drawShape(Model.getPrimitive(path, "Source Port"), canvas, paint, palette);
-            drawShape(Model.getPrimitive(path, "Target Port"), canvas, paint, palette);
-        }
-    }
-
-    public void drawOverviewPath(Entity path, Canvas canvas, Paint paint, Palette palette) {
-
-        // Get Host and Extension Ports
-        Entity hostPort = Path.getSourcePort(path);
-        Entity extensionPort = Path.getTargetPort(path);
-
-        boolean isSingletonPath = (Path.getTargetPort(path) == null);
-
-        if (isSingletonPath) {
-
-            // TODO: Singleton Path
-
-        } else {
-
-            // Draw the connection between the Host's Port and the Extension's Port
-            Entity host = hostPort.getComponent(Structure.class).parentEntity;
-            Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
-
-            Group<Entity> pinContactPoints = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
-            Group<Entity> extensionPinContactPoints = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
-
-            if (pinContactPoints.size() > Port.getIndex(hostPort)
-                    && extensionPinContactPoints.size() > Port.getIndex(extensionPort)) {
-
-                // Draw connection between Ports
-                // <REFACTOR>
-                // TODO: Cache_OLD the integer color code.
-                paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
-                // </REFACTOR>
-                paint.setStrokeWidth(10.0f);
-
-                // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-                Entity shapeEntity = Model.getPrimitive(path, "Path");
-                Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
-                segment.setOutlineThickness(10.0);
-                segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
-
-                palette.outlineThickness = 10.0;
-                palette.outlineColor = camp.computer.clay.util.Color.getColor(Port.getType(extensionPort));
-
-                drawShape(shapeEntity, canvas, paint, palette);
-            }
-        }
-    }
-    // </REFACTOR>
-
     public void drawShape(Entity primitive, Canvas canvas, Paint paint, Palette palette) {
+
+        if (primitive.getComponent(Visibility.class).visible == Visible.INVISIBLE) {
+            return;
+        }
 
         // <HACK>
         Shape shape = primitive.getComponent(Primitive.class).shape;
@@ -901,6 +772,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         palette.outlineColor = shape.getOutlineColor();
         palette.outlineThickness = shape.outlineThickness;
 
+        canvas.save();
         // TODO: drawShape(shape, palette);
         if (shape.getClass() == Segment.class) {
             Segment segment = (Segment) shape;
@@ -918,6 +790,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             Text text = (Text) shape;
             drawText(primitive.getComponent(Transform.class), text.getText(), text.size, canvas, paint, palette);
         }
+        canvas.restore();
 
         // TODO: drawPolyline
         // TODO: drawTriangle

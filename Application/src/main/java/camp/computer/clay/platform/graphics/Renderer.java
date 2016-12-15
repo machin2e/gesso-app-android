@@ -105,7 +105,7 @@ public class Renderer extends Thread {
 
                         frameCount++;
 
-                        // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK HIERARCHY!!!!!!!!!!!!! FUCK!!!!!!!!
+                        // TODO: Flatten the call hierarchy invoked in the renderer.
 
 //                        platformRenderSurface.world.update();
 

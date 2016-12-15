@@ -13,14 +13,17 @@ import camp.computer.clay.engine.component.Primitive;
 import camp.computer.clay.engine.component.Structure;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.TransformConstraint;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.FilterStrategy;
 import camp.computer.clay.engine.component.util.LayoutStrategy;
 import camp.computer.clay.engine.component.util.Signal;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
+import camp.computer.clay.lib.Geometry.Shape;
 
 public class LayoutSystem extends System {
 
@@ -61,7 +64,7 @@ public class LayoutSystem extends System {
             if (entity.hasComponent(Extension.class)) {
                 updateExtensionModelDimensions(entity);
             } else if (entity.hasComponent(Path.class)) {
-                updateModelMesh(entity);
+                generateModelMesh(entity);
             }
         }
     }
@@ -160,23 +163,46 @@ public class LayoutSystem extends System {
      * Updates the mesh in the {@code Entity}'s {@code Model} to match the selected mesh
      * (in {@code meshIndex}).
      */
-    private void updateModelMesh(Entity path) {
+    private void generateModelMesh(Entity path) {
         if (path.isActive == true) {
             if (path.getComponent(Model.class).meshIndex == 0) { // TODO: Replace magic number index
-                selectOverviewPathMesh(path);
+                loadOverviewPathMesh(path);
             } else if (path.getComponent(Model.class).meshIndex == 1) { // TODO: Replace magic number index
-                selectEditablePathMesh(path);
+                loadEditablePathMesh(path);
             }
         }
     }
 
-    private void selectOverviewPathMesh(Entity path) {
+    // previously selectOverviewPathMesh(...)
+    private void loadOverviewPathMesh(Entity path) {
 
         if (Path.getMode(path) == Signal.Mode.ELECTRONIC) {
 
             boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
-            if (!isSingletonPath) {
+            if (isSingletonPath) {
+
+                // <HACK>
+                // TODO: Actually update the reference to a different Model asset in the Model component
+                // Visibility
+//                if (Model.getPrimitive(path, "Source Port") != null) {
+//                    Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                }
+//                if (Model.getPrimitive(path, "Target Port") != null) {
+//                    Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                }
+                // </HACK>
+
+                if (Path.getState(path) != Component.State.EDITING) {
+                    // <HACK>
+                    // TODO: Actually update the reference to a different Model asset in the Model component
+                    // Visibility
+                    Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    // </HACK>
+                }
+
+            } else {
 
                 // Get Host and Extension Ports
                 Entity hostPort = Path.getSourcePort(path);
@@ -187,6 +213,13 @@ public class LayoutSystem extends System {
                 Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
                 int extensionPortIndex = Port.getIndex(extensionPort);
 
+                // <HACK>
+                // TODO: Actually update the reference to a different Model asset in the Model component
+                // Visibility
+                Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                // </HACK>
+
                 // <REFACTOR>
                 Transform hostContactTransform = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$").get(hostPortIndex).getComponent(Transform.class); // host.getComponent(Portable.class).headerContactPrimitives.get(hostPortIndex).getComponent(Transform.class);
                 Transform extensionContactTransform = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$").get(extensionPortIndex).getComponent(Transform.class); // extension.getComponent(Portable.class).headerContactPrimitives.get(extensionPortIndex).getComponent(Transform.class);
@@ -196,11 +229,34 @@ public class LayoutSystem extends System {
                 Segment pathShape = (Segment) pathPrimitive.getComponent(Primitive.class).shape;
                 pathShape.setSource(hostContactTransform);
                 pathShape.setTarget(extensionContactTransform);
+
+                // <STYLE>
+                // Draw the connection between the Host's Port and the Extension's Port
+//                Entity host = hostPort.getComponent(Structure.class).parentEntity;
+//                Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
+
+                Group<Entity> pinContactPoints = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
+                Group<Entity> extensionPinContactPoints = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+
+                if (pinContactPoints.size() > Port.getIndex(hostPort)
+                        && extensionPinContactPoints.size() > Port.getIndex(extensionPort)) {
+
+                    // <STYLE>
+                    // Draw connection between Ports
+                    // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+                    Entity shapeEntity = Model.getPrimitive(path, "Path");
+                    Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
+                    segment.setOutlineThickness(10.0);
+                    segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
+                    // </STYLE>
+                }
+                // </STYLE>
             }
         }
     }
 
-    private void selectEditablePathMesh(Entity path) {
+    // previously selectEditablePathMesh(...)
+    private void loadEditablePathMesh(Entity path) {
 
         boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
@@ -210,10 +266,40 @@ public class LayoutSystem extends System {
             Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
             Entity targetPortPrimitive = Model.getPrimitive(Path.getTargetPort(path), "Port");
 
+            // Automatically set source and target positions of Path when not being edited manually
             if (Path.getState(path) != Component.State.EDITING) {
                 Model.getPrimitive(path, "Source Port").getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
                 Model.getPrimitive(path, "Target Port").getComponent(Transform.class).set(targetPortPrimitive.getComponent(Transform.class));
             }
+
+            // Update path segment shape
+            Segment pathSegment = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            pathSegment.set(
+                    Model.getPrimitive(path, "Source Port").getComponent(Transform.class),
+                    Model.getPrimitive(path, "Target Port").getComponent(Transform.class)
+            );
+
+            // <HACK>
+            // TODO: Actually update the reference to a different Model asset in the Model component
+            // Visibility
+            Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+            Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+            // </HACK>
+
+            // <STYLE>
+            Shape pathShape = Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
+            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
+
+            // Update color of Port shape based on its type
+            Signal.Type pathType = Path.getType(path);
+            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
+            sourcePortShape.setColor(pathColor);
+            targetPortShape.setColor(pathColor);
+
+            pathShape.setOutlineColor(pathColor);
+            pathShape.setOutlineThickness(World.PATH_EDITVIEW_THICKNESS);
+            // </STYLE>
 
         } else {
 
@@ -232,6 +318,39 @@ public class LayoutSystem extends System {
             if (Path.getState(path) != Component.State.EDITING) {
                 pathShape.setTarget(sourcePortPathPrimitive.getComponent(Transform.class));
             }
+
+            if (Path.getState(path) != Component.State.EDITING) {
+                // <HACK>
+                // TODO: Actually update the reference to a different Model asset in the Model component
+                // Visibility
+                Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+//                Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                // </HACK>
+            }
+
+//            if (Path.getState(path) != Component.State.EDITING) {
+//                // <HACK>
+//                // TODO: Actually update the reference to a different Model asset in the Model component
+//                // Visibility
+//                Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+////                Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                // </HACK>
+//            }
+
+            // <STYLE>
+            // Shape pathShape = Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
+            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
+
+            // Color. Update color of mPort shape based on its type.
+            Signal.Type pathType = Path.getType(path);
+            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
+            sourcePortShape.setColor(pathColor);
+
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+            pathShape.setOutlineThickness(World.PATH_OVERVIEW_THICKNESS);
+            pathShape.setOutlineColor(sourcePortShape.getColor());
+            // </STYLE>
         }
     }
 

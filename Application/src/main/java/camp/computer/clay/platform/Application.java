@@ -175,8 +175,7 @@ public class Application extends FragmentActivity {
         */
 
         // <TIMER_THREAD>
-        Engine.getInstance(); // HACK. Added this to prevent recursive call to Engine constructor in getInstance()
-//        Engine.getInstance().setup();
+        Engine.getInstance();
         // </TIMER_THREAD>
     }
 
