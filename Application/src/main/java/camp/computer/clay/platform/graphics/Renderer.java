@@ -61,7 +61,7 @@ public class Renderer extends Thread {
         // <REFACTOR>
         if (entities == null && World.getInstance() != null) {
             entities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Model.class), new SorterStrategy(Group.Sorters.layerSorter));
-            cameraEntities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class), null);
+            cameraEntities = World.getInstance().entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class));
         }
 
         if (entities == null) {

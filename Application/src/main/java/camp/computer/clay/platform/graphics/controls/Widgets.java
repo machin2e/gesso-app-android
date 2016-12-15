@@ -2701,7 +2701,7 @@ public class Widgets {
 //            titleText.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
-//                    if (v.getLabelUid() == titleText.getLabelUid()) {
+//                    if (v.getTagUid() == titleText.getTagUid()) {
 //
 //                        // Move the cursor to the end of the line
 //                        titleText.setSelection(titleText.getText().length());

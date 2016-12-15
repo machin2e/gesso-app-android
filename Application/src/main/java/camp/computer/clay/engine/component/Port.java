@@ -24,7 +24,7 @@ public class Port extends Component {
      * offset by a value of one. (Note that this may changed to be one-indexed.)
      * <p>
      * The {@code Port}'s {@code index} can be used complementary to the {@code Port}'s
-     * {@code label} to refer to a specific {@code Port}.
+     * {@code tag} to refer to a specific {@code Port}.
      */
     private int index = 0;
 

@@ -33,14 +33,12 @@ public class CameraSystem extends System {
 
     private void setup() {
         cameraEntities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class)
         );
-//        portEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Port.class);
-//        pathAndPortEntities = world.entityManager.subscribe(Group.Filters.filterWithComponent, Path.class, Port.class);
+//        portEntities = world.entityManager.registerResponse(Group.Filters.filterWithComponent, Port.class);
+//        pathAndPortEntities = world.entityManager.registerResponse(Group.Filters.filterWithComponent, Path.class, Port.class);
         hostAndExtensionEntities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponent, Host.class, Extension.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponent, Host.class, Extension.class)
         );
     }
 

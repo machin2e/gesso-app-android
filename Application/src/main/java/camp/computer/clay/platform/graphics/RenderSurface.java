@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Engine;
@@ -340,6 +341,17 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                     canvas.restore();
                 }
 
+                if (entity.hasComponent(Boundary.class)) {
+                    ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
+                    for (int j = 0; j < boundaryVertices.size(); j++) {
+                        ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
+                        paint.setStyle(Paint.Style.STROKE);
+                        paint.setStrokeWidth(5.0f);
+                        paint.setColor(Color.CYAN);
+                        drawPolygon(boundaryVertz, canvas, paint, palette);
+                    }
+                }
+
             }
             // </REFACTOR>
         }
@@ -371,15 +383,15 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawOverlay(Canvas canvas, Paint paint) {
 
         if (!isValid) {
-            this.entities = world.entityManager.subscribe(null, null);
-            hostEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Host.class), null);
-            portEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Port.class), null);
-            extensionEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class), null);
-            pathEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Path.class), null);
-            primitiveEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Primitive.class), null);
-            cameraEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class), null);
+            this.entities = world.entityManager.subscribe();
+            hostEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Host.class));
+            portEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Port.class));
+            extensionEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class));
+            pathEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Path.class));
+            primitiveEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Primitive.class));
+            cameraEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class));
 
-            boundaryEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class, Boundary.class), null);
+            boundaryEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class, Boundary.class));
 
             isValid = true;
         }
@@ -592,14 +604,14 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
 
         if (!isValid) {
-            this.entities = world.entityManager.subscribe(null, null);
-            hostEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Host.class), null);
-            portEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Port.class), null);
-            extensionEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class), null);
-            pathEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Path.class), null);
-            cameraEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class), null);
+            this.entities = world.entityManager.subscribe();
+            hostEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Host.class));
+            portEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Port.class));
+            extensionEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class));
+            pathEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Path.class));
+            cameraEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Camera.class));
 
-            boundaryEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class, Boundary.class), null);
+            boundaryEntities = world.entityManager.subscribe(new FilterStrategy(Group.Filters.filterWithComponents, Extension.class, Boundary.class));
 
             isValid = true;
         }

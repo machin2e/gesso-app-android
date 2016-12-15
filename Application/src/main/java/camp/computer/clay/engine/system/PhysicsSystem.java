@@ -19,8 +19,7 @@ public class PhysicsSystem extends System {
 
     private void setup() {
         entities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Physics.class, Transform.class)
         );
     }
 

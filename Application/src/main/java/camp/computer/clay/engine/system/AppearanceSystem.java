@@ -28,10 +28,9 @@ public class AppearanceSystem extends System {
     private void setup() {
         // Setup subscriptions for needed Entity groups.
         entities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class, Style.class, Transform.class, Model.class)
         );
-        // TODO: (if needed) entityManager = world.entityManager.subscribe(Group.Filters.filterWithComponents, Style.class, Transform.class, ModelBuilder.class);
+        // TODO: (if needed) entityManager = world.entityManager.registerResponse(Group.Filters.filterWithComponents, Style.class, Transform.class, ModelBuilder.class);
     }
 
     /**

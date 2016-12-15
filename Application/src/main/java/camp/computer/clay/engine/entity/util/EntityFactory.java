@@ -2,8 +2,10 @@ package camp.computer.clay.engine.entity.util;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.Engine;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -41,6 +43,7 @@ import camp.computer.clay.lib.Geometry.Circle;
 import camp.computer.clay.lib.Geometry.ModelBuilder;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
+import camp.computer.clay.lib.Geometry.Shape;
 import camp.computer.clay.lib.Geometry.Text;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.Widgets;
@@ -69,11 +72,16 @@ public class EntityFactory {
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
-//        // <FUN>
-//        host.getComponent(Physics.class).velocity.x = Random.getRandomGenerator().nextFloat() * 0.01;
-//        host.getComponent(Physics.class).velocity.y = Random.getRandomGenerator().nextFloat() * 0.01;
-//        host.getComponent(Physics.class).velocity.z = Random.getRandomGenerator().nextFloat() * 0.01;
-//        // </FUN>
+        // <GEOMETRY_LOADER>
+        // Load geometry from file into ModelBuilder Component
+        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
+        ModelBuilder modelBuilder = ModelBuilder.openFile("Model_Host_Clay-v7.1.0-beta.json");
+        long modelAssetUid = Engine.getInstance().world.cache.add(modelBuilder); // TODO: Replace with AssetManager?
+        ModelBuilder modelAsset = (ModelBuilder) Engine.getInstance().world.cache.get(modelAssetUid);
+        Log.v("CACHE", "cached model asset shape count: " + modelAsset.getShapes().size());
+        modelBuilder.getModelComponent(host);
+        host.getComponent(Model.class).assetUid = modelAssetUid;
+        // </GEOMETRY_LOADER>
 
         // Portable Component (ModelBuilder Component depends on this)
         final int PORT_COUNT = 12;
@@ -91,13 +99,26 @@ public class EntityFactory {
             Portable.addPort(host, port);
         }
 
-        // <GEOMETRY_LOADER>
-        // Load geometry from file into ModelBuilder Component
-        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
-        ModelBuilder modelBuilder = ModelBuilder.openFile("Model_Host_Clay-v7.1.0-beta.json");
-        long meshUid = modelBuilder.getMeshUid().get(0);
-        modelBuilder.getModelComponent(meshUid, host);
-        // </GEOMETRY_LOADER>
+//        // <GEOMETRY_LOADER>
+//        // Load geometry from file into ModelBuilder Component
+//        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
+//        ModelBuilder modelBuilder = ModelBuilder.openFile("Model_Host_Clay-v7.1.0-beta.json");
+//        modelBuilder.getModelComponent(host);
+//        // </GEOMETRY_LOADER>
+
+        // <DELETE>
+        for (int i = 0; i < modelBuilder.getShapes().size(); i++) {
+            Shape shape = modelBuilder.getShapes().get(i);
+            Log.v("SHAPES", "" + shape.getTag());
+        }
+
+        for (int i = 0; i < modelBuilder.getShapes().size(); i++) {
+            Shape shape = modelBuilder.getShapes().get(i);
+            if (shape.isBoundary) {
+                Log.v("SHAPES", "boundary: " + shape.getTag());
+            }
+        }
+        // </DELETE>
 
         // Add relative layout constraints
         for (int i = 0; i < Portable.getPorts(host).size(); i++) {
@@ -128,7 +149,7 @@ public class EntityFactory {
         }
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -159,9 +180,20 @@ public class EntityFactory {
             }
         });
 
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(final Event event) {
+
+                // <REFACTOR>
+                List<Long> boundaryUids = new ArrayList<>(host.getComponent(Boundary.class).boundaries.keySet());
+                for (int j = 0; j < boundaryUids.size(); j++) {
+                    ArrayList<Transform> boundaryVertices = host.getComponent(Boundary.class).boundaries.get(boundaryUids.get(j));
+                    if (Geometry.contains(boundaryVertices, event.getPosition())) {
+                        // TODO: Make function getBoundaryTag(shapeUid) that returns tag string for comparison in EventResponders (for touch interaction)
+//                        Log.v("BOUNDARY_CHECK", "Clicked in boundary: " + host.getComponent(Model.class).assetReference.getShape(boundaryUids.get(j)).getTag());
+                    }
+                }
+                // </REFACTOR>
 
                 if (event.getTarget() != host) {
                     return;
@@ -259,7 +291,7 @@ public class EntityFactory {
         workspace.addComponent(new Workspace()); // Unique to Workspace
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -275,14 +307,12 @@ public class EntityFactory {
 
                     if (portEntities == null) {
                         portEntities = world.entityManager.subscribe(
-                                new FilterStrategy(Group.Filters.filterWithComponent, Port.class),
-                                null
+                                new FilterStrategy(Group.Filters.filterWithComponent, Port.class)
                         );
                     }
                     if (pathAndPortEntities == null) {
                         pathAndPortEntities = world.entityManager.subscribe(
-                                new FilterStrategy(Group.Filters.filterWithComponent, Path.class, Port.class),
-                                null
+                                new FilterStrategy(Group.Filters.filterWithComponent, Path.class, Port.class)
                         );
                     }
                     // </HACK>
@@ -346,7 +376,7 @@ public class EntityFactory {
 
             Entity port = world.createEntity(Port.class);
 
-//            Label.setLabel(port, "Port " + (j + 1));
+//            Label.setTag(port, "Port " + (j + 1));
             Port.setIndex(port, j);
             Portable.addPort(extension, port);
         }
@@ -368,7 +398,7 @@ public class EntityFactory {
 //        int randomHeight = Random.generateRandomInteger(125, 200);
 //        rectangle.setHeight(randomHeight); // was 200
 //        rectangle.setWidth(Random.generateRandomInteger(125, 200)); // was 200
-//        rectangle.setLabel("Board");
+//        rectangle.setTag("Board");
 //        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
 //        rectangle.setOutlineThickness(0);
 //        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
@@ -378,7 +408,7 @@ public class EntityFactory {
 //
 //        // Headers
 //        rectangle = new Rectangle(50, 14);
-//        rectangle.setLabel("Header");
+//        rectangle.setTag("Header");
 //        rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
 //        rectangle.setRotation(0);
 //        rectangle.setColor("#3b3b3b");
@@ -400,7 +430,7 @@ public class EntityFactory {
         int randomHeight = Random.generateRandomInteger(50, 200); // was 125, 200
         rectangle.setHeight(randomHeight); // was 200
         rectangle.setWidth(Random.generateRandomInteger(50, 200)); // was 125, 200
-//        rectangle.setLabel("Board");
+//        rectangle.setTag("Board");
         rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
@@ -413,7 +443,7 @@ public class EntityFactory {
 
         // Headers
         rectangle = new Rectangle(50, 14);
-        // rectangle.setLabel("Header");
+        // rectangle.setTag("Header");
         // rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
@@ -431,7 +461,7 @@ public class EntityFactory {
         // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("HOLD", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("HOLD", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -443,7 +473,7 @@ public class EntityFactory {
             }
         });
 
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -627,7 +657,7 @@ public class EntityFactory {
         // Board
         Segment segment = new Segment();
         segment.setOutlineThickness(2.0);
-        segment.setLabel("Path");
+        segment.setTag("Path");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
 //        imageBuilder.addShape(segment);
@@ -640,7 +670,7 @@ public class EntityFactory {
 
         Circle circle = new Circle();
         circle.setRadius(50.0);
-        circle.setLabel("Source Port"); // TODO: Give proper name...
+        circle.setTag("Source Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
@@ -658,7 +688,7 @@ public class EntityFactory {
 
         circle = new Circle();
         circle.setRadius(50.0);
-        circle.setLabel("Target Port"); // TODO: Give proper name...
+        circle.setTag("Target Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
@@ -678,7 +708,7 @@ public class EntityFactory {
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -809,7 +839,7 @@ public class EntityFactory {
             }
         });
 
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1142,7 +1172,7 @@ public class EntityFactory {
         // Create Shapes for ModelBuilder
         Circle circle = new Circle();
         circle.setRadius(50.0);
-        circle.setLabel("Port"); // TODO: Give proper name...
+        circle.setTag("Port"); // TODO: Give proper name...
         circle.setColor("#ffe7e7e7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
 //        circle.isBoundary = true;
@@ -1158,7 +1188,7 @@ public class EntityFactory {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1209,7 +1239,7 @@ public class EntityFactory {
         camera.addComponent(new Physics());
 
         // <EVENT_HANDLERS>
-        world.eventManager.subscribe("MOVE", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("MOVE", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1231,7 +1261,7 @@ public class EntityFactory {
             }
         });
 
-        world.eventManager.subscribe("UNSELECT", new EventResponse<Entity>() {
+        world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(Event event) {
 

@@ -21,7 +21,6 @@ import camp.computer.clay.engine.component.util.Mapper;
 import camp.computer.clay.engine.component.util.Sorter;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Shape;
 
 public class Group<E> implements List<E> {
@@ -33,7 +32,7 @@ public class Group<E> implements List<E> {
     // <GROUP>
     private List<E> elements = new ArrayList<>();
 
-    // Used by subscribe to filter elements that will be added to it.
+    // Used by registerResponse to filter elements that will be added to it.
     public Filter filter = null;
     public Object data = null;
 
@@ -501,22 +500,22 @@ public class Group<E> implements List<E> {
         return boundaryVertices;
     }
 
-    // Expects Group<Entity>
-    public Rectangle getBoundingBox() {
-
-        List<Transform> imageBoundaries = new ArrayList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
-//            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
-            //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
-//            imageBoundaries.addAll(entity.getComponent(Boundary.class).boundary);
-
-            imageBoundaries.add(entity.getComponent(Transform.class));
-        }
-
-        return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
-    }
+//    // Expects Group<Entity>
+//    public Rectangle getBoundingBox() {
+//
+//        List<Transform> imageBoundaries = new ArrayList<>();
+//        for (int i = 0; i < elements.size(); i++) {
+//            Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
+//            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
+////            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
+//            //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
+////            imageBoundaries.addAll(entity.getComponent(Boundary.class).boundary);
+//
+//            imageBoundaries.add(entity.getComponent(Transform.class));
+//        }
+//
+//        return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
+//    }
     // </GROUP_LOOKUP>
 
 

@@ -22,6 +22,9 @@ public class Model extends Component {
     public List<Long> primitives;
     // </REFACTOR>
 
+    // public ModelBuilder assetReference;
+    public long assetUid = -1L;
+
     public Model() {
         super();
         setup();

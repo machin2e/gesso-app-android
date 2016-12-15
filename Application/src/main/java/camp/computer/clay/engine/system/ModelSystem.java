@@ -21,8 +21,7 @@ public class ModelSystem extends System {
 
     private void setup() {
         entities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class)
         );
     }
 

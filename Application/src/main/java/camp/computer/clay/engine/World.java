@@ -92,16 +92,15 @@ public class World {
     public List<Event> eventQueue = new ArrayList<>();
     public int nextEventIndex = 0;
 
-    public EventManager eventManager;
+    public EventManager eventManager = new EventManager(); // TODO: Move to Engine. Engine has EventManager and Cache/AssetManager.
 
-    public EntityManager entityManager;
+    public EntityManager entityManager = new EntityManager();
     // </MANAGERS>
 
     private List<System> systems = new ArrayList<>();
 
     // <TEMPORARY>
-//    public Repository repository;
-    public Cache cache;
+    public Cache cache = new Cache();
     // </TEMPORARY>
 
     public World() {
@@ -114,7 +113,8 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-        eventManager = new EventManager();
+        // <REFACTOR>
+        // TODO: Move into Engine
         eventManager.registerEvent("NONE"); // TODO: Delete!
 
         eventManager.registerEvent("CLOCK_TICK");
@@ -127,18 +127,20 @@ public class World {
         eventManager.registerEvent("CREATE_HOST");
         eventManager.registerEvent("DESTROY_HOST");
 
-        // CREATE_NOTIFICATION
+        // SET_VISIBLE
+        // SET_INVISIBLE
+        // SET_TRANSFORM
+        // CREATE_EXTENSION/DESTROY_EXTENSION
+        // CREATE_NOTIFICATION/DESTROY_EXTENSION
         // SYNTHESIZE_SPEECH
-
-        entityManager = new EntityManager();
+        // LAYOUT_UPDATED
+        // </REFACTOR>
 
         createPrototypeExtensionEntity();
 
-        // <TEMPORARY>
-        cache = new Cache();
-        // </TEMPORARY>
-
-        eventManager.subscribe("CREATE_HOST", new EventResponse() {
+        // <REFACTOR>
+        // TODO: Move to Engine
+        eventManager.registerResponse("CREATE_HOST", new EventResponse() {
             @Override
             public void execute(Event event) {
                 Log.v("EVENT_QUEUE", "CREATE_HOST");
@@ -157,15 +159,17 @@ public class World {
 //                }
             }
         });
+        // </REFACTOR>
     }
 
-    // <TODO: DELETE>
+    // <DELETE>
+    // TODO: Remove this. World should not be a singleton class.
     private static World world = null;
 
     public static World getInstance() {
         return World.world;
     }
-    // </TODO: DELETE>
+    // </DELETE>
 
     public void addSystem(System system) {
         if (!systems.contains(system)) {
@@ -260,9 +264,6 @@ public class World {
     public Entity createPrototypeExtensionEntity() {
 
         Entity prototypeExtension = new Entity();
-
-//        // prototypeExtension.addComponent(new Extension()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
-//        prototypeExtension.addComponent(new Portable());
 
         prototypeExtension.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypeExtension.addComponent(new Transform());

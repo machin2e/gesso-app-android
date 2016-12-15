@@ -22,7 +22,7 @@ public class PortConfiguration {
     public PortConfiguration(Entity portEntity) {
         setType(Port.getType(portEntity));
         setDirection(Port.getDirection(portEntity));
-        // setLabel(portEntity.getLabel());
+        // setLabel(portEntity.getTag());
     }
 
     public UUID getUuid() {

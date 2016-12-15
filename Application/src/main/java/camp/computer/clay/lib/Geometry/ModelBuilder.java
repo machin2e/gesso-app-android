@@ -45,68 +45,86 @@ import camp.computer.clay.platform.Application;
  */
 public class ModelBuilder {
 
-    // <LABEL_CACHE>
-    private static long labelUidCounter = 0;
-    private HashMap<String, Long> labels = new HashMap<>();
+    // <TAG_MANAGER>
+    // TODO: Make universal "TagManager"
+    private static long shapeCounter = 0;
 
-    public long addLabel(String label) {
-        if (!labels.containsKey(label)) {
-            labels.put(label, labelUidCounter++);
-            Log.v("MODEL_FILE_LOADER", "Indexing label \"" + label + "\" as " + labels.get(label));
+    private HashMap<String, Long> shapeTags = new HashMap<>();
+
+    private long addTag(String tag) {
+        if (!shapeTags.containsKey(tag)) {
+            shapeTags.put(tag, shapeCounter++);
+            Log.v("MODEL_FILE_LOADER", "Indexing tag \"" + tag + "\" as " + shapeTags.get(tag));
         }
-        return labels.get(label);
+        return shapeTags.get(tag);
     }
 
-    public long getLabelUid(String label) {
-        return labels.get(label);
+    public long getTagUid(String label) {
+        return shapeTags.get(label);
     }
+    // </TAG_MANAGER>
 
-    // TODO: private HashMap<Long, Shape> shapes2;
-    // </LABEL_CACHE>
+    // <HACK>
+    private List<Shape> shapes2 = new ArrayList<>();
+    // </HACK>
 
-    private static long meshUidCounter = 0;
+    private HashMap<Long, Shape> shapes = new HashMap<>();
 
-    private HashMap<Long, ArrayList<Shape>> meshes = new HashMap<>();
-//    private List<Shape> shapes = new ArrayList<>();
+    public long addShape(Shape shape) {
+        if (!shapes.containsValue(shape)) {
+            long shapeUid = shapeCounter++;
+            shapes.put(shapeUid, shape);
 
-    public void addShape(long meshUid, Shape shape) {
-//        shapes.add(shape);
-        meshes.get(meshUid).add(shape);
-    }
+            // <HACK>
+            shapes2.add(shape);
+            // </HACK>
 
-    public Shape removeShape(long meshUid, int shapeIndex) {
-//        return shapes.remove(index);
-        return meshes.get(meshUid).remove(shapeIndex);
-    }
+            String tag = shape.getTag();
+            if (!shapeTags.containsKey(tag)) {
+                shapeTags.put(tag, shapeUid);
+                Log.v("MODEL_FILE_LOADER", "Indexing tag \"" + tag + "\" as " + shapeTags.get(tag));
+            }
 
-    public List<Shape> getShapes(long meshUid) {
-//        return shapes;
-        return meshes.get(meshUid);
-    }
-
-    public List<Long> getMeshUid() {
-        return new ArrayList<>(meshes.keySet());
+            return shapeUid;
+        }
+        return -1;
     }
 
     /*
-    public Shape getPrimitive(String label) {
-        World.getInstance().lookupCount++;
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            if (shape.getLabel().equals(label)) {
-                return shape;
-            }
-        }
-        return null;
+    // TODO: Replace with removeShape(long shapeUid) and also remove its boundary (if cached).
+    public Shape removeShape(int index) {
+        return shapes.remove(index);
+    }
+    */
+
+    public List<Shape> getShapes() {
+        // <HACK>
+        return shapes2;
+        // </HACK>
+//        return new ArrayList<>(shapes.values());
     }
 
-    // TODO: <REMOVE?>
-    public List<Shape> getShapes(String... labels) {
+    public Shape getShape(long uid) {
+        return shapes.get(uid);
+    }
+
+//    public List<Shape> getBoundaryShapes() {
+//        List<Shape> boundaryShapes = new ArrayList<>();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            if (shapes.get(i).isBoundary) {
+//                boundaryShapes.add(shapes.get(i));
+//            }
+//        }
+//        return boundaryShapes;
+//    }
+
+    /*
+    public List<Shape> getShapes(String... shapeTags) {
         List<Shape> shapes = new ArrayList<>();
         for (int i = 0; i < this.shapes.size(); i++) {
-            for (int j = 0; j < labels.length; j++) {
-                Pattern pattern = Pattern.compile(labels[j]);
-                Matcher matcher = pattern.matcher(shapes.get(i).getLabel());
+            for (int j = 0; j < shapeTags.length; j++) {
+                Pattern pattern = Pattern.compile(shapeTags[j]);
+                Matcher matcher = pattern.matcher(shapes.get(i).getTag());
                 if (matcher.matches()) {
                     shapes.add(this.shapes.get(i));
                 }
@@ -114,7 +132,6 @@ public class ModelBuilder {
         }
         return shapes;
     }
-    // TODO: </REMOVE?>
     */
 
     // TODO: ModelComponent createModelComponent() --- after loading...
@@ -124,7 +141,7 @@ public class ModelBuilder {
     /**
      * File Format Specification Outline:
      * - Labels in file must be unique (cannot be re-used).
-     * - Loader constructs index of labels, group names, and assigns a unique integer ID (asset ID?) to each for faster retrieval.
+     * - Loader constructs index of shapeTags, group names, and assigns a unique integer ID (asset ID?) to each for faster retrieval.
      */
     public static ModelBuilder openFile(String filename) {
 
@@ -144,161 +161,120 @@ public class ModelBuilder {
             e.printStackTrace();
         }
 
-        // TODO: Crawl entire JSON hierarchy, extract labels, and generate UUIDs for each label in the modelBuilder.
+        // TODO: Crawl entire JSON hierarchy, extract shapeTags, and generate UUIDs for each tag in the modelBuilder.
 
         // Create JSON object from file contents for parsing content.
         try {
             JSONObject rootObject = new JSONObject(jsonString);
+
             String rootType = rootObject.getString("type");
             String rootLabel = rootObject.getString("label");
 
-            JSONArray meshesArray = rootObject.getJSONArray("meshes"); // Handle to Host
+            JSONArray geometryArray = rootObject.getJSONArray("geometry"); // Handle to array of primitives
 
-            // <REFACTOR>
-            builder.addLabel(rootLabel);
-            // </REFACTOR>
+            // <DELETE>
+            // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
+            double scaleFactor = 6.0;
+            // </DELETE>
 
-            for (int m = 0; m < meshesArray.length(); m++) {
+            for (int i = 0; i < geometryArray.length(); i++) {
+                JSONObject shape = geometryArray.getJSONObject(i);
+                JSONObject position = shape.getJSONObject("position");
 
-                // Create Mesh
-                long meshUid = meshUidCounter++;
-                builder.meshes.put(meshUid, new ArrayList<Shape>());
+                JSONObject style = null;
+                if (shape.has("style")) {
+                    style = shape.getJSONObject("style");
+                }
 
-                JSONObject meshObject = meshesArray.getJSONObject(m);
-
-                String meshLabel = meshObject.getString("label");
-
-                JSONArray geometryArray = meshObject.getJSONArray("geometry"); // Handle to array of primitives
+                // Description
+                String label = shape.getString("label");
+                String type = shape.getString("type");
 
                 // <REFACTOR>
-                // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
-                double scaleFactor = 6.0;
+//                builder.addTag(tag);
                 // </REFACTOR>
 
-                for (int i = 0; i < geometryArray.length(); i++) {
-                    JSONObject shape = geometryArray.getJSONObject(i);
-                    JSONObject position = shape.getJSONObject("position");
+                // Position
+                double x = 0, y = 0, z = 0;
+                if (position.has("x")) {
+                    x = position.getDouble("x") * scaleFactor; // TODO: Remove scaleFactor. Use conversion from mm to DP.
+                }
+                if (position.has("y")) {
+                    y = position.getDouble("y") * scaleFactor; // TODO: Remove scaleFactor. Use conversion from mm to DP.
+                }
+                if (position.has("z")) {
+                    z = position.getDouble("z") * scaleFactor; // TODO: Remove scaleFactor. Use conversion from mm to DP.
+                }
+                double rotation = shape.getDouble("rotation");
 
-                    JSONObject style = null;
-                    if (shape.has("style")) {
-                        style = shape.getJSONObject("style");
+                // Boundary
+                boolean isBoundary = false;
+                if (shape.has("boundary")) {
+                    isBoundary = shape.getBoolean("boundary");
+                }
+
+                // Style
+                String color = "#ffffff";
+                String outlineColor = "#000000";
+                double outlineThickness = 0.0;
+
+                if (style != null) {
+                    if (style.has("color")) {
+                        color = style.getString("color");
                     }
-
-                    // Description
-                    String label = shape.getString("label");
-                    String type = shape.getString("type");
-
-                    // <REFACTOR>
-                    builder.addLabel(label);
-                    // </REFACTOR>
-
-                    // Primitive
-                    double x = position.getDouble("x") * scaleFactor;
-                    double y = position.getDouble("y") * scaleFactor;
-                    double rotation = shape.getDouble("rotation");
-
-                    // <REFACTOR>
-                    // Boundary
-                    boolean isBoundary = false;
-                    if (shape.has("boundary")) {
-                        isBoundary = shape.getBoolean("boundary");
+                    if (style.has("outlineColor")) {
+                        outlineColor = style.getString("outlineColor");
                     }
-                    // </REFACTOR>
-
-                    // Style
-                    String color = "#ffffff";
-                    String outlineColor = "#000000";
-                    double outlineThickness = 0.0;
-
-                    if (style != null) {
-                        if (style.has("color")) {
-                            color = style.getString("color");
-                        }
-                        if (style.has("outlineColor")) {
-                            outlineColor = style.getString("outlineColor");
-                        }
-                        if (style.has("outlineThickness")) {
-                            outlineThickness = style.getDouble("outlineThickness") * scaleFactor;
-                        }
+                    if (style.has("outlineThickness")) {
+                        outlineThickness = style.getDouble("outlineThickness") * scaleFactor;
                     }
+                }
 
-                    if (type.equalsIgnoreCase("Point")) {
+                if (type.equalsIgnoreCase("Point")) {
 
-                        Point point = new Point();
-                        point.setLabel(label);
-                        point.setPosition(x, y);
-                        point.setRotation(rotation);
-                        point.setColor(color);
-                        point.setOutlineColor(outlineColor);
-                        point.setOutlineThickness(outlineThickness);
-//                    point.isBoundary = isBoundary;
+                    Point point = new Point();
+                    point.setTag(label);
+                    point.setPosition(x, y, z);
+                    point.setRotation(rotation);
+                    point.setColor(color);
+                    point.setOutlineColor(outlineColor);
+                    point.setOutlineThickness(outlineThickness);
+                    point.isBoundary = isBoundary;
 
-                        builder.addShape(meshUid, point);
+                    builder.addShape(point);
 
-//                    // <ENTITY>
-//                    // <HACK>
-//                    // Set Label
-//                    Entity shapeEntity = Model.addShape(entity, point); // HACK
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
-//                    Label.setLabel(shapeEntity, label);
-//                    // </HACK>
-//                    // </ENTITY>
+                } else if (type.equalsIgnoreCase("Rectangle")) {
 
-                    } else if (type.equalsIgnoreCase("Rectangle")) {
+                    double width = shape.getDouble("width") * scaleFactor;
+                    double height = shape.getDouble("height") * scaleFactor;
+                    double cornerRadius = shape.getDouble("cornerRadius") * scaleFactor;
 
-                        double width = shape.getDouble("width") * scaleFactor;
-                        double height = shape.getDouble("height") * scaleFactor;
-                        double cornerRadius = shape.getDouble("cornerRadius") * scaleFactor;
+                    Rectangle rectangle = new Rectangle(width, height);
+                    rectangle.setTag(label);
+                    rectangle.setCornerRadius(cornerRadius);
+                    rectangle.setPosition(x, y, z);
+                    rectangle.setRotation(rotation);
+                    rectangle.setColor(color);
+                    rectangle.setOutlineColor(outlineColor);
+                    rectangle.setOutlineThickness(outlineThickness);
+                    rectangle.isBoundary = isBoundary;
 
-                        Rectangle rectangle = new Rectangle(width, height);
-                        rectangle.setLabel(label);
-                        rectangle.setCornerRadius(cornerRadius);
-                        rectangle.setPosition(x, y);
-                        rectangle.setRotation(rotation);
-                        rectangle.setColor(color);
-                        rectangle.setOutlineColor(outlineColor);
-                        rectangle.setOutlineThickness(outlineThickness);
-//                    rectangle.isBoundary = isBoundary;
+                    builder.addShape(rectangle);
 
-                        builder.addShape(meshUid, rectangle);
+                } else if (type.equalsIgnoreCase("Circle")) {
 
-//                    // <ENTITY>
-//                    // <HACK>
-//                    // Set Label
-//                    Entity shapeEntity = Model.addShape(entity, rectangle); // HACK
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
-//                    Label.setLabel(shapeEntity, label);
-//                    // </HACK>
-//                    // </ENTITY>
+                    double radius = shape.getDouble("radius") * scaleFactor;
 
-                    } else if (type.equalsIgnoreCase("Circle")) {
+                    Circle circle = new Circle(radius);
+                    circle.setTag(label);
+                    circle.setPosition(x, y, z);
+                    circle.setRotation(rotation);
+                    circle.setColor(color);
+                    circle.setOutlineColor(outlineColor);
+                    circle.setOutlineThickness(outlineThickness);
+                    circle.isBoundary = isBoundary;
 
-                        double radius = shape.getDouble("radius") * scaleFactor;
-
-                        Circle circle = new Circle(radius);
-                        circle.setLabel(label);
-                        circle.setPosition(x, y);
-                        circle.setRotation(rotation);
-                        circle.setColor(color);
-                        circle.setOutlineColor(outlineColor);
-                        circle.setOutlineThickness(outlineThickness);
-//                    circle.isBoundary = isBoundary;
-
-                        builder.addShape(meshUid, circle);
-
-//                    // <ENTITY>
-//                    // TODO: Move to createModelComponent(...)
-//                    // <HACK>
-//                    // Set Label
-//                    Entity shapeEntity = Model.addShape(entity, circle); // HACK
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(x, y);
-//                    shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = rotation;
-//                    Label.setLabel(shapeEntity, label);
-//                    // </HACK>
-//                    // </ENTITY>
-                    }
+                    builder.addShape(circle);
                 }
             }
 
@@ -306,13 +282,6 @@ public class ModelBuilder {
             e.printStackTrace();
         }
         // </PLATFORM_LAYER>
-
-        // <DELETE>
-        List<String> labelList = new ArrayList<>(builder.labels.keySet());
-        for (int i = 0; i < labelList.size(); i++) {
-            Log.v("MODEL_FILE_LOADER", "" + builder.labels.get(labelList.get(i)) + "\t" + labelList.get(i));
-        }
-        // <DELETE>
 
         return builder;
     }
@@ -323,9 +292,9 @@ public class ModelBuilder {
      *
      * @return
      */
-    public void getModelComponent(long meshUid, Entity entity) {
+    public void getModelComponent(Entity entity) {
 
-        List<Shape> shapes = meshes.get(meshUid);
+        List<Shape> shapes = getShapes();
 
         for (int i = 0; i < shapes.size(); i++) {
             // <ENTITY>
@@ -334,7 +303,7 @@ public class ModelBuilder {
             Entity shapeEntity = Model.addShape(entity, shapes.get(i)); // HACK
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
-            Label.setLabel(shapeEntity, shapes.get(i).getLabel());
+            Label.setLabel(shapeEntity, shapes.get(i).getTag());
             // </HACK>
             // </ENTITY>
         }
@@ -354,7 +323,7 @@ public class ModelBuilder {
             Entity shapeEntity = Model.addShape(entity, shapes.get(i)); // HACK
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
             shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
-            Label.setLabel(shapeEntity, shapes.get(i).getLabel());
+            Label.setTag(shapeEntity, shapes.get(i).getTag());
             // </HACK>
             // </ENTITY>
         }

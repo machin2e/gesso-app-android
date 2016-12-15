@@ -108,7 +108,7 @@ public class EntityManager {
     }
 
     /**
-     * Convenience method equivalent to {@code subscribe(null, null)}.
+     * Convenience method equivalent to {@code registerResponse(null, null)}.
      *
      * @return
      */
@@ -117,7 +117,7 @@ public class EntityManager {
     }
 
     /**
-     * Convenience method equivalent to {@code subscribe(filterStrategy, null)}.
+     * Convenience method equivalent to {@code registerResponse(filterStrategy, null)}.
      *
      * @param filterStrategy
      * @return
@@ -127,7 +127,7 @@ public class EntityManager {
     }
 
     /**
-     * Convenience method equivalent to {@code subscribe(null, sorterStrategy)}.
+     * Convenience method equivalent to {@code registerResponse(null, sorterStrategy)}.
      *
      * @param sorterStrategy
      * @return
@@ -135,7 +135,7 @@ public class EntityManager {
     public Group<Entity> subscribe(SorterStrategy sorterStrategy) {
         return subscribe(null, sorterStrategy);
     }
-    
+
     public boolean unsubscribe(Group group) {
         return subscribers.remove(group);
     }

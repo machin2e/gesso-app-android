@@ -18,28 +18,17 @@ public class EventManager {
     /**
      * Return -1 if the type name already exists.
      */
-    public long registerEvent(String eventTitle) {
-        if (!eventUids.containsKey(eventTitle)) {
+    public long registerEvent(String eventTag) {
+        // TODO: Optionally, include an "EventParser" that intercepts the specified event and emits a different one (for generating specific events).
+        if (!eventUids.containsKey(eventTag)) {
             long eventTypeUid = eventCounter++;
-            eventUids.put(eventTitle, eventTypeUid);
+            eventUids.put(eventTag, eventTypeUid);
         }
-        return eventUids.get(eventTitle);
+        return eventUids.get(eventTag);
     }
 
-    public long getEventUid(String eventLabel) {
-        return eventUids.get(eventLabel);
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    // <REFACTOR>
-    // TODO: Move to EventQueue
-    public void schedule(Event event) {
-        // TODO: Add to scheduled eventManager so it can be fired at or after the scheduled time.
-    }
-    // <REFACTOR>
-
-    public boolean subscribe(String eventType, EventResponse<?> eventResponse) {
+    // previously: subscribe(...)
+    public boolean registerResponse(String eventType, EventResponse<?> eventResponse) {
 
         // <REFACTOR>
         long eventTypeUid = World.getInstance().eventManager.getEventUid(eventType);
@@ -57,11 +46,20 @@ public class EventManager {
         }
     }
 
+    public long getEventUid(String eventTag) {
+        return eventUids.get(eventTag);
+    }
+
+    // <REFACTOR>
+    // TODO: Move to EventQueue
+    public void schedule(Event event) {
+        // TODO: Add to scheduled eventManager so it can be fired at or after the scheduled time.
+    }
+    // <REFACTOR>
+
     // TODO: public boolean unsubscribe(...)
 
     public void dispatch(Event event) { // previously notifySubscribers
-
-        // Get subscribers to Event
         ArrayList<EventResponse> subscribedEventResponses = eventResponses.get(event.getType());
         if (subscribedEventResponses != null) {
             for (int i = 0; i < subscribedEventResponses.size(); i++) {

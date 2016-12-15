@@ -28,8 +28,7 @@ public class InputSystem extends System {
 
     private void setup() {
         cameraEntities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Camera.class)
         );
     }
 

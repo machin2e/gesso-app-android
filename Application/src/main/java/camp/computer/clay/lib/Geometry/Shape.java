@@ -7,12 +7,10 @@ import camp.computer.clay.engine.component.Transform;
 public abstract class Shape {
 
     // <TODO>
-    // TODO: 11/15/2016 Delete this after creating Shape component.
-    protected String label = ""; // Component
+    protected String tag = "";
 
-    // public boolean isBoundary = false;
+    public boolean isBoundary = false;
 
-    //    protected Transform imagePosition = null;
     protected Transform position = new Transform(0, 0);
     // TODO: private Transform facingAngle/normal; // Consider placing into Transform.
     // </TODO>
@@ -29,11 +27,13 @@ public abstract class Shape {
     }
 
     public Transform getPosition() {
-//        // <HACK>
-//        position.set(0, 0);
-//        position.rotation = 0;
-//        // </HACK>
         return position;
+    }
+
+    public void setPosition(double x, double y, double z) {
+        // TODO: this.position.set(x, y, z);
+        this.position.set(x, y);
+        this.position.z = z;
     }
 
     public void setPosition(double x, double y) {
@@ -50,7 +50,6 @@ public abstract class Shape {
 
     public double getRotation() {
         return this.position.rotation;
-//        return 0;
     }
 
     public abstract List<Transform> getVertices();
@@ -93,12 +92,12 @@ public abstract class Shape {
     }
 
     // <REFACTOR>
-    public void setLabel(String label) {
-        this.label = label;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    public String getLabel() {
-        return this.label;
+    public String getTag() {
+        return this.tag;
     }
     // </REFACTOR>
 }

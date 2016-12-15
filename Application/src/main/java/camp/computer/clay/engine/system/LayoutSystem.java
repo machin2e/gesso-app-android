@@ -30,33 +30,23 @@ public class LayoutSystem extends System {
         super(world);
 
         entities = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Model.class, Transform.class)
         );
-        // TODO: Group<Entity> entitiesWithBoundary = world.entitiesWithBoundary.get().filterActive(true).filterWithComponents(ModelBuilder.class, Transform.class);
 
-        //paths = world.entitiesWithBoundary.get().filterActive(true).filterWithComponent(Path.class);
         paths = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Path.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Path.class)
         );
 
-        //Group<Entity> hosts = world.entitiesWithBoundary.get().filterWithComponent(Host.class);
         hosts = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Host.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Host.class)
         );
 
-        //extensions = world.entitiesWithBoundary.get().filterWithComponent(Extension.class);
         extensions = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Extension.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Extension.class)
         );
 
-//        Group<Entity> ports = world.entitiesWithBoundary.get().filterWithComponent(Port.class);
         ports = world.entityManager.subscribe(
-                new FilterStrategy(Group.Filters.filterWithComponents, Port.class),
-                null
+                new FilterStrategy(Group.Filters.filterWithComponents, Port.class)
         );
     }
 
