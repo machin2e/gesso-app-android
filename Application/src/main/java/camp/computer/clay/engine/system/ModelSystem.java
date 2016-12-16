@@ -51,7 +51,7 @@ public class ModelSystem extends System {
         } else {
 
             // HACK!
-            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDITING state (or make it not important)
+            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDIT state (or make it not important)
             absoluteReferenceTransform = entity.getComponent(Transform.class);
         }
 
@@ -59,7 +59,7 @@ public class ModelSystem extends System {
         if (entity.hasComponent(Path.class)) {
             // TODO: Refactor so a special case isn't needed for Path.
         } else {
-            Group<Entity> primitives = Model.getPrimitives(entity);
+            Group<Entity> primitives = entity.getComponent(Model.class).primitives;
             for (int i = 0; i < primitives.size(); i++) {
                 if (absoluteReferenceTransform != null) {
                     // TODO: if (shape.hasComponent(TransformConstraint.class)) {

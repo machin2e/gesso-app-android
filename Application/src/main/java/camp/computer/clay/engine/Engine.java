@@ -108,8 +108,8 @@ public class Engine {
         int maxHostCount = 6;
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
-            enqueue(new Event("CREATE_HOST"));
-            // execute(new Event("CREATE_HOST"));
+//            enqueue(new Event("CREATE_HOST"));
+            execute(new Event("CREATE_HOST"));
         }
         // </VIRTUAL_HOSTS>
 
@@ -126,9 +126,16 @@ public class Engine {
         // </DELETE>
     }
 
+    // <REFACTOR>
     public void enqueue(Event event) {
         world.getSystem(EventSystem.class).enqueue(event);
     }
+
+    public void enqueueInput(Event event) {
+        // TODO: Refactor to combine enqueue/enqueueInput. Just one!
+        world.getSystem(InputSystem.class).enqueue(event);
+    }
+    // </REFACTOR>
 
     public void execute(Event event) {
         world.getSystem(EventSystem.class).execute(event);

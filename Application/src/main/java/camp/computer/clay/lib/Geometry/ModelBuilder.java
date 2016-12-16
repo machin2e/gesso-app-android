@@ -303,7 +303,11 @@ public class ModelBuilder {
             // Set Label
             Entity primitive = Model.createPrimitiveFromShape(shapes.get(i));
             primitive.getComponent(Transform.class).z = shapes.get(i).getPosition().z;
-            Model.addPrimitive(entity, primitive); // HACK
+
+//            Model.addPrimitive(entity, primitive); // HACK
+            // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
+            primitive.getComponent(TransformConstraint.class).setReferenceEntity(entity);
+            entity.getComponent(Model.class).primitives.add(primitive);
             primitive.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
             primitive.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
             Label.setLabel(primitive, shapes.get(i).getTag()); // TODO: Remove?
@@ -311,25 +315,4 @@ public class ModelBuilder {
             // </ENTITY>
         }
     }
-
-    /*
-    // TODO: Model getModel();
-    public Model getModelComponent() {
-
-        Model model = new Model();
-
-        for (int i = 0; i < shapes.size(); i++) {
-            // <ENTITY>
-            // <HACK>
-            // Set Label
-            model.
-            Entity shapeEntity = Model.addPrimitive(entity, shapes.get(i)); // HACK
-            shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set(shapes.get(i).getPosition().x, shapes.get(i).getPosition().y);
-            shapeEntity.getComponent(TransformConstraint.class).relativeTransform.rotation = shapes.get(i).getRotation();
-            Label.setTag(shapeEntity, shapes.get(i).getTag());
-            // </HACK>
-            // </ENTITY>
-        }
-    }
-    */
 }

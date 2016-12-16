@@ -115,7 +115,7 @@ public class World {
 
         // <REFACTOR>
         // TODO: Move into Engine
-        eventManager.registerEvent("NONE"); // TODO: Delete!
+        eventManager.registerEvent("VIEW"); // TODO: Delete!
 
         eventManager.registerEvent("CLOCK_TICK");
 
@@ -249,7 +249,7 @@ public class World {
         // </HACK>
 
 //        Text text2 = (Text) notification.getComponent(ModelBuilder.class).getModelComponent().getPrimitives().get(0);
-        Text text2 = (Text) Model.getPrimitives(notification).get(0).getComponent(Primitive.class).shape;
+        Text text2 = (Text) notification.getComponent(Model.class).primitives.get(0).getComponent(Primitive.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 
@@ -279,8 +279,10 @@ public class World {
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(rectangle);
-        Model.addPrimitive(prototypeExtension, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(prototypeExtension);
+        prototypeExtension.getComponent(Model.class).primitives.add(primitive);
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 

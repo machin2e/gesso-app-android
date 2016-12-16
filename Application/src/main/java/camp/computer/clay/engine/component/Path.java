@@ -11,13 +11,13 @@ public class Path extends Component {
     // <COMPONENT_DATA>
 //    public enum Mode {
 //
-//        NONE(0),
+//        VIEW(0),
 //        ELECTRONIC(1),
 //        BLUETOOTH(2),
 //        MESH(3),
 //        INTERNET(4);
 //
-//        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
+//        // TODO: VIEW, ELECTRONIC, MESH, INTERNET, BLUETOOTH
 //        // TODO: TCP, UDP, HTTP, HTTPS
 //
 //        // TODO: Change the index to a UUID?

@@ -4,12 +4,14 @@ import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Component {
 
+    private Entity entity = null;
+
     public enum State {
-        NONE,
-        EDITING
+        VIEW,
+        EDIT
     }
 
-    private Entity entity = null;
+    public State state = State.VIEW;
 
     public Component() {
         this.entity = null;
@@ -22,8 +24,6 @@ public abstract class Component {
     public Entity getEntity() {
         return this.entity;
     }
-
-    public State state = State.NONE;
 
     public static State getState(Entity path) {
         return path.getComponent(Path.class).state;

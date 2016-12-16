@@ -32,7 +32,7 @@ public abstract class Signal {
         BOTH    // sourcePortUuid <-> destination
     }
 
-    // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
+    // TODO: VIEW, ELECTRONIC, MESH, INTERNET, BLUETOOTH
     // TODO: TCP, UDP, HTTP, HTTPS
     public enum Mode {
         NONE,

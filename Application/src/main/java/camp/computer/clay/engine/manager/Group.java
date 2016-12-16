@@ -369,7 +369,7 @@ public class Group<E> implements List<E> {
         Group<Entity> primitives = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Model model = (Model) elements.get(i);
-            Group<Entity> modelPrimitives = Model.getPrimitives(model.getEntity());
+            Group<Entity> modelPrimitives = model.primitives;
             for (int j = 0; j < modelPrimitives.size(); j++) {
                 primitives.add(modelPrimitives.get(j));
             }
@@ -401,11 +401,9 @@ public class Group<E> implements List<E> {
      */
     // Expects Group<Entity>
     // Requires components: Label
-    public Group<Entity> filterLabel(String... labels) {
+    public Group<Entity> filterWithLabel(String... labels) {
 
-        // HACK: Assumes Group<Entity>
-
-        Group<Entity> shapeGroup = new Group<>();
+        Group<Entity> group = new Group<>();
 
         for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < labels.length; j++) {
@@ -417,12 +415,12 @@ public class Group<E> implements List<E> {
                 boolean isMatch = matcher.matches();
 
                 if (isMatch) {
-                    shapeGroup.add((Entity) this.elements.get(i)); // HACK: Forced type to be Entity
+                    group.add((Entity) this.elements.get(i)); // HACK: Forced type to be Entity
                 }
             }
         }
 
-        return shapeGroup;
+        return group;
     }
     // </TODO: REMOVE. REPLACE WITH CALLS TO SHAPES IN IMAGE API.>
 
