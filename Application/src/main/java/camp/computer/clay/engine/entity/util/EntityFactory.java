@@ -93,6 +93,14 @@ public class EntityFactory {
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
             port.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+            // <REFACTOR>
+            // TODO: Move to common location (in System update based on state of Entity/components) and make function.
+            List<Entity> primitives = port.getComponent(Model.class).primitives;
+            for (int i = 0; i < primitives.size(); i++) {
+                primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+            }
+            // </REFACTOR>
             // </HACK>
 
             Portable.addPort(host, port);
@@ -151,7 +159,7 @@ public class EntityFactory {
                 // Show prototype Extension if any are saved and available in the repository
                 if (world.cache.getObjects(Configuration.class).size() > 0) {
 
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
                     // Update position of prototype Extension
                     // world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
@@ -162,11 +170,19 @@ public class EntityFactory {
                             event.getPosition()
                     );
 
-                    extensionPrototype.getComponent(Transform.class).set(event.getPosition());
-                    extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
+                    prototypeExtension.getComponent(Transform.class).set(event.getPosition());
+                    prototypeExtension.getComponent(Transform.class).setRotation(eventAngle);
 
                     // Show the prototype Extension
-                    extensionPrototype.getComponent(Visibility.class).visible = Visible.VISIBLE;
+                    prototypeExtension.getComponent(Visibility.class).visible = Visible.VISIBLE;
+
+                    // <REFACTOR>
+                    // TODO: Move to common location (in System?) and make function.
+                    List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                    for (int i = 0; i < primitives.size(); i++) {
+                        primitives.get(i).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                    }
+                    // </REFACTOR>
                 }
             }
         });
@@ -185,6 +201,18 @@ public class EntityFactory {
                 Portable.getPaths(host).setVisibility(Visible.VISIBLE);
                 Portable.getPorts(host).setVisibility(Visible.VISIBLE);
 
+                // <REFACTOR>
+                for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+                    Entity port = Portable.getPort(host, i);
+                    // TODO: Move to common location (in System?) and make function.
+                    // TODO: (Response to previous TODO) Yes, in system, update based on state of Entity/components.
+                    List<Entity> primitives = port.getComponent(Model.class).primitives;
+                    for (int k = 0; k < primitives.size(); k++) {
+                        primitives.get(k).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                    }
+                }
+                // </REFACTOR>
+
                 Log.v("HostPorts", "host.ports.size(): " + Portable.getPorts(host).size());
 
                 // TODO: Update transparency
@@ -195,6 +223,7 @@ public class EntityFactory {
                     Entity port = Portable.getPort(host, i);
                     Group<Entity> paths = Port.getPaths(port);
 
+                    // Set Path Visibility
                     for (int j = 0; j < paths.size(); j++) {
                         Entity path = paths.get(j);
 
@@ -222,8 +251,16 @@ public class EntityFactory {
                 Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
                 if (prototypeExtension.getComponent(Visibility.class).visible == Visible.VISIBLE) {
 
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    // Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                    // <REFACTOR>
+                    // TODO: Move to common location (in System?) and make function.
+                    List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                    for (int i = 0; i < primitives.size(); i++) {
+                        primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    }
+                    // </REFACTOR>
 
                     // Get cached extension configurations (and retrieve additional from Internet2 store)
                     List<Configuration> configurations = world.cache.getObjects(Configuration.class);
@@ -282,16 +319,16 @@ public class EntityFactory {
                 if (event.getTarget().hasComponent(Camera.class)) {
 
                     // <HACK>
-                    Group<Entity> portEntities = null;
-                    Group<Entity> pathAndPortEntities = null;
+                    Group<Entity> ports = null;
+                    Group<Entity> pathsAndPorts = null;
 
-                    if (portEntities == null) {
-                        portEntities = world.entityManager.subscribe(
+                    if (ports == null) {
+                        ports = world.entityManager.subscribe(
                                 new FilterStrategy(Group.Filters.filterWithComponent, Port.class)
                         );
                     }
-                    if (pathAndPortEntities == null) {
-                        pathAndPortEntities = world.entityManager.subscribe(
+                    if (pathsAndPorts == null) {
+                        pathsAndPorts = world.entityManager.subscribe(
                                 new FilterStrategy(Group.Filters.filterWithComponent, Path.class, Port.class)
                         );
                     }
@@ -300,8 +337,21 @@ public class EntityFactory {
                     // <MOVE_TO_WORLD_EVENT_HANDLER>
                     // Hide Portables' Ports.
 //                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
-                    portEntities.setVisibility(Visible.INVISIBLE);
-                    Group<Model> pathAndPortModels = pathAndPortEntities.getModels();
+                    ports.setVisibility(Visible.INVISIBLE);
+
+                    // <REFACTOR>
+                    for (int i = 0; i < ports.size(); i++) {
+                        Entity port = ports.get(i);
+                        // TODO: Move to common location (in System?) and make function.
+                        // TODO: (Response to previous TODO) Yes, in system, update based on state of Entity/components.
+                        List<Entity> primitives = port.getComponent(Model.class).primitives;
+                        for (int k = 0; k < primitives.size(); k++) {
+                            primitives.get(k).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                    }
+                    // </REFACTOR>
+
+                    Group<Model> pathAndPortModels = pathsAndPorts.getModels();
                     for (int i = 0; i < pathAndPortModels.size(); i++) {
                         pathAndPortModels.get(i).meshIndex = 0;
                     }
@@ -453,7 +503,7 @@ public class EntityFactory {
                     return;
                 }
 
-                world.createExtensionProfile(extension);
+                world.createExtensionConfiguration(extension);
             }
         });
 
@@ -604,7 +654,7 @@ public class EntityFactory {
 
         // <HACK>
         // TODO: Remove references to Configuration in Portables. Remove Configuration altogether!?
-        World.getInstance().configureExtensionFromProfile(extension, configuration);
+        World.getInstance().configureExtensionFromConfiguration(extension, configuration);
         // </HACK>
 
         Log.v("Configuration", "extension from profile # ports: " + Portable.getPorts(extension).size());
@@ -745,9 +795,17 @@ public class EntityFactory {
                     }
 
                     // Update position of prototype Path and Extension
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     if (isCreateExtensionAction) {
-                        extensionPrototype.getComponent(Visibility.class).visible = Visible.VISIBLE;
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.VISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                        }
+                        // </REFACTOR>
 
                         // Set Event Angle (angle from first Event to current Event)
                         double eventAngle = camp.computer.clay.util.Geometry.getAngle(
@@ -755,10 +813,18 @@ public class EntityFactory {
                                 event.getPosition()
                         );
                         // Set prototype Extension transform
-                        extensionPrototype.getComponent(Transform.class).set(event.getPosition());
-                        extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
+                        prototypeExtension.getComponent(Transform.class).set(event.getPosition());
+                        prototypeExtension.getComponent(Transform.class).setRotation(eventAngle);
                     } else {
-                        extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                        // </REFACTOR>
                     }
 
                     // Ports of nearby Hosts and Extensions
@@ -1031,8 +1097,16 @@ public class EntityFactory {
 //                    // Hide prototype Path and prototype Extension
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
 //                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                        Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                        extensionPrototype.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                        Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                        // </REFACTOR>
 
 //                    Entity hostPort = event.getFirstEvent().getTargetPort();
                         Entity hostPort = Path.getSourcePort(path);

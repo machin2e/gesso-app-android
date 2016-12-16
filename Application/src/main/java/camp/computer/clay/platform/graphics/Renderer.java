@@ -128,7 +128,7 @@ public class Renderer extends Thread {
                         // <UPDATE>
                         // TODO: Draw Renderables.
                         // TODO: This call is expensive. Make it way faster. Cache_OLD? Sublist?
-                        renderSurface.drawRenderables(entities, canvas, paint, palette);
+                        renderSurface.drawPrimitives(entities, canvas, paint, palette);
                         // </UPDATE>
 
                         if (World.ENABLE_GEOMETRY_ANNOTATIONS) {

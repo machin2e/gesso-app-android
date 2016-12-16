@@ -178,7 +178,7 @@ public class LayoutSystem extends System {
     // previously selectOverviewPathMesh(...)
     private void loadOverviewPathMesh(Entity path) {
 
-        if (Path.getMode(path) == Signal.Mode.ELECTRONIC) {
+        if (path.getComponent(Path.class).mode == Signal.Mode.ELECTRONIC) {
 
             boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
@@ -202,6 +202,14 @@ public class LayoutSystem extends System {
                     Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
                     Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
                     // </HACK>
+
+//                    // <HACK>
+//                    // NOTE: Recursively set visibility of Primitives in Model
+//                    List<Entity> primitives = path.getComponent(Model.class).primitives;
+//                    for (int i = 0; i < primitives.size(); i++) {
+//                        primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                    }
+//                    // </HACK>
                 }
 
             } else {

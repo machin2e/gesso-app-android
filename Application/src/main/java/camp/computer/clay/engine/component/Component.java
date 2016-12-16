@@ -33,6 +33,11 @@ public abstract class Component {
         path.getComponent(Path.class).state = state;
     }
 
+    // TODO: Phone
+    // TODO: Workspace?
+    // TODO: Widget
+    // TODO: Player
+    //
     // TODO: PortableComponent
     // TODO: TouchableComponent (enables touch interaction)
     // TODO: PositionComponent/TransformComponent

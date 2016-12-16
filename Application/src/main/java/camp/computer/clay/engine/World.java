@@ -259,6 +259,7 @@ public class World {
     }
     // </TODO:REFACTOR>
 
+    // <DELETE>
     // TODO: Actually create and stage a real single-port Entity without a parent!?
     // Serves as a "prop" for user to define new Extensions
     public Entity createPrototypeExtensionEntity() {
@@ -285,6 +286,14 @@ public class World {
 
         prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
 
+        // <REFACTOR>
+        // TODO: Move to common location (in System?) and make function.
+        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+        for (int i = 0; i < primitives.size(); i++) {
+            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+        }
+        // </REFACTOR>
+
         // <HACK>
         // TODO: Add to common createEntity method.
         entityManager.add(prototypeExtension);
@@ -292,11 +301,12 @@ public class World {
 
         return prototypeExtension;
     }
+    // <DELETE>
 
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: Come up with better way to determine if the Extension already exists in the database.
     // TODO: Make more general for all Portables.
-    public void configureExtensionFromProfile(Entity extension, Configuration configuration) {
+    public void configureExtensionFromConfiguration(Entity extension, Configuration configuration) {
 
         // Create Ports to match the Configuration
         for (int i = 0; i < configuration.getPorts().size(); i++) {
@@ -328,7 +338,8 @@ public class World {
     }
 
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    public void createExtensionProfile(final Entity extension) {
+    // TODO: Return Configuration and cache the returned value. Don't cache in this method.
+    public Configuration createExtensionConfiguration(final Entity extension) {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call openCreateExtensionView if the extensionEntity is a draft (i.e., does not have an associated Configuration)
@@ -343,7 +354,7 @@ public class World {
                     Log.v("Configuration", "configuration # ports: " + configuration.getPorts().size());
 
                     // Assign the Configuration to the ExtensionEntity
-//                    configureExtensionFromProfile(extension, configuration);
+//                    configureExtensionFromConfiguration(extension, configuration);
 
                     // Cache_OLD the new ExtensionEntity Configuration
                     cache.add(configuration);
@@ -361,6 +372,8 @@ public class World {
                 }
             });
         }
+
+        return null;
     }
     // </EXTENSION_IMAGE_HELPERS>
 }

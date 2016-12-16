@@ -299,7 +299,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     }
     // </TODO: REMOVE_REFERENCE_TO_WORLD>
 
-    public void drawRenderables(Group<Entity> entities, Canvas canvas, Paint paint, Palette palette) {
+    public void drawPrimitives(Group<Entity> entities, Canvas canvas, Paint paint, Palette palette) {
 
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
@@ -312,10 +312,9 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 //                for (int j = 0; j < shapes.size(); j++) {
                 drawPrimitive(entity, canvas, paint, palette);
 //                }
-            }
 
-            // <DRAW_BOUNDARY>
-            if (entity.hasComponent(Boundary.class)) {
+                // <DRAW_BOUNDARY>
+                if (entity.hasComponent(Boundary.class)) {
 //                ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
 //                for (int j = 0; j < boundaryVertices.size(); j++) {
 //                    ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
@@ -324,12 +323,13 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 //                    paint.setColor(Color.CYAN);
 //                    drawPolygon(boundaryVertz, canvas, paint, palette);
 //                }
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(5.0f);
-                paint.setColor(Color.CYAN);
-                drawPolygon(entity.getComponent(Boundary.class).boundary, canvas, paint, palette);
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(5.0f);
+                    paint.setColor(Color.CYAN);
+                    drawPolygon(entity.getComponent(Boundary.class).boundary, canvas, paint, palette);
+                }
+                // </DRAW_BOUNDARY>
             }
-            // </DRAW_BOUNDARY>
         }
     }
 

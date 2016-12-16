@@ -71,22 +71,6 @@ public class Path extends Component {
         path.getComponent(Path.class).type = type;
     }
 
-    public static Signal.Mode getMode(Entity path) {
-        return path.getComponent(Path.class).mode;
-    }
-
-    public static void setMode(Entity path, Signal.Mode mode) {
-        path.getComponent(Path.class).mode = mode;
-    }
-
-    public static Signal.Direction getDirection(Entity path) {
-        return path.getComponent(Path.class).direction;
-    }
-
-    public static void setDirection(Entity path, Signal.Direction direction) {
-        path.getComponent(Path.class).direction = direction;
-    }
-
     public static void set(Entity path, Entity sourcePort, Entity targetPort) {
 
         Path pathComponent = path.getComponent(Path.class);
