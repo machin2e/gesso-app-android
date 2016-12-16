@@ -115,7 +115,7 @@ public class World {
 
         // <REFACTOR>
         // TODO: Move into Engine
-        eventManager.registerEvent("NONE"); // TODO: Delete!
+        eventManager.registerEvent("VIEW"); // TODO: Delete!
 
         eventManager.registerEvent("CLOCK_TICK");
 
@@ -249,7 +249,7 @@ public class World {
         // </HACK>
 
 //        Text text2 = (Text) notification.getComponent(ModelBuilder.class).getModelComponent().getPrimitives().get(0);
-        Text text2 = (Text) Model.getPrimitives(notification).get(0).getComponent(Primitive.class).shape;
+        Text text2 = (Text) notification.getComponent(Model.class).primitives.get(0).getComponent(Primitive.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 
@@ -259,6 +259,7 @@ public class World {
     }
     // </TODO:REFACTOR>
 
+    // <DELETE>
     // TODO: Actually create and stage a real single-port Entity without a parent!?
     // Serves as a "prop" for user to define new Extensions
     public Entity createPrototypeExtensionEntity() {
@@ -278,12 +279,22 @@ public class World {
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(rectangle);
-        Model.addPrimitive(prototypeExtension, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(prototypeExtension);
+        prototypeExtension.getComponent(Model.class).primitives.add(primitive);
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 
-        prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+        // <REFACTOR>
+        // TODO: Move to common location (in System?) and make function.
+        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+        for (int i = 0; i < primitives.size(); i++) {
+            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+        }
+        // </REFACTOR>
 
         // <HACK>
         // TODO: Add to common createEntity method.
@@ -292,11 +303,12 @@ public class World {
 
         return prototypeExtension;
     }
+    // <DELETE>
 
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: Come up with better way to determine if the Extension already exists in the database.
     // TODO: Make more general for all Portables.
-    public void configureExtensionFromProfile(Entity extension, Configuration configuration) {
+    public void configureExtensionFromConfiguration(Entity extension, Configuration configuration) {
 
         // Create Ports to match the Configuration
         for (int i = 0; i < configuration.getPorts().size(); i++) {
@@ -328,7 +340,8 @@ public class World {
     }
 
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    public void createExtensionProfile(final Entity extension) {
+    // TODO: Return Configuration and cache the returned value. Don't cache in this method.
+    public Configuration createExtensionConfiguration(final Entity extension) {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call openCreateExtensionView if the extensionEntity is a draft (i.e., does not have an associated Configuration)
@@ -343,7 +356,7 @@ public class World {
                     Log.v("Configuration", "configuration # ports: " + configuration.getPorts().size());
 
                     // Assign the Configuration to the ExtensionEntity
-//                    configureExtensionFromProfile(extension, configuration);
+//                    configureExtensionFromConfiguration(extension, configuration);
 
                     // Cache_OLD the new ExtensionEntity Configuration
                     cache.add(configuration);
@@ -361,6 +374,8 @@ public class World {
                 }
             });
         }
+
+        return null;
     }
     // </EXTENSION_IMAGE_HELPERS>
 }

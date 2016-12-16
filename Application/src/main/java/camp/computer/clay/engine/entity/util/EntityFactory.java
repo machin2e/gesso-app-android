@@ -49,7 +49,6 @@ import camp.computer.clay.platform.graphics.controls.Widgets;
 import camp.computer.clay.structure.configuration.Configuration;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.Geometry;
-import camp.computer.clay.util.Random;
 
 public class EntityFactory {
     /**
@@ -92,18 +91,19 @@ public class EntityFactory {
 
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
-            port.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+            port.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+            // <REFACTOR>
+            // TODO: Move to common location (in System update based on state of Entity/components) and make function.
+            List<Entity> primitives = port.getComponent(Model.class).primitives;
+            for (int i = 0; i < primitives.size(); i++) {
+                primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+            }
+            // </REFACTOR>
             // </HACK>
 
             Portable.addPort(host, port);
         }
-
-//        // <GEOMETRY_LOADER>
-//        // Load geometry from file into ModelBuilder Component
-//        // TODO: Application.getPlatform().openFile(this, "Model_Host_Clay-v7.1.0-beta.json");
-//        ModelBuilder modelBuilder = ModelBuilder.openFile("Model_Host_Clay-v7.1.0-beta.json");
-//        modelBuilder.getModelComponent(host);
-//        // </GEOMETRY_LOADER>
 
         // <DELETE>
         for (int i = 0; i < modelBuilder.getShapes().size(); i++) {
@@ -125,7 +125,6 @@ public class EntityFactory {
             port.addComponent(new TransformConstraint());
             port.getComponent(TransformConstraint.class).setReferenceEntity(host);
         }
-
 
         // Relative Position Port Images
         Portable.getPort(host, 0).getComponent(TransformConstraint.class).relativeTransform.set(-19.0, 40.0);
@@ -159,7 +158,7 @@ public class EntityFactory {
                 // Show prototype Extension if any are saved and available in the repository
                 if (world.cache.getObjects(Configuration.class).size() > 0) {
 
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterWithLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
                     // Update position of prototype Extension
                     // world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
@@ -170,11 +169,19 @@ public class EntityFactory {
                             event.getPosition()
                     );
 
-                    extensionPrototype.getComponent(Transform.class).set(event.getPosition());
-                    extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
+                    prototypeExtension.getComponent(Transform.class).set(event.getPosition());
+                    prototypeExtension.getComponent(Transform.class).setRotation(eventAngle);
 
                     // Show the prototype Extension
-                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                    prototypeExtension.getComponent(Visibility.class).visible = Visible.VISIBLE;
+
+                    // <REFACTOR>
+                    // TODO: Move to common location (in System?) and make function.
+                    List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                    for (int i = 0; i < primitives.size(); i++) {
+                        primitives.get(i).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                    }
+                    // </REFACTOR>
                 }
             }
         });
@@ -182,17 +189,6 @@ public class EntityFactory {
         world.eventManager.registerResponse("UNSELECT", new EventResponse<Entity>() {
             @Override
             public void execute(final Event event) {
-
-//                // <REFACTOR>
-//                List<Long> boundaryUids = new ArrayList<>(host.getComponent(Boundary.class).boundaries.keySet());
-//                for (int j = 0; j < boundaryUids.size(); j++) {
-//                    ArrayList<Transform> boundaryVertices = host.getComponent(Boundary.class).boundaries.get(boundaryUids.get(j));
-//                    if (Geometry.contains(boundaryVertices, event.getPosition())) {
-//                        // TODO: Make function getBoundaryTag(shapeUid) that returns tag string for comparison in EventResponders (for touch interaction)
-////                        Log.v("BOUNDARY_CHECK", "Clicked in boundary: " + host.getComponent(Model.class).assetReference.getShape(boundaryUids.get(j)).getTag());
-//                    }
-//                }
-//                // </REFACTOR>
 
                 if (event.getTarget() != host) {
                     return;
@@ -204,6 +200,18 @@ public class EntityFactory {
                 Portable.getPaths(host).setVisibility(Visible.VISIBLE);
                 Portable.getPorts(host).setVisibility(Visible.VISIBLE);
 
+                // <REFACTOR>
+                for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+                    Entity port = Portable.getPort(host, i);
+                    // TODO: Move to common location (in System?) and make function.
+                    // TODO: (Response to previous TODO) Yes, in system, update based on state of Entity/components.
+                    List<Entity> primitives = port.getComponent(Model.class).primitives;
+                    for (int k = 0; k < primitives.size(); k++) {
+                        primitives.get(k).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                    }
+                }
+                // </REFACTOR>
+
                 Log.v("HostPorts", "host.ports.size(): " + Portable.getPorts(host).size());
 
                 // TODO: Update transparency
@@ -214,6 +222,7 @@ public class EntityFactory {
                     Entity port = Portable.getPort(host, i);
                     Group<Entity> paths = Port.getPaths(port);
 
+                    // Set Path Visibility
                     for (int j = 0; j < paths.size(); j++) {
                         Entity path = paths.get(j);
 
@@ -221,7 +230,7 @@ public class EntityFactory {
                         Path.getPorts(path).setVisibility(Visible.VISIBLE);
 
                         // Show Path connection
-                        path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        path.getComponent(Visibility.class).visible = Visible.VISIBLE;
                     }
                 }
 
@@ -238,11 +247,19 @@ public class EntityFactory {
                 // TODO: 11/13/2016 Set Title
 
                 // Check if connecting to a Extension
-                Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-                if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
+                Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterWithLabel("prototypeExtension").get(0);
+                if (prototypeExtension.getComponent(Visibility.class).visible == Visible.VISIBLE) {
 
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                    // Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterWithLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                    // <REFACTOR>
+                    // TODO: Move to common location (in System?) and make function.
+                    List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                    for (int i = 0; i < primitives.size(); i++) {
+                        primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    }
+                    // </REFACTOR>
 
                     // Get cached extension configurations (and retrieve additional from Internet2 store)
                     List<Configuration> configurations = world.cache.getObjects(Configuration.class);
@@ -301,16 +318,16 @@ public class EntityFactory {
                 if (event.getTarget().hasComponent(Camera.class)) {
 
                     // <HACK>
-                    Group<Entity> portEntities = null;
-                    Group<Entity> pathAndPortEntities = null;
+                    Group<Entity> ports = null;
+                    Group<Entity> pathsAndPorts = null;
 
-                    if (portEntities == null) {
-                        portEntities = world.entityManager.subscribe(
+                    if (ports == null) {
+                        ports = world.entityManager.subscribe(
                                 new FilterStrategy(Group.Filters.filterWithComponent, Port.class)
                         );
                     }
-                    if (pathAndPortEntities == null) {
-                        pathAndPortEntities = world.entityManager.subscribe(
+                    if (pathsAndPorts == null) {
+                        pathsAndPorts = world.entityManager.subscribe(
                                 new FilterStrategy(Group.Filters.filterWithComponent, Path.class, Port.class)
                         );
                     }
@@ -319,10 +336,23 @@ public class EntityFactory {
                     // <MOVE_TO_WORLD_EVENT_HANDLER>
                     // Hide Portables' Ports.
 //                pathAndPortEntities.setVisibility(Visible.INVISIBLE);
-                    portEntities.setVisibility(Visible.INVISIBLE);
-                    Group<Model> pathAndPortModels = pathAndPortEntities.getModels();
+                    ports.setVisibility(Visible.INVISIBLE);
+
+                    // <REFACTOR>
+                    for (int i = 0; i < ports.size(); i++) {
+                        Entity port = ports.get(i);
+                        // TODO: Move to common location (in System?) and make function.
+                        // TODO: (Response to previous TODO) Yes, in system, update based on state of Entity/components.
+                        List<Entity> primitives = port.getComponent(Model.class).primitives;
+                        for (int k = 0; k < primitives.size(); k++) {
+                            primitives.get(k).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                    }
+                    // </REFACTOR>
+
+                    Group<Model> pathAndPortModels = pathsAndPorts.getModels();
                     for (int i = 0; i < pathAndPortModels.size(); i++) {
-                        pathAndPortModels.get(i).meshIndex = 0;
+                        pathAndPortModels.get(i).assetIndex = 0;
                     }
 
 
@@ -374,8 +404,6 @@ public class EntityFactory {
         for (int j = 0; j < defaultPortCount; j++) {
 
             Entity port = world.createEntity(Port.class);
-
-//            Label.setTag(port, "Port " + (j + 1));
             Port.setIndex(port, j);
             Portable.addPort(extension, port);
         }
@@ -385,79 +413,42 @@ public class EntityFactory {
             port.addComponent(new TransformConstraint());
             port.getComponent(TransformConstraint.class).setReferenceEntity(extension);
         }
-//        Portable.getPort(extension, 0).getComponent(TransformConstraint.class).relativeTransform.set(0, 20.0 * 6.0);
-
-//        // <LOAD_GEOMETRY_FROM_FILE>
-//        ModelBuilder imageBuilder = new ModelBuilder();
-//
-//        Rectangle rectangle;
-//
-//        // Create Shapes for ModelBuilder
-//        rectangle = new Rectangle();
-//        int randomHeight = Random.generateRandomInteger(125, 200);
-//        rectangle.setHeight(randomHeight); // was 200
-//        rectangle.setWidth(Random.generateRandomInteger(125, 200)); // was 200
-//        rectangle.setTag("Board");
-//        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
-//        rectangle.setOutlineThickness(0);
-//        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-////        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
-//        rectangle.isBoundary = true;
-//        imageBuilder.addPrimitive(rectangle);
-//
-//        // Headers
-//        rectangle = new Rectangle(50, 14);
-//        rectangle.setTag("Header");
-//        rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
-//        rectangle.setRotation(0);
-//        rectangle.setColor("#3b3b3b");
-//        rectangle.setOutlineThickness(0);
-////        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
-//        imageBuilder.addPrimitive(rectangle);
-//
-//        extension.getComponent(ModelBuilder.class).setImage(imageBuilder);
-//        // </LOAD_GEOMETRY_FROM_FILE>
 
         // <LOAD_GEOMETRY_FROM_FILE>
-//        ModelBuilder imageBuilder = new ModelBuilder();
+        ModelBuilder modelBuilder = new ModelBuilder();
 
         Rectangle rectangle;
-        Entity shape;
 
         // Create Shapes for ModelBuilder
+        int BOARD_HEIGHT = 200; // Random.generateRandomInteger(50, 200); // was 125, 200
         rectangle = new Rectangle();
-        int randomHeight = Random.generateRandomInteger(50, 200); // was 125, 200
-        rectangle.setHeight(randomHeight); // was 200
-        rectangle.setWidth(Random.generateRandomInteger(50, 200)); // was 125, 200
+        rectangle.setHeight(200); // was 200
+        rectangle.setWidth(200); // was 125, 200 // (Random.generateRandomInteger(50, 200)
         rectangle.setTag("Board");
         rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
-        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-//        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
-//        rectangle.isBoundary = true;
-//        imageBuilder.addPrimitive(rectangle);
+        rectangle.isBoundary = true;
 
+        modelBuilder.addShape(rectangle);
+
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(rectangle);
-//        Label.setLabel(primitive, "Board");
-        Model.addPrimitive(extension, primitive);
-
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(extension);
+        extension.getComponent(Model.class).primitives.add(primitive);
 
         // Headers
         rectangle = new Rectangle(50, 14);
         rectangle.setTag("Header");
-        // rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-//        extension.getComponent(ModelBuilder.class).addPrimitive(rectangle);
-//        imageBuilder.addPrimitive(rectangle);
+        modelBuilder.addShape(rectangle);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         primitive = Model.createPrimitiveFromShape(rectangle);
-        Model.addPrimitive(extension, primitive);
-//        Label.setLabel(shape, "Header");
-        primitive.getComponent(TransformConstraint.class).relativeTransform.set(0, randomHeight / 2.0f + 7.0f);
-
-//        extension.getComponent(ModelBuilder.class).setImage(imageBuilder);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(extension);
+        primitive.getComponent(TransformConstraint.class).relativeTransform.set(0, BOARD_HEIGHT / 2.0f + 7.0f);
+        extension.getComponent(Model.class).primitives.add(primitive);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into ModelBuilder Component
@@ -472,7 +463,7 @@ public class EntityFactory {
                     return;
                 }
 
-                world.createExtensionProfile(extension);
+                world.createExtensionConfiguration(extension);
             }
         });
 
@@ -534,12 +525,12 @@ public class EntityFactory {
                         // Show Ports
                         Entity sourcePort = Path.getSourcePort(path);
                         Entity targetPort = Path.getTargetPort(path);
-                        sourcePort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
-                        targetPort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        sourcePort.getComponent(Visibility.class).visible = Visible.VISIBLE;
+                        targetPort.getComponent(Visibility.class).visible = Visible.VISIBLE;
 
 
                         // Show Path
-                        path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        path.getComponent(Visibility.class).visible = Visible.VISIBLE;
                     }
                 }
                 // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getModels().setVisibility(Visible.VISIBLE);
@@ -623,7 +614,7 @@ public class EntityFactory {
 
         // <HACK>
         // TODO: Remove references to Configuration in Portables. Remove Configuration altogether!?
-        World.getInstance().configureExtensionFromProfile(extension, configuration);
+        World.getInstance().configureExtensionFromConfiguration(extension, configuration);
         // </HACK>
 
         Log.v("Configuration", "extension from profile # ports: " + Portable.getPorts(extension).size());
@@ -664,8 +655,11 @@ public class EntityFactory {
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
 //        imageBuilder.addPrimitive(segment);
+
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(segment);
-        Model.addPrimitive(path, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(path);
+        path.getComponent(Model.class).primitives.add(primitive);
 
         // <HACK>
         // Set Label
@@ -681,8 +675,11 @@ public class EntityFactory {
         circle.isBoundary = true;
 //        imageBuilder.addPrimitive(circle);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         primitive = Model.createPrimitiveFromShape(circle);
-        Model.addPrimitive(path, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(path);
+        path.getComponent(Model.class).primitives.add(primitive);
+
 //        Entity shapeEntity = world.entityManager.get(pathShapeUuid);
         // <HACK>
 //        shapeEntity.getComponent(TransformConstraint.class).relativeTransform.set();
@@ -702,8 +699,10 @@ public class EntityFactory {
         circle.isBoundary = true;
 //        imageBuilder.addPrimitive(circle);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         primitive = Model.createPrimitiveFromShape(circle);
-        Model.addPrimitive(path, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(path);
+        path.getComponent(Model.class).primitives.add(primitive);
 
         // <HACK>
         // Set Label
@@ -737,9 +736,9 @@ public class EntityFactory {
 
                     Log.v("handlePathEvent", "Moving on singleton Path.");
 
-                    Path.setState(path, Component.State.EDITING);
+                    Path.setState(path, Component.State.EDIT);
 
-                    Entity pathShape = Model.getPrimitive(path, "Path");
+                    Entity pathShape = path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0);
                     Segment pathSegment = (Segment) pathShape.getComponent(Primitive.class).shape;
                     pathSegment.setTarget(event.getPosition());
                     pathShape.getComponent(Visibility.class).visible = Visible.VISIBLE;
@@ -764,9 +763,17 @@ public class EntityFactory {
                     }
 
                     // Update position of prototype Path and Extension
-                    Entity extensionPrototype = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponents(Prototype.class, Label.class).filterWithLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     if (isCreateExtensionAction) {
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.VISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.VISIBLE;
+                        }
+                        // </REFACTOR>
 
                         // Set Event Angle (angle from first Event to current Event)
                         double eventAngle = camp.computer.clay.util.Geometry.getAngle(
@@ -774,10 +781,18 @@ public class EntityFactory {
                                 event.getPosition()
                         );
                         // Set prototype Extension transform
-                        extensionPrototype.getComponent(Transform.class).set(event.getPosition());
-                        extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
+                        prototypeExtension.getComponent(Transform.class).set(event.getPosition());
+                        prototypeExtension.getComponent(Transform.class).setRotation(eventAngle);
                     } else {
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                        // </REFACTOR>
                     }
 
                     // Ports of nearby Hosts and Extensions
@@ -826,23 +841,23 @@ public class EntityFactory {
 
                     // Multi-Port Path (non-singleton)
 
-                    Entity sourcePortShape = Model.getPrimitive(path, "Source Port");
+                    Entity sourcePortShape = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0);
                     if (event.getSecondaryTarget() == sourcePortShape) {
                         Log.v("handlePathEvent", "Touched Source");
                         //sourcePortShape.getComponent(Primitive.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
                         sourcePortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
                         // TODO: sourcePortShape.getComponent(Physics.class).targetTransform.set(event.getPosition());
 
-                        Path.setState(path, Component.State.EDITING);
+                        Path.setState(path, Component.State.EDIT);
                     }
 
-                    Entity targetPortShape = Model.getPrimitive(path, "Target Port");
+                    Entity targetPortShape = path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0);
                     if (event.getSecondaryTarget() == targetPortShape) {
                         Log.v("handlePathEvent", "Touched Target");
                         targetPortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
                         // TODO: targetPortShape.getComponent(Physics.class).targetTransform.set(event.getPosition()); // TODO: Change TRANSFORM
 
-                        Path.setState(path, Component.State.EDITING);
+                        Path.setState(path, Component.State.EDIT);
                     }
 
                 }
@@ -857,8 +872,8 @@ public class EntityFactory {
                     return;
                 }
 
-                Entity sourcePortShape = Model.getPrimitive(path, "Source Port"); // path.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Source Port");
-                Entity targetPortShape = Model.getPrimitive(path, "Target Port"); // path.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Target Port");
+                Entity sourcePortShape = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0);
+                Entity targetPortShape = path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0);
 
                 Log.v("handlePathEvent", "UNSELECT PATH.");
 
@@ -868,7 +883,7 @@ public class EntityFactory {
 
                     // Full Path (non-singleton Path)
 
-                    if (Path.getState(path) != Component.State.EDITING) {
+                    if (Path.getState(path) != Component.State.EDIT) {
 
                         // <PATH>
                         // Set next Path type
@@ -882,7 +897,7 @@ public class EntityFactory {
                         // Notification
                         world.createAndConfigureNotification("" + nextType, event.getPosition(), 800);
 
-                    } else if (Path.getState(path) == Component.State.EDITING) {
+                    } else if (Path.getState(path) == Component.State.EDIT) {
 
                         Group<Entity> dropTargetPorts = world.entityManager.get().filterWithComponent(Port.class).filterContains(event.getPosition());
 
@@ -946,8 +961,8 @@ public class EntityFactory {
                                 // Remap the Path's Ports
 
                                 // Check if source or target in Path was moved, and reassign it
-                                Entity sourcePortShape2 = Model.getPrimitive(path, "Source Port"); // path.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Source Port");
-                                Entity targetPortShape2 = Model.getPrimitive(path, "Target Port"); // path.getComponent(ModelBuilder.class).getModelComponent().getPrimitive("Target Port");
+                                Entity sourcePortShape2 = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0);
+                                Entity targetPortShape2 = path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0);
                                 if (camp.computer.clay.util.Geometry.contains(Boundary.get(sourcePortShape2), event.getPosition())) {
 
                                     // Check if the new Path's Port's would be on the same Portable
@@ -1028,7 +1043,7 @@ public class EntityFactory {
 
                     }
 
-                    Path.setState(path, Component.State.NONE);
+                    Path.setState(path, Component.State.VIEW);
 
                 } else {
 
@@ -1042,16 +1057,24 @@ public class EntityFactory {
 
                     // If prototype Extension is visible, create Extension
 //                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
-                    Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
+                    Entity prototypeExtension = world.entityManager.get().filterWithComponent(Label.class).filterWithLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    if (prototypeExtension.getComponent(Visibility.class).visible == Visible.VISIBLE) {
 
                         Log.v("handlePathEvent", "creating extension");
 
 //                    // Hide prototype Path and prototype Extension
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
 //                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                        Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                        extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+//                        Entity extensionPrototype = world.entityManager.get().filterWithComponent(Label.class).filterWithLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                        prototypeExtension.getComponent(Visibility.class).visible = Visible.INVISIBLE;
+
+                        // <REFACTOR>
+                        // TODO: Move to common location (in System?) and make function.
+                        List<Entity> primitives = prototypeExtension.getComponent(Model.class).primitives;
+                        for (int i = 0; i < primitives.size(); i++) {
+                            primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                        }
+                        // </REFACTOR>
 
 //                    Entity hostPort = event.getFirstEvent().getTargetPort();
                         Entity hostPort = Path.getSourcePort(path);
@@ -1124,7 +1147,7 @@ public class EntityFactory {
                                 // TODO: Delete path on target
                                 // <CLEANUP_ENTITY_DELETE_CODE>
                                 dropTargetPath.isActive = false;
-                                Path.setState(dropTargetPath, Component.State.EDITING);
+                                Path.setState(dropTargetPath, Component.State.EDIT);
                                 Entity tempSourcePort = Path.getSourcePort(dropTargetPath);
                                 Path.setSource(dropTargetPath, null); // Reset path
                                 Path.setTarget(dropTargetPath, null); // Reset path
@@ -1150,7 +1173,7 @@ public class EntityFactory {
 
                     }
 
-                    Path.setState(path, Component.State.NONE);
+                    Path.setState(path, Component.State.VIEW);
                 }
             }
         });
@@ -1188,8 +1211,10 @@ public class EntityFactory {
         circle.isBoundary = true;
 //        imageBuilder.addPrimitive(circle);
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(circle);
-        Model.addPrimitive(port, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(port);
+        port.getComponent(Model.class).primitives.add(primitive);
 
 //        // <HACK>
 //        // Set Label
@@ -1317,6 +1342,7 @@ public class EntityFactory {
         shape.addComponent(new Label());
         shape.addComponent(new Primitive()); // Unique to Shape Entity
         shape.addComponent(new Transform());
+        shape.addComponent(new Structure());
         shape.addComponent(new Physics());
         shape.addComponent(new Style());
         shape.addComponent(new Boundary());
@@ -1354,8 +1380,10 @@ public class EntityFactory {
         text.setPosition(0, 0);
         text.font = World.NOTIFICATION_FONT;
 
+        // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
         Entity primitive = Model.createPrimitiveFromShape(text);
-        Model.addPrimitive(notification, primitive);
+        primitive.getComponent(TransformConstraint.class).setReferenceEntity(notification);
+        notification.getComponent(Model.class).primitives.add(primitive);
 
 //        imageBuilder.addPrimitive(text);
 

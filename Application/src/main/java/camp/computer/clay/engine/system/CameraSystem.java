@@ -89,7 +89,7 @@ public class CameraSystem extends System {
 //                portEntities.setVisibility(Visible.INVISIBLE);
 //                Group<ModelBuilder> pathAndPortModels = pathAndPortEntities.getModels();
 //                for (int i = 0; i < pathAndPortModels.size(); i++) {
-//                    pathAndPortModels.get(i).meshIndex = 0;
+//                    pathAndPortModels.get(i).assetIndex = 0;
 //                }
 //
 //
@@ -137,7 +137,7 @@ public class CameraSystem extends System {
                     // Update Path ModelBuilder
                     Group<Model> portPathModels = portPaths.getModels();
                     for (int j = 0; j < portPathModels.size(); j++) {
-                        portPathModels.get(j).meshIndex = 1;
+                        portPathModels.get(j).assetIndex = 1;
                     }
                     // </REFACTOR>
                 }
@@ -187,11 +187,11 @@ public class CameraSystem extends System {
                 // </REFACTOR>
 
                 // Increase distance between Host and Extension
-                Entity host = Portable.getHosts(focusEntity).get(0);
+//                Entity host = Portable.getHosts(focusEntity).get(0);
 //                world.getSystem(LayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
                 Group<Entity> extensionPathPortShapes = extensionPathPorts.getModels().getPrimitives();
-                extensionPathPortShapes.addAll(Model.getPrimitives(focusEntity)); // HACK: Add Extension primitives
+                extensionPathPortShapes.addAll(focusEntity.getComponent(Model.class).primitives); // HACK: Add Extension primitives
                 Rectangle boundingBox = Geometry.getBoundingBox(extensionPathPortShapes.getBoundaryVertices());
 
                 // <REFACTOR>

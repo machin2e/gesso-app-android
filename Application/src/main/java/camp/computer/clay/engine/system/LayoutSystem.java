@@ -131,20 +131,20 @@ public class LayoutSystem extends System {
             // </FACTOR_OUT>
 
             // Update Headers Primitive to match the corresponding ExtensionEntity Configuration
-            Entity extensionHeaderPrimitive = Model.getPrimitive(extension, "Header");
+            Entity extensionHeaderPrimitive = extension.getComponent(Model.class).primitives.filterWithLabel("Header").get(0);
             Rectangle extensionHeaderShape = (Rectangle) extensionHeaderPrimitive.getComponent(Primitive.class).shape;
             extensionHeaderShape.setWidth(extensionHeaderWidth);
 
             // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
 
             // Update Contact Positions for Header
-            Group<Entity> extensionHeaderContactPrimitives = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+            Group<Entity> extensionHeaderContactPrimitives = extension.getComponent(Model.class).primitives.filterWithLabel("^Pin (1[0-2]|[1-9])$");
             for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
                 double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
                 if (i < extensionHeaderContactPrimitives.size()) {
                     Entity headerContactPrimitive = extensionHeaderContactPrimitives.get(i);
 
-                    Entity boardPrimitive = Model.getPrimitive(extension, "Board");
+                    Entity boardPrimitive = extension.getComponent(Model.class).primitives.filterWithLabel("Board").get(0);
                     Rectangle boardShape = (Rectangle) boardPrimitive.getComponent(Primitive.class).shape;
                     double headerContactOffset = boardShape.height / 2.0f + 7.0f;
 
@@ -153,9 +153,12 @@ public class LayoutSystem extends System {
                     // Add header contact shape
                     Point headerContactShape = new Point();
                     headerContactShape.setTag("Pin " + (i + 1));
+
+                    // Set TransformConstraint for relative positioning and add Shape entity to ModelBuilder component.
                     Entity primitive = Model.createPrimitiveFromShape(headerContactShape);
-                    Model.addPrimitive(extension, primitive);
+                    primitive.getComponent(TransformConstraint.class).setReferenceEntity(extension);
                     primitive.getComponent(Label.class).label = "Pin " + (i + 1); // HACK? // TODO: Remove!
+                    extension.getComponent(Model.class).primitives.add(primitive);
                 }
             }
         }
@@ -163,22 +166,24 @@ public class LayoutSystem extends System {
 
     /**
      * Updates the mesh in the {@code Entity}'s {@code Model} to match the selected mesh
-     * (in {@code meshIndex}).
+     * (in {@code assetIndex}).
      */
     private void generateModelMesh(Entity path) {
         if (path.isActive == true) {
-            if (path.getComponent(Model.class).meshIndex == 0) { // TODO: Replace magic number index
-                loadOverviewPathMesh(path);
-            } else if (path.getComponent(Model.class).meshIndex == 1) { // TODO: Replace magic number index
-                loadEditablePathMesh(path);
+            if (path.getComponent(Model.class).assetIndex == 0) { // TODO: Replace magic number index
+                loadViewPathModel(path);
+            } else if (path.getComponent(Model.class).assetIndex == 1) { // TODO: Replace magic number index
+                loadEditPathModel(path);
+            } else if (path.getComponent(Model.class).assetIndex == 2) { // TODO: Replace magic number index
+                // loadCreateExtensionPathModel(path);
             }
         }
     }
 
     // previously selectOverviewPathMesh(...)
-    private void loadOverviewPathMesh(Entity path) {
+    private void loadViewPathModel(Entity path) {
 
-        if (Path.getMode(path) == Signal.Mode.ELECTRONIC) {
+        if (path.getComponent(Path.class).mode == Signal.Mode.ELECTRONIC) {
 
             boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
@@ -195,13 +200,21 @@ public class LayoutSystem extends System {
 //                }
                 // </HACK>
 
-                if (Path.getState(path) != Component.State.EDITING) {
+                if (Path.getState(path) != Component.State.EDIT) {
                     // <HACK>
                     // TODO: Actually update the reference to a different Model asset in the Model component
                     // Visibility
-                    Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
-                    Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                    path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Visibility.class).visible = Visible.INVISIBLE;
                     // </HACK>
+
+//                    // <HACK>
+//                    // NOTE: Recursively set visibility of Primitives in Model
+//                    List<Entity> primitives = path.getComponent(Model.class).primitives;
+//                    for (int i = 0; i < primitives.size(); i++) {
+//                        primitives.get(i).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+//                    }
+//                    // </HACK>
                 }
 
             } else {
@@ -218,16 +231,16 @@ public class LayoutSystem extends System {
                 // <HACK>
                 // TODO: Actually update the reference to a different Model asset in the Model component
                 // Visibility
-                Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
-                Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Visibility.class).visible = Visible.INVISIBLE;
+                path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Visibility.class).visible = Visible.INVISIBLE;
                 // </HACK>
 
                 // <REFACTOR>
-                Transform hostContactTransform = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$").get(hostPortIndex).getComponent(Transform.class); // host.getComponent(Portable.class).headerContactPrimitives.get(hostPortIndex).getComponent(Transform.class);
-                Transform extensionContactTransform = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$").get(extensionPortIndex).getComponent(Transform.class); // extension.getComponent(Portable.class).headerContactPrimitives.get(extensionPortIndex).getComponent(Transform.class);
+                Transform hostContactTransform = host.getComponent(Model.class).primitives.filterWithLabel("^Pin (1[0-2]|[1-9])$").get(hostPortIndex).getComponent(Transform.class); // host.getComponent(Portable.class).headerContactPrimitives.get(hostPortIndex).getComponent(Transform.class);
+                Transform extensionContactTransform = extension.getComponent(Model.class).primitives.filterWithLabel("^Pin (1[0-2]|[1-9])$").get(extensionPortIndex).getComponent(Transform.class); // extension.getComponent(Portable.class).headerContactPrimitives.get(extensionPortIndex).getComponent(Transform.class);
                 // </REFACTOR>
 
-                Entity pathPrimitive = Model.getPrimitive(path, "Path");
+                Entity pathPrimitive = path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0);
                 Segment pathShape = (Segment) pathPrimitive.getComponent(Primitive.class).shape;
                 pathShape.setSource(hostContactTransform);
                 pathShape.setTarget(extensionContactTransform);
@@ -237,8 +250,8 @@ public class LayoutSystem extends System {
 //                Entity host = hostPort.getComponent(Structure.class).parentEntity;
 //                Entity extension = extensionPort.getComponent(Structure.class).parentEntity;
 
-                Group<Entity> pinContactPoints = Model.getPrimitives(host, "^Pin (1[0-2]|[1-9])$");
-                Group<Entity> extensionPinContactPoints = Model.getPrimitives(extension, "^Pin (1[0-2]|[1-9])$");
+                Group<Entity> pinContactPoints = host.getComponent(Model.class).primitives.filterWithLabel("^Pin (1[0-2]|[1-9])$");
+                Group<Entity> extensionPinContactPoints = extension.getComponent(Model.class).primitives.filterWithLabel("^Pin (1[0-2]|[1-9])$");
 
                 if (pinContactPoints.size() > Port.getIndex(hostPort)
                         && extensionPinContactPoints.size() > Port.getIndex(extensionPort)) {
@@ -246,9 +259,9 @@ public class LayoutSystem extends System {
                     // <STYLE>
                     // Draw connection between Ports
                     // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-                    Entity shapeEntity = Model.getPrimitive(path, "Path");
+                    Entity shapeEntity = path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0);
                     Segment segment = (Segment) shapeEntity.getComponent(Primitive.class).shape;
-                    segment.setOutlineThickness(10.0);
+                    segment.setOutlineThickness(World.PATH_OVERVIEW_THICKNESS);
                     segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
                     // </STYLE>
                 }
@@ -258,40 +271,40 @@ public class LayoutSystem extends System {
     }
 
     // previously selectEditablePathMesh(...)
-    private void loadEditablePathMesh(Entity path) {
+    private void loadEditPathModel(Entity path) {
 
         boolean isSingletonPath = (Path.getTargetPort(path) == null);
 
         if (!isSingletonPath) {
 
             Entity sourcePort = Path.getSourcePort(path);
-            Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
-            Entity targetPortPrimitive = Model.getPrimitive(Path.getTargetPort(path), "Port");
+            Entity sourcePortPrimitive = sourcePort.getComponent(Model.class).primitives.filterWithLabel("Port").get(0);
+            Entity targetPortPrimitive = Path.getTargetPort(path).getComponent(Model.class).primitives.filterWithLabel("Port").get(0);
 
             // Automatically set source and target positions of Path when not being edited manually
-            if (Path.getState(path) != Component.State.EDITING) {
-                Model.getPrimitive(path, "Source Port").getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
-                Model.getPrimitive(path, "Target Port").getComponent(Transform.class).set(targetPortPrimitive.getComponent(Transform.class));
+            if (Path.getState(path) != Component.State.EDIT) {
+                path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
+                path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Transform.class).set(targetPortPrimitive.getComponent(Transform.class));
             }
 
             // Update path segment shape
-            Segment pathSegment = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            Segment pathSegment = (Segment) path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0).getComponent(Primitive.class).shape;
             pathSegment.set(
-                    Model.getPrimitive(path, "Source Port").getComponent(Transform.class),
-                    Model.getPrimitive(path, "Target Port").getComponent(Transform.class)
+                    path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Transform.class),
+                    path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Transform.class)
             );
 
             // <HACK>
             // TODO: Actually update the reference to a different Model asset in the Model component
             // Visibility
-            Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
-            Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+            path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Visibility.class).visible = Visible.VISIBLE;
+            path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Visibility.class).visible = Visible.VISIBLE;
             // </HACK>
 
             // <STYLE>
-            Shape pathShape = Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
-            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
-            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
+            Shape pathShape = path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0).getComponent(Primitive.class).shape;
+            Shape sourcePortShape = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Primitive.class).shape;
+            Shape targetPortShape = path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Primitive.class).shape;
 
             // Update color of Port shape based on its type
             Signal.Type pathType = Path.getType(path);
@@ -306,31 +319,31 @@ public class LayoutSystem extends System {
         } else {
 
             Entity sourcePort = Path.getSourcePort(path);
-            Entity sourcePortPathPrimitive = Model.getPrimitive(path, "Source Port");
-            Entity sourcePortPrimitive = Model.getPrimitive(sourcePort, "Port");
+            Entity sourcePortPathPrimitive = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0);
+            Entity sourcePortPrimitive = sourcePort.getComponent(Model.class).primitives.filterWithLabel("Port").get(0);
 
             path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class));
 
-            if (Path.getState(path) != Component.State.EDITING) {
+            if (Path.getState(path) != Component.State.EDIT) {
                 sourcePortPathPrimitive.getComponent(Transform.class).set(sourcePortPrimitive.getComponent(Transform.class));
             }
 
-            Segment pathShape = (Segment) Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
+            Segment pathShape = (Segment) path.getComponent(Model.class).primitives.filterWithLabel("Path").get(0).getComponent(Primitive.class).shape;
             pathShape.setSource(sourcePortPathPrimitive.getComponent(Transform.class));
-            if (Path.getState(path) != Component.State.EDITING) {
+            if (Path.getState(path) != Component.State.EDIT) {
                 pathShape.setTarget(sourcePortPathPrimitive.getComponent(Transform.class));
             }
 
-            if (Path.getState(path) != Component.State.EDITING) {
+            if (Path.getState(path) != Component.State.EDIT) {
                 // <HACK>
                 // TODO: Actually update the reference to a different Model asset in the Model component
                 // Visibility
-                Model.getPrimitive(path, "Source Port").getComponent(Visibility.class).visible = Visible.VISIBLE;
+                path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Visibility.class).visible = Visible.VISIBLE;
 //                Model.getPrimitive(path, "Target Port").getComponent(Visibility.class).visible = Visible.INVISIBLE;
                 // </HACK>
             }
 
-//            if (Path.getState(path) != Component.State.EDITING) {
+//            if (Path.getState(path) != Component.State.EDIT) {
 //                // <HACK>
 //                // TODO: Actually update the reference to a different Model asset in the Model component
 //                // Visibility
@@ -341,8 +354,8 @@ public class LayoutSystem extends System {
 
             // <STYLE>
             // Shape pathShape = Model.getPrimitive(path, "Path").getComponent(Primitive.class).shape;
-            Shape sourcePortShape = Model.getPrimitive(path, "Source Port").getComponent(Primitive.class).shape;
-            Shape targetPortShape = Model.getPrimitive(path, "Target Port").getComponent(Primitive.class).shape;
+            Shape sourcePortShape = path.getComponent(Model.class).primitives.filterWithLabel("Source Port").get(0).getComponent(Primitive.class).shape;
+            Shape targetPortShape = path.getComponent(Model.class).primitives.filterWithLabel("Target Port").get(0).getComponent(Primitive.class).shape;
 
             // Color. Update color of mPort shape based on its type.
             Signal.Type pathType = Path.getType(path);
@@ -457,7 +470,7 @@ public class LayoutSystem extends System {
 
         Group<Entity> ports = Portable.getPorts(host);
         for (int j = 0; j < ports.size(); j++) {
-            if (Port.getType(ports.get(j)) == Signal.Type.NONE) {
+            if (Port.getType(ports.get(j)) == Signal.Type.VIEW) {
 
                 Entity port = ports.get(j);
 

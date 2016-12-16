@@ -30,7 +30,7 @@ public class Boundary extends Component {
 
         // <HACK>
         if (entity.hasComponent(Model.class)) {
-            Group<Entity> primitives = Model.getPrimitives(entity);
+            Group<Entity> primitives = entity.getComponent(Model.class).primitives;
             for (int i = 0; i < primitives.size(); i++) {
                 if (Geometry.contains(Boundary.get(primitives.get(i)), point)) {
                     return true;

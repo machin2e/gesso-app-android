@@ -59,7 +59,7 @@ public class AppearanceSystem extends System {
 
         // Get LED primitives
         Group<Entity> ports = Portable.getPorts(host);
-        Group<Entity> lightShapes = Model.getPrimitives(host, "^LED (1[0-2]|[1-9])$");
+        Group<Entity> lightShapes = host.getComponent(Model.class).primitives.filterWithLabel("^LED (1[0-2]|[1-9])$");
 
         // Update color of LEDs to color of corresponding Port shape
         for (int i = 0; i < ports.size(); i++) {

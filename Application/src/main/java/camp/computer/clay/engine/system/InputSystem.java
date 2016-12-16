@@ -40,7 +40,7 @@ public class InputSystem extends System {
         }
     }
 
-    public void queue(Event event) {
+    public void enqueue(Event event) {
         eventQueue.add(event);
     }
 
@@ -131,7 +131,7 @@ public class InputSystem extends System {
 
             if (primaryTarget.hasComponent(Model.class)) { // Needed because entitiesWithBoundary like Camera without ModelBuilder component are also processed here.
                 for (int i = 0; i < secondaryBoundaries.size(); i++) {
-                    if (Model.getPrimitives(primaryTarget).contains(secondaryBoundaries.get(i))) {
+                    if (primaryTarget.getComponent(Model.class).primitives.contains(secondaryBoundaries.get(i))) {
                         event.setSecondaryTarget(secondaryBoundaries.get(i));
                     }
                 }

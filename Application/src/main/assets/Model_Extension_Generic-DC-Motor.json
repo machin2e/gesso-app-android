@@ -1,0 +1,63 @@
+{
+  "type": "model",
+  "label": "DC Motor",
+  "version": "0.0.1-alpha",
+  "geometry": [
+    {
+      "label": "Board",
+      "type": "Rectangle",
+      "width": 50.8,
+      "height": 50.8,
+      "cornerRadius": 4.064,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#1f1f1e",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 1",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": 0.0,
+        "y": -26.5,
+        "z": -1.0
+      },
+      "rotation": 0.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    },
+    {
+      "label": "Header 2",
+      "group": "Headers",
+      "type": "Rectangle",
+      "width": 7.62,
+      "height": 2.33,
+      "cornerRadius": 0,
+      "position": {
+        "x": 26.5,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "rotation": 90.0,
+      "style": {
+        "color": "#404040",
+        "outlineThickness": 0.0
+      },
+      "boundary": true
+    }
+  ]
+}

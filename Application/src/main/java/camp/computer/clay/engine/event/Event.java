@@ -34,7 +34,7 @@ public class Event {
 //        CAMERA_MOVE,
 //        CAMERA_FOCUS,
 //
-//        HOST_SHOW_PORT_CONTROLS, // Host.State = EDITING
+//        HOST_SHOW_PORT_CONTROLS, // Host.State = EDIT
 //        HOST_HIDE_PORT_CONTROLS,
 //        HOST_SHOW_PATHS,
 //        HOST_HIDE_PATHS,
@@ -103,7 +103,7 @@ public class Event {
         );
     }
 
-    // TODO: States for editable entityManager (states: VIEWING, EDITING)
+    // TODO: States for editable entityManager (states: VIEW, EDIT)
     static class RecognizerStateMachine {
 
         enum State {

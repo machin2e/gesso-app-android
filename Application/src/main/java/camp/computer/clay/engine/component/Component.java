@@ -4,12 +4,14 @@ import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Component {
 
+    private Entity entity = null;
+
     public enum State {
-        NONE,
-        EDITING
+        VIEW,
+        EDIT
     }
 
-    private Entity entity = null;
+    public State state = State.VIEW;
 
     public Component() {
         this.entity = null;
@@ -23,8 +25,6 @@ public abstract class Component {
         return this.entity;
     }
 
-    public State state = State.NONE;
-
     public static State getState(Entity path) {
         return path.getComponent(Path.class).state;
     }
@@ -33,6 +33,11 @@ public abstract class Component {
         path.getComponent(Path.class).state = state;
     }
 
+    // TODO: Phone
+    // TODO: Workspace?
+    // TODO: Widget
+    // TODO: Player
+    //
     // TODO: PortableComponent
     // TODO: TouchableComponent (enables touch interaction)
     // TODO: PositionComponent/TransformComponent

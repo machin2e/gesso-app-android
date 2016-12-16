@@ -37,13 +37,16 @@ import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.event.Event;
 import camp.computer.clay.engine.manager.Group;
-import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.Geometry.Circle;
+import camp.computer.clay.lib.Geometry.Line;
+import camp.computer.clay.lib.Geometry.Point;
 import camp.computer.clay.lib.Geometry.Polygon;
+import camp.computer.clay.lib.Geometry.Polyline;
 import camp.computer.clay.lib.Geometry.Rectangle;
 import camp.computer.clay.lib.Geometry.Segment;
 import camp.computer.clay.lib.Geometry.Shape;
 import camp.computer.clay.lib.Geometry.Text;
+import camp.computer.clay.lib.Geometry.Triangle;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.util.DeviceDimensionsHelper;
 
@@ -201,11 +204,8 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         final int pointerCount = motionEvent.getPointerCount();
 
-        // Get active inputSystem
-        InputSystem inputSystem = world.getSystem(InputSystem.class);
-
         // Create pointerCoordinates event
-        Event event = new Event("NONE");
+        Event event = new Event("VIEW");
 
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
@@ -226,7 +226,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                     event.setType("SELECT");
                     event.pointerIndex = pointerId;
-                    inputSystem.queue(event);
+                    Engine.getInstance().enqueueInput(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
@@ -235,7 +235,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
                     event.setType("MOVE");
                     event.pointerIndex = pointerId;
 
-                    inputSystem.queue(event);
+                    Engine.getInstance().enqueueInput(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
 
@@ -243,7 +243,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
                     event.setType("UNSELECT");
                     event.pointerIndex = pointerId;
-                    inputSystem.queue(event);
+                    Engine.getInstance().enqueueInput(event);
 
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
@@ -299,7 +299,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
     }
     // </TODO: REMOVE_REFERENCE_TO_WORLD>
 
-    public void drawRenderables(Group<Entity> entities, Canvas canvas, Paint paint, Palette palette) {
+    public void drawPrimitives(Group<Entity> entities, Canvas canvas, Paint paint, Palette palette) {
 
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
@@ -307,31 +307,242 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
             // Draw a gray line from the Host's start position and the destination, under it, to show animation path for moving entities.
 
             Visibility visibility = entity.getComponent(Visibility.class);
-            if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-//                Group<Entity> shapes = Model.getPrimitives(entity);
-//                for (int j = 0; j < shapes.size(); j++) {
-                drawPrimitive(entity, canvas, paint, palette);
-//                }
-            }
+            if (visibility != null && visibility.visible == Visible.VISIBLE) {
 
-            // <DRAW_BOUNDARY>
-            if (entity.hasComponent(Boundary.class)) {
-//                ArrayList<ArrayList<Transform>> boundaryVertices = new ArrayList<>(entity.getComponent(Boundary.class).boundaries.values());
-//                for (int j = 0; j < boundaryVertices.size(); j++) {
-//                    ArrayList<Transform> boundaryVertz = boundaryVertices.get(j);
-//                    paint.setStyle(Paint.Style.STROKE);
-//                    paint.setStrokeWidth(5.0f);
-//                    paint.setColor(Color.CYAN);
-//                    drawPolygon(boundaryVertz, canvas, paint, palette);
-//                }
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(5.0f);
-                paint.setColor(Color.CYAN);
-                drawPolygon(entity.getComponent(Boundary.class).boundary, canvas, paint, palette);
+                if (entity.getComponent(Visibility.class).visible == Visible.INVISIBLE) {
+                    return;
+                }
+
+                // <HACK>
+                int emptyPrimitives = 0;
+                if (entity.getComponent(Primitive.class).shape == null) {
+                    emptyPrimitives++;
+                }
+                if (emptyPrimitives > 0) {
+                    Log.v("EMPTY_PRIMITIVES", "count: " + emptyPrimitives);
+                    return;
+                }
+                // </HACK>
+
+                drawShape(entity.getComponent(Primitive.class).shape, entity.getComponent(Transform.class), canvas, paint, palette);
+
+                // <DRAW_BOUNDARY>
+                if (entity.hasComponent(Boundary.class)) {
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(5.0f);
+                    paint.setColor(Color.CYAN);
+                    drawPolygon(entity.getComponent(Boundary.class).boundary, canvas, paint, palette);
+                }
+                // </DRAW_BOUNDARY>
             }
-            // </DRAW_BOUNDARY>
         }
     }
+
+    // <GEOMETRY_LIBRARY>
+
+    /**
+     * Draws {@code shape} centered at the position stored in {@code transform}.
+     *
+     * @param shape
+     * @param transform
+     * @param canvas
+     * @param paint
+     * @param palette
+     */
+    public void drawShape(Shape shape, Transform transform, Canvas canvas, Paint paint, Palette palette) {
+
+        // TODO: Refactor signature to be drawShape(Shape shape, Palette palette, Paint paint, Canvas canvas)
+        // TODO: (cont'd) or drawShape(Shape shape, Palette palette)
+        // TODO: (cont'd) or drawShape(Shape shape) // Palette included in Shape or removed altogether.
+
+        // <REFACTOR>
+        // TODO: Make palette shape-specific, another logical/consistent way, or remove it.
+        // Palette
+        palette.color = shape.getColor();
+        palette.outlineColor = shape.getOutlineColor();
+        palette.outlineThickness = shape.outlineThickness;
+        // </REFACTOR>
+
+        canvas.save();
+
+        if (shape.getClass() == Point.class) {
+            Point point = (Point) shape;
+            // TODO: drawPoint(point);
+        } else if (shape.getClass() == Segment.class) {
+            Segment segment = (Segment) shape;
+            drawSegment(segment.getSource(), segment.getTarget(), canvas, paint, palette);
+        } else if (shape.getClass() == Line.class) {
+            Line line = (Line) shape;
+            // TODO: drawLine(line);
+        } else if (shape.getClass() == Polyline.class) {
+            Polyline polyline = (Polyline) shape;
+            // TODO: drawPolyline(polyline);
+        } else if (shape.getClass() == Triangle.class) {
+            Triangle triangle = (Triangle) shape;
+            // TODO: drawTriangle(triangle);
+        } else if (shape.getClass() == Rectangle.class) {
+            Rectangle rectangle = (Rectangle) shape;
+            drawRectangle(transform, rectangle.width, rectangle.height, rectangle.cornerRadius, canvas, paint, palette);
+        } else if (shape.getClass() == Polygon.class) {
+            Polygon polygon = (Polygon) shape;
+            drawPolygon(polygon.getVertices(), canvas, paint, palette);
+        } else if (shape.getClass() == Circle.class) {
+            Circle circle = (Circle) shape;
+            drawCircle(transform, circle.radius, canvas, paint, palette);
+        } else if (shape.getClass() == Text.class) {
+            Text text = (Text) shape;
+            drawText(transform, text.getText(), text.size, canvas, paint, palette);
+        }
+
+        canvas.restore();
+    }
+
+    public void drawSegment(Transform source, Transform target, Canvas canvas, Paint paint, Palette palette) {
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.parseColor(palette.outlineColor));
+        paint.setStrokeWidth((float) palette.outlineThickness);
+
+        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
+    }
+
+    // TODO: Refactor with transforms
+    public void drawPolyline(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
+
+        for (int i = 0; i < vertices.size() - 1; i++) {
+
+            canvas.drawLine(
+                    (float) vertices.get(i).x,
+                    (float) vertices.get(i).y,
+                    (float) vertices.get(i + 1).x,
+                    (float) vertices.get(i + 1).y,
+                    paint
+            );
+        }
+    }
+
+    public void drawRectangle(Transform transform, double width, double height, double cornerRadius, Canvas canvas, Paint paint, Palette palette) {
+
+        // Set style
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.parseColor(palette.color));
+
+        canvas.save();
+        canvas.translate((float) transform.x, (float) transform.y);
+        canvas.rotate((float) transform.rotation);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            canvas.drawRoundRect(
+                    (float) (0 - (width / 2.0)),
+                    (float) (0 - (height / 2.0)),
+                    (float) (0 + (width / 2.0)),
+                    (float) (0 + (height / 2.0)),
+                    (float) cornerRadius,
+                    (float) cornerRadius,
+                    paint
+            );
+        }
+
+        // Draw Points in Shape
+        if (palette.outlineThickness > 0) {
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.parseColor(palette.outlineColor));
+            paint.setStrokeWidth((float) palette.outlineThickness);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                canvas.drawRoundRect(
+                        (float) (0 - (width / 2.0)),
+                        (float) (0 - (height / 2.0)),
+                        (float) (0 + (width / 2.0)),
+                        (float) (0 + (height / 2.0)),
+                        (float) cornerRadius,
+                        (float) cornerRadius,
+                        paint
+                );
+            }
+        }
+
+        canvas.restore();
+    }
+
+    public void drawCircle(Transform transform, double radius, Canvas canvas, Paint paint, Palette palette) {
+
+        // Set style
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.parseColor(palette.color));
+
+        canvas.save();
+        canvas.translate((float) transform.x, (float) transform.y);
+        canvas.rotate((float) transform.rotation);
+
+        canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
+
+        // Draw Points in Shape
+        if (palette.outlineThickness > 0) {
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.parseColor(palette.outlineColor));
+            paint.setStrokeWidth((float) palette.outlineThickness);
+
+            canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
+        }
+
+        canvas.restore();
+
+    }
+
+    public void drawPolygon(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
+
+        // <HACK>
+        if (vertices == null || vertices.size() < 1) {
+            return;
+        }
+        // </HACK>
+
+        // Draw vertex Points in Shape
+        android.graphics.Path path = new android.graphics.Path();
+        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+        path.moveTo((float) vertices.get(0).x, (float) vertices.get(0).y);
+        for (int i = 1; i < vertices.size(); i++) {
+            path.lineTo((float) vertices.get(i).x, (float) vertices.get(i).y);
+        }
+        // path.lineTo((float) boundary.get(0).x, (float) boundary.get(0).y);
+        path.close();
+
+        canvas.drawPath(path, paint);
+    }
+
+    public void drawText(Transform position, String text, double size, Canvas canvas, Paint paint, Palette palette) {
+
+        canvas.save();
+        canvas.translate((float) position.x, (float) position.y);
+        canvas.rotate((float) position.rotation);
+
+        // Style
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize((float) size);
+
+        /*
+        // Font
+        Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
+        Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
+        paint.setTypeface(overlayTypefaceBold);
+        */
+
+        // Style (Guaranteed)
+        String printText = text.toUpperCase();
+        paint.setStyle(Paint.Style.FILL);
+
+        // Draw
+        Rect textBounds = new Rect();
+        paint.getTextBounds(printText, 0, printText.length(), textBounds);
+        canvas.drawText(printText, (float) 0 - textBounds.width() / 2.0f, (float) 0 + textBounds.height() / 2.0f, paint);
+
+        canvas.restore();
+    }
+    // </GEOMETRY_LIBRARY>
 
     private static Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), World.OVERLAY_FONT);
     private static Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
@@ -356,6 +567,7 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
     boolean isValid = false;
 
+    // TODO: Convert to use a Widget component for a "list" or "metrics view" or "data view".
     public void drawOverlay(Canvas canvas, Paint paint) {
 
         if (!isValid) {
@@ -565,16 +777,6 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText(lineText, World.OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_TARGET_POSITION_MONITOR>
-
-//        // <BOUNDARY_COUNT>
-//        canvas.save();
-//        String shapeBoundaryCountText = "Boundary Count: appx. " + Boundary.innerBoundaries.size();
-//        Rect shapeBoundaryCountBounds = new Rect();
-//        paint.getTextBounds(shapeBoundaryCountText, 0, shapeBoundaryCountText.length(), shapeBoundaryCountBounds);
-//        linePosition += OVERLAY_LINE_SPACING + shapeBoundaryCountBounds.height();
-//        canvas.drawText(shapeBoundaryCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
-//        canvas.restore();
-//        // </BOUNDARY_COUNT>
     }
 
     public void drawGeometryAnnotations(Group<Entity> entities, Canvas canvas, Paint paint) {
@@ -758,202 +960,5 @@ public class RenderSurface extends SurfaceView implements SurfaceHolder.Callback
 
         canvas.restore();
         // </DISPLAY_SURFACE_AXES>
-    }
-
-    public void drawPrimitive(Entity primitive, Canvas canvas, Paint paint, Palette palette) {
-
-        if (primitive.getComponent(Visibility.class).visible == Visible.INVISIBLE) {
-            return;
-        }
-
-        // <HACK>
-        int emptyPrimitives = 0;
-        if (primitive.getComponent(Primitive.class).shape == null) {
-            emptyPrimitives++;
-        }
-        if (emptyPrimitives > 0) {
-            Log.v("EMPTY_PRIMITIVES", "count: " + emptyPrimitives);
-            return;
-        }
-        // </HACK>
-
-        // <HACK>
-        Shape shape = primitive.getComponent(Primitive.class).shape;
-
-        // Palette
-        palette.color = shape.getColor();
-        palette.outlineColor = shape.getOutlineColor();
-        palette.outlineThickness = shape.outlineThickness;
-
-        canvas.save();
-        // TODO: drawPrimitive(shape, palette);
-        if (shape.getClass() == Segment.class) {
-            Segment segment = (Segment) shape;
-            drawSegment(segment.getSource(), segment.getTarget(), canvas, paint, palette);
-        } else if (shape.getClass() == Rectangle.class) {
-            Rectangle rectangle = (Rectangle) shape;
-            drawRectangle(primitive.getComponent(Transform.class), rectangle.width, rectangle.height, rectangle.cornerRadius, canvas, paint, palette);
-        } else if (shape.getClass() == Polygon.class) {
-            Polygon polygon = (Polygon) shape;
-            drawPolygon(polygon.getVertices(), canvas, paint, palette);
-        } else if (shape.getClass() == Circle.class) {
-            Circle circle = (Circle) shape;
-            drawCircle(primitive.getComponent(Transform.class), circle.radius, canvas, paint, palette);
-        } else if (shape.getClass() == Text.class) {
-            Text text = (Text) shape;
-            drawText(primitive.getComponent(Transform.class), text.getText(), text.size, canvas, paint, palette);
-        }
-        canvas.restore();
-
-        // TODO: drawPolyline
-        // TODO: drawTriangle
-        // </HACK>
-    }
-    // </TODO: REFACTOR>
-
-    public void drawSegment(Transform source, Transform target, Canvas canvas, Paint paint, Palette palette) {
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.parseColor(palette.outlineColor));
-        paint.setStrokeWidth((float) palette.outlineThickness);
-
-        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
-    }
-
-    // TODO: Refactor with transforms
-    public void drawPolyline(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
-
-        for (int i = 0; i < vertices.size() - 1; i++) {
-
-            canvas.drawLine(
-                    (float) vertices.get(i).x,
-                    (float) vertices.get(i).y,
-                    (float) vertices.get(i + 1).x,
-                    (float) vertices.get(i + 1).y,
-                    paint
-            );
-        }
-    }
-
-    public void drawRectangle(Transform transform, double width, double height, double cornerRadius, Canvas canvas, Paint paint, Palette palette) {
-
-        // Set style
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor(palette.color));
-
-        canvas.save();
-        canvas.translate((float) transform.x, (float) transform.y);
-        canvas.rotate((float) transform.rotation);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            canvas.drawRoundRect(
-                    (float) (0 - (width / 2.0)),
-                    (float) (0 - (height / 2.0)),
-                    (float) (0 + (width / 2.0)),
-                    (float) (0 + (height / 2.0)),
-                    (float) cornerRadius,
-                    (float) cornerRadius,
-                    paint
-            );
-        }
-
-        // Draw Points in Shape
-        if (palette.outlineThickness > 0) {
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.parseColor(palette.outlineColor));
-            paint.setStrokeWidth((float) palette.outlineThickness);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                canvas.drawRoundRect(
-                        (float) (0 - (width / 2.0)),
-                        (float) (0 - (height / 2.0)),
-                        (float) (0 + (width / 2.0)),
-                        (float) (0 + (height / 2.0)),
-                        (float) cornerRadius,
-                        (float) cornerRadius,
-                        paint
-                );
-            }
-        }
-
-        canvas.restore();
-    }
-
-    public void drawCircle(Transform transform, double radius, Canvas canvas, Paint paint, Palette palette) {
-
-        // Set style
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor(palette.color));
-
-        canvas.save();
-        canvas.translate((float) transform.x, (float) transform.y);
-        canvas.rotate((float) transform.rotation);
-
-        canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
-
-        // Draw Points in Shape
-        if (palette.outlineThickness > 0) {
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.parseColor(palette.outlineColor));
-            paint.setStrokeWidth((float) palette.outlineThickness);
-
-            canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
-        }
-
-        canvas.restore();
-
-    }
-
-    public void drawPolygon(List<Transform> vertices, Canvas canvas, Paint paint, Palette palette) {
-
-        // <HACK>
-        if (vertices == null || vertices.size() < 1) {
-            return;
-        }
-        // </HACK>
-
-        // Draw vertex Points in Shape
-        android.graphics.Path path = new android.graphics.Path();
-        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-        path.moveTo((float) vertices.get(0).x, (float) vertices.get(0).y);
-        for (int i = 1; i < vertices.size(); i++) {
-            path.lineTo((float) vertices.get(i).x, (float) vertices.get(i).y);
-        }
-        // path.lineTo((float) boundary.get(0).x, (float) boundary.get(0).y);
-        path.close();
-
-        canvas.drawPath(path, paint);
-    }
-
-    public void drawText(Transform position, String text, double size, Canvas canvas, Paint paint, Palette palette) {
-
-        canvas.save();
-        canvas.translate((float) position.x, (float) position.y);
-        canvas.rotate((float) position.rotation);
-
-        // Style
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize((float) size);
-
-        /*
-        // Font
-        Typeface overlayTypeface = Typeface.createFromAsset(Application.getInstance().getAssets(), text.font);
-        Typeface overlayTypefaceBold = Typeface.create(overlayTypeface, Typeface.NORMAL);
-        paint.setTypeface(overlayTypefaceBold);
-        */
-
-        // Style (Guaranteed)
-        String printText = text.toUpperCase();
-        paint.setStyle(Paint.Style.FILL);
-
-        // Draw
-        Rect textBounds = new Rect();
-        paint.getTextBounds(printText, 0, printText.length(), textBounds);
-        canvas.drawText(printText, (float) 0 - textBounds.width() / 2.0f, (float) 0 + textBounds.height() / 2.0f, paint);
-
-        canvas.restore();
     }
 }
