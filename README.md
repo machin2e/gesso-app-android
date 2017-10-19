@@ -1,32 +1,25 @@
-# Clay
+# Gesso
 
-Designer is a mobile design environment for Clay.
+This repository contains the code for the Gesso Android app.
 
-You use Designer to define
-action, interconnectivity, and intelligence into your own projects
-made with Clay devices. You can, for example, define connectivity across
-Clay devices, controlling electronic peripherals connected to a extensionEntity and
+The Gesso app is used to define the tasks executed by boards, including those 
+to control connected sensor and actuator components, participate in 
+communications between boards and with Internet services using protocols such
+as HTTP.
+
+On a high level, the Gesso app is used to compose three types of behaviors
+supported by Gesso boards: (1) interconnectivity, (2) interactivity, and 
+(3) intelligence. Together the tasks composed together from these categories
+defines the functionality of the systems built for projects.
+
+You can, for example, define connectivity across
+Gesso boards, controlling electronic peripherals connected to a extensionEntity and
 communications between devices. In simple terms, Designer visualizes your
 system and gives you tools for manipulating the data structures that underly
 your project's system behavior by creating, copy, and curating from other
 projects.
 
-You might wonder why Designers exists along with
-[Looper](https://github.com/computercamp/Looper). After all, Looper is also
-a tool for programming Clay, too. The answer is simple! Both Sequencer and
-Looper are experimental programming environments for Clay. We are building
-both of them because we want to test multiple designs that are quite
-different by actually programming Clay.
-
-Generally speaking, Designer is programmatically simpler than Looper because
-it is built using the native list widgets. Looper implements a custom
-graphical design language.
-
-## Dependencies
-
-We used open source software to build Clay. Here's what we're using:
-
-*   [FloatingActionButton](https://github.com/Clans/FloatingActionButton/)
+## Contribute
 
 We also used the
 [Android Asset Studio](http://romannurik.github.io/AndroidAssetStudio/index.html)'s
